@@ -13,7 +13,7 @@ export const WALL = 0.75, LID = 2, FLOOR = 1, PANEL = 1.0, VENT = 5.5;
 export const DEFAULTS = {
   W: 32, D: 30, H: 36.5,            // enclosure: snug around the freezer (≈2.5" clear each side)
   bowlD: 32, bowlH: 10.7, pedH: 12,  // cup: as wide as the box (as in the render), sized for 12 bottles
-  flutes: 28, twist: 0.9, fluteDepth: 1.5,
+  flutes: 26, twist: 0.6, fluteDepth: 2.8,
   bottles: 12, heap: 1.6, lean: 0.1,
   base: 'sled', metal: 'chrome', color: '#14217f', glass: 'amber',
 };
@@ -51,8 +51,8 @@ export function makeMaterials(P, o = {}) {
     grille: new THREE.MeshStandardMaterial({ name: 'vent-grille', color: 0x05070d, roughness: 0.6, metalness: 0.4 }),
     rubber: new THREE.MeshStandardMaterial({ name: 'caster-rubber', color: 0x16171a, roughness: 0.75 }),
     uhmw: new THREE.MeshPhysicalMaterial({ name: 'UHMW-PE', color: 0xe9e9e3, roughness: 0.6, sheen: 0.3 }),
-    ice: new THREE.MeshPhysicalMaterial({ name: 'ice', color: 0xf3f8ff, roughness: 0.16, transmission: 0.68, thickness: 1.6, ior: 1.31, attenuationColor: 0xe2efff, attenuationDistance: 8, clearcoat: 1, clearcoatRoughness: 0.1, sheen: 0.4, sheenColor: 0xffffff }),
-    iceBed: new THREE.MeshPhysicalMaterial({ name: 'ice-bed', color: 0xdfe8f2, roughness: 0.45, clearcoat: 0.8, clearcoatRoughness: 0.3, sheen: 0.6, sheenColor: 0xffffff }),
+    ice: new THREE.MeshPhysicalMaterial({ name: 'ice', color: 0xffffff, roughness: 0.07, transmission: 0.92, thickness: 0.9, ior: 1.31, attenuationColor: 0xd6e8ff, attenuationDistance: 5, clearcoat: 1, clearcoatRoughness: 0.04 }),
+    iceBed: new THREE.MeshPhysicalMaterial({ name: 'ice-bed', color: 0xcfdbe8, roughness: 0.3, clearcoat: 1, clearcoatRoughness: 0.15, sheen: 0.5, sheenColor: 0xffffff }),
     glass: P.glass === 'clear'
       ? new THREE.MeshPhysicalMaterial({ name: 'bottle-glass-clear', color: 0xffffff, roughness: 0.03, transmission: 0.97, thickness: 0.18, ior: 1.52, attenuationColor: 0xd8f0e4, attenuationDistance: 3, clearcoat: 1 })
       : new THREE.MeshPhysicalMaterial({ name: 'bottle-glass-amber', color: 0x8a430e, roughness: 0.04, transmission: 0.5, thickness: 0.2, ior: 1.52, attenuationColor: 0x5a2604, attenuationDistance: 0.55, clearcoat: 1, clearcoatRoughness: 0.03 }),
@@ -107,25 +107,35 @@ export function buildBase(P, M) {
 // ======================================================================
 // Cup: stepped chrome pedestal + spiral-fluted bowl with rim band.
 // ======================================================================
-const PED = [ // [radius, height] from the render, for a 61" bowl; y=0 sits on the lid
-  [0, 0], [23.3, 0], [23.3, 1.0], [22.6, 2.0], [21.5, 2.2], [21.5, 4.4], [20.1, 5.6], [17.7, 5.8], [17.7, 9.2], [16.4, 10.4],
-  [13.9, 10.6], [13.9, 13.4], [12.9, 14.3], [11.4, 14.5], [11.4, 17.2], [9.6, 18.4], [8.2, 19.0], [8.2, 21.2], [10.4, 22.4], [11.6, 22.9], [0, 22.9],
-];
+// pedestal profile measured off the reference (inches, for a 32" bowl on a 12" pedestal; y = 0 sits on the lid):
+// a base flange, three rounded bullnose tiers, a pinched neck and a flared collar under the bowl
+function tierPts(y0, y1, rOut, rTop, n = 10) {
+  const out = [];
+  for (let k = 0; k <= n; k++) { const u = k / n, y = y0 + u * (y1 - y0);
+    const r = u < 0.3 ? rOut - 0.35 * Math.pow(1 - u / 0.3, 2) : rTop + (rOut - rTop) * Math.sqrt(Math.max(0, 1 - Math.pow((u - 0.3) / 0.7, 2)));
+    out.push([r, y]); }
+  return out;
+}
+const PED = [[0, 0], [12.35, 0], [12.5, 0.25], ...tierPts(0.3, 1.2, 12.5, 11.7, 6), [11.45, 1.32],
+  ...tierPts(1.35, 4.1, 11.3, 10.1), [9.95, 4.15], ...tierPts(4.2, 7.0, 9.9, 7.5), [7.3, 7.05], ...tierPts(7.1, 9.2, 7.0, 5.6, 8),
+  [5.25, 9.4], [5.0, 10.0], [5.1, 10.6], [5.5, 11.0], [5.9, 11.15], [6.25, 11.5], [6.3, 11.8], [6.1, 12.0], [0, 12.0]];
 export function bowlShape(P) { // outer radius as a function of t (0 = bowl base, 1 = rim)
-  const s = P.bowlD / 61, R = P.bowlD / 2, rb = 11.6 * s;
-  return { s, R, rb, r: (t) => rb + (R - rb) * Math.pow(Math.sin((t * Math.PI) / 2), 0.8) };
+  const s = P.bowlD / 61, R = P.bowlD / 2, rb = 6.1 * (P.bowlD / 32);
+  return { s, R, rb, r: (t) => rb + (R - rb) * Math.pow(Math.sin((t * Math.PI) / 2), 0.62) }; // full, rounded belly
 }
 export function buildCup(P, M) {
-  const g = named(new THREE.Group(), 'cup'), { s, R, r } = bowlShape(P), ky = P.pedH / 22.9;
-  const ped = named(lathe(PED.map(([rr, y]) => [rr * s, y * ky]), 128, M.metal), 'pedestal'); g.add(ped);
+  const g = named(new THREE.Group(), 'cup'), { s, R, r } = bowlShape(P), kx = P.bowlD / 32, ky = P.pedH / 12;
+  const ped = named(lathe(PED.map(([rr, y]) => [rr * kx, y * ky]), 192, M.metal), 'pedestal'); g.add(ped);
   const yb = P.pedH, H = P.bowlH, N = Math.round(P.flutes), tw = P.twist, amp = P.fluteDepth * s;
   // fluted outer bowl: lathe-like grid with spiral ridges that fade out toward the smooth rim band
-  const RS = Math.max(N * 10, 120), HS = 90, pos = [], idx = [], uv = [];
+  // gadroons: rounded lobes split by crisp grooves, swirling up the belly, tapering to teardrop tips under a smooth polished band
+  const RS = Math.max(N * 18, 240), HS = 150, pos = [], idx = [], uv = [];
   for (let j = 0; j <= HS; j++) {
-    const t = j / HS, w = ss(0.02, 0.12, t) * (1 - ss(0.7, 0.86, t)), base = r(t);
+    const t = j / HS, base = r(t), w = ss(0.0, 0.1, t) * (1 - ss(0.7, 0.78, t)), cut = 0.9 * ss(0.6, 0.76, t) + 0.6 * (1 - ss(0.0, 0.16, t));
     for (let i = 0; i <= RS; i++) {
-      const th = (i / RS) * Math.PI * 2, ph = th - tw * t * 1.4, ridge = Math.pow(0.5 + 0.5 * Math.cos(N * ph), 0.7);
-      const rr = base + amp * w * (ridge - 0.35);
+      const th = (i / RS) * Math.PI * 2, ph = th - tw * 1.5 * Math.pow(t, 1.35), lobe = Math.abs(Math.cos((N * ph) / 2));
+      const ridge = Math.sqrt(Math.max(0, (lobe - cut) / (1 - cut)));
+      const rr = base + amp * w * (ridge - 0.25);
       pos.push(rr * Math.sin(th), yb + t * H, rr * Math.cos(th)); uv.push(i / RS, t);
     }
   }
@@ -177,15 +187,16 @@ export function buildContents(P, M, bowl, { instanced = true, seed = 7 } = {}) {
   }
   // loose cubes on top of the bed, kept clear of the bottles
   const cubes = [], cell = new Map(), key = (x, z) => `${Math.floor(x / 2)},${Math.floor(z / 2)}`;
-  for (let t = 0; t < 9000 && cubes.length < Math.round(Ri * Ri * 0.5); t++) {
-    const rr = Math.sqrt(r()) * (Ri - 1.2), a = r() * Math.PI * 2, x = rr * Math.cos(a), z = rr * Math.sin(a);
-    if (slots.some(([, bx, bz]) => Math.hypot(x - bx, z - bz) < 2.0)) continue;
+  for (let t = 0; t < 16000 && cubes.length < Math.round(Ri * Ri * 1.15); t++) {
+    const rr = Math.sqrt(r()) * (Ri - 0.5), a = r() * Math.PI * 2, x = rr * Math.cos(a), z = rr * Math.sin(a);
+    if (slots.some(([, bx, bz]) => Math.hypot(x - bx, z - bz) < 1.55)) continue;
     const k = key(x, z), near = [-1, 0, 1].flatMap((i) => [-1, 0, 1].map((j) => cell.get(`${Math.floor(x / 2) + i},${Math.floor(z / 2) + j}`) || [])).flat();
-    if (near.some(([cx, cz]) => Math.hypot(x - cx, z - cz) < 1.7)) continue;
+    if (near.some(([cx, cz]) => Math.hypot(x - cx, z - cz) < 1.0)) continue;
     cubes.push([x, z]); (cell.get(k) || cell.set(k, []).get(k)).push([x, z]);
   }
-  const cg = instanced ? new RoundedBoxGeometry(1.9, 1.7, 1.9, 2, 0.32) : new THREE.BoxGeometry(1.8, 1.6, 1.8), d = new THREE.Object3D(), cm = [];
-  for (const [x, z] of cubes) { d.position.set(x, surf(x, z) - 0.2 + r() * 0.5, z); d.rotation.set(r() * 0.8, r() * 3, r() * 0.8); d.scale.setScalar(0.75 + r() * 0.5); d.updateMatrix(); cm.push(d.matrix.clone()); }
+  const cg = new THREE.IcosahedronGeometry(0.62, instanced ? 1 : 0), d = new THREE.Object3D(), cm = []; // crushed ice: irregular faceted chunks
+  if (instanced) { const p = cg.attributes.position, rq = rng(11); for (let i = 0; i < p.count; i++) { const f = 0.82 + rq() * 0.3; p.setXYZ(i, p.getX(i) * f, p.getY(i) * f, p.getZ(i) * f); } cg.computeVertexNormals(); }
+  for (const [x, z] of cubes) { d.position.set(x, surf(x, z) - 0.15 + r() * 0.8, z); d.rotation.set(r() * 3, r() * 3, r() * 3); d.scale.set(0.8 + r() * 0.7, 0.6 + r() * 0.5, 0.8 + r() * 0.7); d.updateMatrix(); cm.push(d.matrix.clone()); }
   if (instanced) { const im = new THREE.InstancedMesh(cg, M.ice, cm.length); cm.forEach((m, i) => im.setMatrixAt(i, m)); im.castShadow = true; im.receiveShadow = true; g.add(im); }
   else g.add(mesh(mergeGeometries(cm.map((m) => cg.clone().applyMatrix4(m))), M.ice));
   g.userData.top = Math.max(...slots.map(([, , , y, l]) => y + 9.1 * Math.cos(l)));

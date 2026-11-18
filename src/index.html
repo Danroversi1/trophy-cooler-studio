@@ -232,7 +232,7 @@ details b{color:#d6dbe4;font-weight:600}
     <div class="slider-head"><label for="pedH">Pedestal height</label><output id="pedH-v"></output></div><input class="range" id="pedH" type="range" min="6" max="28" step="0.2">
     <div class="slider-head"><label for="flutes">Spiral flutes</label><output id="flutes-v"></output></div><input class="range" id="flutes" type="range" min="12" max="48" step="1">
     <div class="slider-head"><label for="twist">Flute twist</label><output id="twist-v"></output></div><input class="range" id="twist" type="range" min="0" max="2" step="0.05">
-    <div class="slider-head"><label for="fluteDepth">Flute depth</label><output id="fluteDepth-v"></output></div><input class="range" id="fluteDepth" type="range" min="0" max="1.6" step="0.05">
+    <div class="slider-head"><label for="fluteDepth">Flute depth</label><output id="fluteDepth-v"></output></div><input class="range" id="fluteDepth" type="range" min="0" max="4" step="0.1">
     <div class="input-row"><label>Metal</label><div class="seg" id="metal" style="width:170px;grid-template-columns:repeat(3,1fr)"><button data-v="chrome">Chrome</button><button data-v="satin">Satin</button><button data-v="gold">Gold</button></div></div>
   </section>
 
@@ -306,7 +306,7 @@ import * as T from './trophy.js';
 
 const $ = (id) => document.getElementById(id);
 const mk = (w, h) => { const c = document.createElement('canvas'); c.width = w; c.height = h; return c; };
-const KEY = 'trophy-cooler-model-v5';
+const KEY = 'trophy-cooler-model-v6';
 let P = { ...T.DEFAULTS }, lock = true;
 const V = { sel: 'cup', isolate: false, xray: false, panel: 0, explode: 0, env: 'studio', spin: false, vis: { cup: true, contents: true, enc: true, fridge: true, base: true } };
 const B = { logo: null, logoSrc: null };
