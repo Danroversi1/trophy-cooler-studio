@@ -1,0 +1,13 @@
+{
+  "name": "trophy-cooler-studio",
+  "private": true,
+  "type": "module",
+  "description": "Michelob ULTRA trophy cooler: on-ice activation 3D concept studio",
+  "scripts": {
+    "build": "node scripts/build.mjs",
+    "dev": "npx serve src",
+    "export-models": "node scripts/export-models.mjs models"
+  },
+  "dependencies": { "three": "0.160.0" },
+  "devDependencies": { "esbuild": "^0.24.0" }
+}

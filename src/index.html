@@ -1,0 +1,832 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="theme-color" content="#07080b">
+<title>Trophy Cooler Studio — On-Ice Activation Concepts</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@600;700&family=DM+Serif+Display&display=swap" rel="stylesheet">
+<style>
+:root{color-scheme:dark;--blue:#08277d;--panel:#141519;--muted:#9a9da6;--line:#ffffff10;--field:#202126;--radius:8px;--ok:#3ccf91;--warn:#ffb547;--bad:#ff6b6b;font-family:Arial,Helvetica,sans-serif}
+*{box-sizing:border-box}
+html,body{margin:0;width:100%;height:100%;overflow:hidden;background:#0d0e11;color:#f6f7f9}
+body{height:100svh;display:flex;flex-direction:column}
+button,input,select{font:inherit}
+button{cursor:pointer;border:1px solid #2d4479;background:linear-gradient(180deg,#0d2e80,#071e5c);border-radius:var(--radius);padding:10px 12px;color:#e9efff;transition:background .18s,border-color .18s,transform .18s;font-size:12px;line-height:1.2}
+button:hover{background:linear-gradient(180deg,#173e98,#0c2b79);border-color:#4d6db0}
+button.active{background:linear-gradient(180deg,#244da6,#08277d);border-color:#5d7ab5;color:#fff}
+button:active{transform:translateY(1px)}
+button:focus-visible,input:focus-visible,select:focus-visible{outline:2px solid #7fa2f2;outline-offset:3px}
+button.ghost{background:#1d1f25;border-color:#34363e;color:#c6cbd4}
+button.ghost:hover{background:#252832;border-color:#4d6db0;color:#fff}
+/* top bar */
+.topbar{height:80px;flex-shrink:0;position:relative;display:flex;align-items:center;justify-content:space-between;padding:0 28px;background:#060709;z-index:10}
+.brand{position:absolute;left:50%;top:50%;transform:translate(-50%,-50%);pointer-events:none;display:flex;align-items:center}
+.brand img{display:block;max-width:280px;max-height:40px;object-fit:contain}
+.brand .txt{font:700 30px/1 "Barlow Condensed",Arial,sans-serif;letter-spacing:.14em;white-space:nowrap}
+.header-left,.header-actions{display:flex;align-items:center;gap:10px}
+.header-actions button{height:36px;padding:0 17px}
+.pill{font-size:11px;color:#9195a0;display:inline-flex;align-items:center;gap:8px}
+.statusdot{width:5px;height:5px;border-radius:50%;background:#4e74ca}
+.mobile-toggle{display:none}
+.study-title{padding:18px 25px 17px;flex-shrink:0}
+.study-title h1{font-size:14px;line-height:20px;letter-spacing:-.2px;margin:0;font-weight:500}
+.study-title h1 span{color:#9da1ab;font-weight:400}
+/* layout */
+.layout{display:grid;grid-template-columns:300px minmax(0,1fr);gap:14px;flex:1;min-height:0;padding:0 20px}
+aside{background:var(--panel);border:1px solid var(--line);border-radius:12px;min-height:0;overflow:auto;overscroll-behavior:contain;scrollbar-width:thin;scrollbar-color:#353941 transparent;z-index:5;padding-bottom:20px}
+.section{padding:20px 17px;border-bottom:1px solid var(--line)}
+.section h2{font-size:10px;line-height:14px;font-weight:400;letter-spacing:1.4px;text-transform:uppercase;color:#9297a2;margin:0 0 14px;display:flex;justify-content:space-between}
+.section h2 small{letter-spacing:.3px;text-transform:none;color:#6b717d}
+.subhead{font-size:11px;color:#c6cbd4;margin:16px 0 8px;display:flex;justify-content:space-between}
+.subhead:first-of-type{margin-top:0}
+.subhead small{color:#6b717d;font-size:10px}
+.layer{display:flex;align-items:center;border:1px solid transparent;background:#1d1f25;border-radius:8px;margin:4px 0;padding:3px;min-height:39px}
+.layer.selected{border-color:#345496;background:linear-gradient(100deg,#0c2254,#142d5f)}
+.layer>button.select{flex:1;text-align:left;border:0;background:transparent;padding:9px 7px;color:#e8ebf2;font-size:12px;font-weight:500;line-height:1.3;min-width:0;display:flex;align-items:center;gap:8px}
+.layer>button.select:active{transform:none}
+.layer>button.select small{color:#8f95a1;font-weight:400;font-size:10.5px;margin-left:auto;padding-right:4px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.layer.sub{margin-left:17px;background:transparent;min-height:32px}
+.layer.sub>button.select{font-size:11px;font-weight:400;color:#a9b1c1;padding-top:6px;padding-bottom:6px}
+.dot{display:inline-block;width:6px;height:6px;border-radius:50%;background:#5784e0;flex:none}
+.sw{width:16px;height:16px;border-radius:4px;flex:none;border:1px solid #ffffff22}
+.eye{background:transparent!important;border:0;border-radius:6px;padding:6px 8px;font-size:14px;color:#8a9dbc;line-height:1;min-width:27px}
+.eye:hover{color:#fff}.eye.off{opacity:.3}
+.num{font:600 10px Arial;color:#b8ceff;background:#092368;border-radius:4px;padding:3px 5px;letter-spacing:.4px;flex:none}
+.muted{font-size:10px;line-height:1.65;color:#8f95a1;margin:9px 0 0}
+.selected-title{font-size:16px;line-height:21px;letter-spacing:-.3px;font-weight:500;margin:0 0 13px}
+.wide{width:100%;margin-top:8px;font-size:11px;min-height:33px}
+.seg{display:grid;grid-template-columns:1fr 1fr;gap:7px}
+.seg button{font-size:11px;padding:9px 5px}
+.seg:not(.blue) button:not(.active){background:#1d1f25;border-color:#34363e;color:#a9b0bf}
+.box{padding:12px;border-radius:10px;background:#191c24;border:1px solid #2a3348;margin-bottom:12px}
+.box-head{display:flex;align-items:center;justify-content:space-between;gap:7px;font-size:11px;line-height:1.4}
+.badge{font-size:7px;letter-spacing:.45px;color:#b8ceff;background:#092368;border-radius:4px;padding:4px 5px;white-space:nowrap;text-transform:uppercase}
+.input-row{display:flex;align-items:center;gap:8px;margin-top:9px;font-size:11px;color:#c6cbd4}
+.input-row>label{flex:1}
+.input-wrap{display:flex;align-items:center;background:var(--field);border:1px solid #34363e;border-radius:7px;width:120px;overflow:hidden}
+.input-wrap:focus-within{border-color:#5377ba}
+.input-wrap input[type=text]{background:transparent;border:0;width:100%;padding:8px 9px;font-size:11px;color:#eef2fb;outline:none}
+.input-wrap input[type=color]{width:26px;height:22px;border:0;background:none;padding:0;margin:3px 6px 3px 4px;cursor:pointer}
+.input-wrap .val{font-size:10.5px;color:#c6cbd4;font-variant-numeric:tabular-nums}
+select{background:var(--field);border:1px solid #34363e;border-radius:7px;color:#eef2fb;padding:7px 8px;font-size:11px;width:150px}
+.slider-head{display:flex;align-items:center;justify-content:space-between;font-size:11px;line-height:1.5;margin:16px 0 8px;color:#cbd0d9}
+.slider-head output{font-weight:500;color:#b6ccff;font-variant-numeric:tabular-nums}
+.range{width:100%;accent-color:#1744a2;cursor:pointer;height:17px;margin:0}
+.toggle-row{display:flex;align-items:center;gap:8px;font-size:11px;margin:11px 0;color:#c6cbd4;cursor:pointer}
+.toggle-row input{accent-color:#1744a2;margin:0;width:13px;height:13px}
+.variant{display:flex;align-items:center;gap:9px;width:100%;text-align:left;background:#1d1f25;border:1px solid transparent;margin:4px 0;padding:9px 10px;color:#e8ebf2;font-size:12px}
+.variant:hover{background:#232631;border-color:#34405e}
+.variant.active{border-color:#345496;background:linear-gradient(100deg,#0c2254,#142d5f)}
+.variant small{margin-left:auto;color:#8f95a1;font-size:10px}
+.warnbox{background:#2b2210;border:1px solid #6b4d14;color:#ffd38a;border-radius:8px;padding:8px 10px;font-size:10.5px;line-height:1.5;margin-top:10px;display:none}
+/* inputs */
+.drop{display:flex;flex-direction:column;align-items:center;justify-content:center;gap:3px;border:1px dashed #34405e;border-radius:10px;padding:13px;text-align:center;color:#8f95a1;font-size:10.5px;line-height:1.5;cursor:pointer;transition:.15s;background:#17191f}
+.drop b{color:#e8ebf2;font-size:11.5px;font-weight:500}
+.drop:hover,.drop.over{border-color:#5377ba;background:#0c2254;color:#c6cbd4}
+.drop input{display:none}
+.logo-prev{display:flex;gap:10px;align-items:center;margin-top:8px}
+.logo-prev .pv{width:96px;height:48px;border-radius:7px;display:grid;place-items:center;flex:none;background:repeating-conic-gradient(#20232b 0 25%,#191b21 0 50%) 0 0/12px 12px;border:1px solid #2a3348}
+.logo-prev .pv canvas{max-width:86px;max-height:38px}
+.logo-prev .seg button{padding:7px 5px;font-size:10.5px}
+.linkbtn{background:none!important;border:0!important;color:#a8bce6;font-size:10px;padding:6px 0 0;text-decoration:underline;text-decoration-color:#53617c;text-underline-offset:3px}
+.linkbtn:hover{color:#fff}
+.swatches{display:flex;flex-wrap:wrap;gap:6px;margin-top:8px}
+.swc{position:relative;width:44px;border-radius:7px;overflow:hidden;border:1px solid #34363e;background:#1d1f25;font-size:9.5px}
+.swc .c{height:22px}
+.swc .a{display:flex}
+.swc .a button{flex:1;border:0;background:transparent;color:#8f95a1;padding:3px 0;font-size:9.5px;border-radius:0}
+.swc .a button:hover{color:#fff;background:#0c2254}
+.swc .x{position:absolute;top:1px;right:3px;color:#fff;cursor:pointer;font-size:11px;text-shadow:0 0 3px #000;display:none}
+.swc:hover .x{display:block}
+.refs{display:grid;gap:8px;margin-top:8px}
+.ref{background:#191c24;border:1px solid #2a3348;border-radius:10px;padding:8px;display:grid;grid-template-columns:64px 1fr;gap:9px;position:relative}
+.ref.on{border-color:#345496;background:linear-gradient(100deg,#0e1a3a,#141f3d)}
+.ref img{width:64px;height:64px;object-fit:cover;border-radius:6px;background:#000}
+.ref .nm{font-size:11.5px;font-weight:500;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;padding-right:16px}
+.ref .pal{display:flex;height:9px;border-radius:3px;overflow:hidden;margin:6px 0}
+.ref .pal i{flex:1}
+.ref .meta{color:#8f95a1;font-size:9.5px;line-height:1.5}
+.ref .acts{grid-column:1/-1;display:flex;flex-wrap:wrap;gap:4px}
+.ref .acts button{background:#1d1f25;border:1px solid #34363e;color:#c6cbd4;border-radius:6px;padding:6px 8px;font-size:10px}
+.ref .acts button:hover{border-color:#4d6db0;color:#fff}
+.ref .acts button.on{background:linear-gradient(180deg,#244da6,#08277d);border-color:#5d7ab5;color:#fff}
+.ref .rm{position:absolute;top:6px;right:9px;color:#8f95a1;cursor:pointer;font-size:13px}
+.ref canvas.prof{position:absolute;right:9px;top:28px;width:26px;height:34px;opacity:.9}
+.chipsrc{display:inline-flex;align-items:center;gap:6px;font-size:10.5px;color:#8f95a1}
+/* specs */
+.stat{display:grid;grid-template-columns:1fr 1fr;gap:6px}
+.stat div{background:#191c24;border:1px solid #2a3348;border-radius:8px;padding:9px 10px}
+.stat b{display:block;font-size:17px;font-weight:500;letter-spacing:-.3px;font-variant-numeric:tabular-nums}
+.stat span{color:#8f95a1;font-size:9.5px;line-height:1.4;display:block;margin-top:2px}
+table{width:100%;border-collapse:collapse;font-size:10.5px;margin-top:10px;color:#c6cbd4}
+td{padding:5px 0;border-bottom:1px solid #ffffff0d}
+td:last-child{text-align:right;font-variant-numeric:tabular-nums}
+tr.tot td{font-weight:600;color:#fff;border-bottom:0;padding-top:8px}
+.lift{margin-top:6px;display:grid;gap:9px}
+.lift .l{display:grid;grid-template-columns:1fr auto;gap:3px 10px;font-size:10.5px;color:#c6cbd4}
+.lift .l small{color:#6b717d}
+.lift .bar{grid-column:1/-1;height:4px;background:#23262f;border-radius:4px;position:relative;overflow:hidden}
+.lift .bar i{position:absolute;inset:0 auto 0 0;border-radius:4px}
+.lift .bar em{position:absolute;top:-2px;bottom:-2px;width:2px;background:#fff8;left:0}
+.ok{color:var(--ok)}.warn{color:var(--warn)}.bad{color:var(--bad)}
+details{border-top:1px solid #ffffff0d;padding:10px 0}
+details:first-of-type{border-top:0;padding-top:0}
+details summary{cursor:pointer;font-size:11.5px;color:#e8ebf2;list-style:none;display:flex;justify-content:space-between}
+details summary::after{content:"+";color:#8a9dbc}
+details[open] summary::after{content:"–"}
+details li,details p{color:#9aa1ad;font-size:10.5px;line-height:1.6;margin:6px 0 0}
+details ul{padding-left:16px;margin:4px 0 0}
+details b{color:#d6dbe4;font-weight:600}
+.disclaimer{font-size:9px;line-height:1.7;color:#808793;padding:17px 18px 0}
+/* stage */
+#stage{position:relative;min-height:0;min-width:0;overflow:hidden;border:1px solid #ffffff0c;border-radius:12px;background-color:#111315;background-image:radial-gradient(#5f66774d .75px,transparent .9px);background-size:22px 22px}
+#stage canvas{display:block;outline:none;touch-action:none}
+.viewbar{position:absolute;left:20px;top:20px;z-index:2;display:flex;gap:4px;padding:5px;background:#0a0b0edc;border:1px solid #ffffff0c;backdrop-filter:blur(16px);border-radius:10px}
+.viewbar button{border:1px solid transparent;background:transparent;padding:8px 13px;font-size:11px;color:#a9b0bf;border-radius:6px}
+.viewbar button:hover{background:#0c245c;color:#fff}
+.viewbar button.active{background:linear-gradient(180deg,#224796,#08277d);border-color:#355994;color:#fff}
+.focusbtn{position:absolute;right:20px;top:20px;min-height:36px;font-size:11px;z-index:2}
+.legend{position:absolute;left:25px;top:78px;font-size:10px;line-height:1.6;color:#929aaa;pointer-events:none;max-width:280px}
+.scene-label{position:absolute;bottom:52px;left:20px;font-size:9px;letter-spacing:1.2px;color:#8f97a5;text-transform:uppercase;pointer-events:none;background:#0a0b0ecc;backdrop-filter:blur(10px);border:1px solid #ffffff0c;border-radius:7px;padding:5px 10px}
+.hint{position:absolute;bottom:18px;left:20px;font-size:10px;line-height:1.4;color:#a1a8b7;pointer-events:none;background:#0a0b0ecc;backdrop-filter:blur(10px);border:1px solid #ffffff0c;border-radius:7px;padding:5px 10px}
+.hint span{display:inline-block;margin:0 10px;color:#5f6570}
+#toast{position:absolute;left:50%;bottom:80px;transform:translateX(-50%);padding:11px 16px;background:#0c2151;border:1px solid #365388;color:#eaf0ff;border-radius:8px;font-size:11px;opacity:0;transition:opacity .2s;pointer-events:none;z-index:10;white-space:nowrap;max-width:92%}
+#toast.show{opacity:1}
+.loader{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;z-index:8;background:#111315f5}
+.loadbox{padding:30px 34px;background:#17191f;border:1px solid #323846;border-radius:14px;text-align:center;max-width:340px}
+.loadbox h3{font-size:15px;font-weight:500;margin:14px 0 4px}.loadbox p{font-size:11px;color:#aab3c4;margin:0}
+.spin{width:25px;height:25px;border:2px solid #263248;border-top-color:#3765be;border-radius:50%;animation:spin .8s linear infinite;margin:auto}
+@keyframes spin{to{transform:rotate(360deg)}}
+/* footer wordmark */
+.wordmark-footer{flex-shrink:0;padding:14px 28px 10px;height:clamp(74px,10vw,142px);display:flex;align-items:center;justify-content:center;background:#0d0e11;overflow:hidden}
+.wordmark-footer span{font-family:"DM Serif Display",Georgia,serif;font-size:clamp(46px,7.6vw,112px);line-height:1.08;padding-bottom:.06em;color:#f2f2f2;white-space:nowrap;letter-spacing:.005em;opacity:.95}
+@media(max-width:1050px){.layout{grid-template-columns:270px minmax(0,1fr);gap:12px;padding:0 15px}.section{padding:18px 14px}.topbar{padding:0 20px}.header-actions button{padding:0 12px}.viewbar{left:14px;top:14px;gap:2px}.viewbar button{padding:8px 9px}.focusbtn{right:14px;top:14px}.legend{top:70px;left:20px}.scene-label{left:18px;font-size:8px}.hint{left:18px;font-size:9px}.study-title{padding-left:20px}}
+@media(max-width:760px){.topbar{height:74px;padding:0 15px}.brand .txt{font-size:22px}.brand img{max-width:200px}.header-actions button{font-size:10px;padding:0 10px;height:32px}.pill{display:none}.mobile-toggle{display:block;font-size:10px;min-height:32px;padding:0 10px}.layout{display:block;position:relative;padding:0 12px;min-height:0}#stage{height:100%}aside{position:absolute;left:12px;top:0;bottom:0;width:min(300px,calc(100vw - 50px));transform:translateX(calc(-100% - 25px));transition:transform .2s;box-shadow:10px 0 35px #0008;background:#141519fa}aside.open{transform:translateX(0)}.study-title{padding:14px 16px}.study-title h1{font-size:12px}.wordmark-footer{height:80px}.viewbar{left:12px;top:12px}.viewbar button{padding:7px 8px;font-size:10px}.focusbtn{right:12px;top:auto;bottom:12px}.legend{display:none}#toast{white-space:normal;text-align:center}}
+@media(max-width:520px){.topbar{height:96px;align-items:flex-end;padding:0 14px 11px}.brand{top:24px}.header-actions{gap:7px}.header-actions button{height:30px;font-size:10px}.hint{display:none}.scene-label{bottom:20px}}
+@media(prefers-reduced-motion:reduce){*{transition:none!important}}
+</style>
+<script type="importmap">
+{ "imports": {
+  "three": "https://cdn.jsdelivr.net/npm/three@0.160.0/build/three.module.js",
+  "three/addons/": "https://cdn.jsdelivr.net/npm/three@0.160.0/examples/jsm/"
+} }
+</script>
+</head>
+<body>
+<header class="topbar">
+  <div class="header-left"><span class="pill"><span class="statusdot"></span><span id="pill-txt">Parametric 3D concept</span></span><button class="mobile-toggle" id="mobileToggle" aria-controls="panel" aria-expanded="false">Controls</button></div>
+  <div class="brand" id="brand-mark"><span class="txt">MICHELOB ULTRA</span></div>
+  <div class="header-actions"><button id="capture">Capture view</button><button id="export">Export GLB</button></div>
+</header>
+<div class="study-title"><h1>3D study <span id="study-sub">· Trophy cooler</span></h1></div>
+<div class="layout">
+<aside id="panel" aria-label="Studio controls">
+
+  <section class="section"><h2>Concepts <small>5 starting designs</small></h2><div id="presets"></div></section>
+
+  <section class="section"><h2>Scene objects</h2>
+    <div id="layers"></div>
+    <button id="isolate" class="wide">Isolate selected</button>
+    <p class="muted" id="dims-readout"></p>
+  </section>
+
+  <section class="section"><h2>Module</h2>
+    <div class="selected-title" id="mod-title">03 · Cup</div>
+    <div id="variants"></div>
+    <p class="muted" id="v-blurb"></p>
+    <div id="mod-cup">
+      <div class="slider-head"><label for="facets">Cup facets <span style="color:#6b717d">· ★ cup, 0 = smooth</span></label><output id="facets-v">0</output></div>
+      <input class="range" id="facets" type="range" min="0" max="16" step="1" value="0">
+      <div class="warnbox" id="cup-warn"></div>
+    </div>
+    <div id="mod-enc">
+      <div class="slider-head"><label for="door">Service door</label><output id="door-v">Closed</output></div>
+      <input class="range" id="door" type="range" min="0" max="1" step="0.01" value="0">
+      <label class="toggle-row"><input type="checkbox" id="xray">X-ray sleeve · show the freezer</label>
+    </div>
+    <div id="mod-base"><p class="muted">All bases share a 3″ deck height and the same enclosure pin pattern, so any sleeve drops onto any sled.</p></div>
+  </section>
+
+  <section class="section"><h2>Finish</h2>
+    <div class="input-row"><label>Metal</label><div class="seg" id="metal" style="width:150px"><button data-v="chrome">Chrome</button><button data-v="gold">Gold</button></div></div>
+    <div class="input-row"><label>Primary lacquer</label><div class="input-wrap"><input type="color" id="primary"><span class="val" id="primary-v"></span></div></div>
+    <div class="input-row"><label>Accent · glass · LED</label><div class="input-wrap"><input type="color" id="accent"><span class="val" id="accent-v"></span></div></div>
+    <div class="input-row"><label>Enclosure skin</label><select id="skin"></select></div>
+    <div class="slider-head"><label for="skin-scale">Skin scale</label><output id="skin-scale-v">1.0×</output></div>
+    <input class="range" id="skin-scale" type="range" min="0.5" max="4" step="0.1" value="1">
+    <div class="input-row"><label>Glass palette</label><span class="chipsrc"><span id="pal-src">Auto from accent</span><button class="linkbtn" id="pal-reset" style="display:none;padding:0">reset</button></span></div>
+    <div class="input-row"><label>Label text</label><div class="input-wrap" style="width:150px"><input type="text" id="brand" maxlength="28"></div></div>
+    <div class="input-row"><label>Footer wordmark</label><div class="input-wrap" style="width:150px"><input type="text" id="wordmark" maxlength="22"></div></div>
+  </section>
+
+  <section class="section" id="inputs"><h2>Inputs <small>inform geometry + skin</small></h2>
+    <div class="subhead">01 · Brand assets <small>logo · font · colors</small></div>
+    <label class="drop" id="drop-logo"><input type="file" id="f-logo" accept="image/png,image/svg+xml,image/jpeg,image/webp"><b>Drop logo</b>PNG / SVG / JPG → labels, header, monogram skin</label>
+    <div class="box" id="logo-prev" style="display:none;margin:8px 0 0">
+      <div class="box-head"><span>Logo on labels</span><label class="toggle-row" style="margin:0"><input type="checkbox" id="use-logo" checked>On</label></div>
+      <div class="logo-prev"><div class="pv" id="logo-pv"></div><div style="flex:1"><div class="seg" id="logo-mode"><button data-v="tint">Tinted</button><button data-v="original">Original</button></div><button class="linkbtn" id="logo-rm">Remove logo</button></div></div>
+    </div>
+    <div class="input-row"><label>Brand font <span style="color:#6b717d">.ttf .otf .woff</span></label><label class="ghost" style="cursor:pointer;font-size:11px;padding:7px 10px;border:1px solid #34363e;border-radius:7px;background:#1d1f25"><input type="file" id="f-font" accept=".ttf,.otf,.woff,.woff2" style="display:none"><span id="font-name">Upload</span></label></div>
+    <div class="input-row"><label>Brand colors</label><div class="input-wrap" style="width:auto"><input type="color" id="c-add" value="#0b2a6b"><button id="c-add-btn" style="border:0;border-radius:0;padding:7px 10px;font-size:10.5px">Add</button></div></div>
+    <div class="swatches" id="brand-sw"></div>
+    <div id="brand-pal-row" style="display:none"><p class="muted">Swatch → <b>P</b> primary · <b>A</b> accent</p><button class="wide" id="brand-pal">Use brand colors as glass palette</button></div>
+
+    <div class="subhead" style="margin-top:20px">02 · Design references <small>moodboard → form + finish</small></div>
+    <label class="drop" id="drop-ref"><input type="file" id="f-ref" accept="image/*" multiple><b>Drop reference images</b>Trophies, vases, sculpture, stained glass, materials — or drop onto the stage</label>
+    <div class="refs" id="refs"></div>
+    <p class="muted">Each reference is read for <b style="color:#c6cbd4">palette</b> → glass + LEDs, <b style="color:#c6cbd4">finish</b> → metal + facets, and <b style="color:#c6cbd4">silhouette</b> → a lathed ★ cup. <b style="color:#c6cbd4">Skin</b> wraps it onto the enclosure. Uploads stay in this browser.</p>
+  </section>
+
+  <section class="section"><h2>View settings</h2>
+    <label class="toggle-row"><input type="checkbox" id="contents" checked>Show 12 beers + ice</label>
+    <label class="toggle-row"><input type="checkbox" id="rink" checked>Show rink markings</label>
+    <label class="toggle-row"><input type="checkbox" id="spin">Auto-rotate</label>
+    <div class="slider-head"><label for="explode">Explode modules</label><output id="explode-v">0%</output></div>
+    <input class="range" id="explode" type="range" min="0" max="1" step="0.01" value="0">
+    <button id="reset" class="wide">Reset concept</button>
+  </section>
+
+  <section class="section"><h2>Specs <small>estimates</small></h2>
+    <div class="stat">
+      <div><b id="s-h">—</b><span>Overall height</span></div>
+      <div><b id="s-f">—</b><span>Footprint on ice</span></div>
+      <div><b id="s-w">—</b><span>Fully loaded</span></div>
+      <div><b id="s-c">—</b><span>Freezer clearance S / B / F / T</span></div>
+    </div>
+    <table id="wt"></table>
+    <div class="subhead" style="margin-top:16px">Carry plan <small>vs ~51 lb / person</small></div>
+    <div class="lift" id="lift"></div>
+  </section>
+
+  <section class="section"><h2>Export</h2>
+    <div class="input-row"><label>GLB scope</label><select id="glb-what"><option value="all">Whole assembly</option><option value="base">01 · Base</option><option value="enc">02 · Enclosure</option><option value="cup">03 · Cup + beers</option></select></div>
+    <button class="wide" id="glb">Download .glb</button>
+    <button class="wide ghost" id="copy">Copy config JSON</button>
+    <p class="muted" id="glb-msg">GLB in meters, +Y up, +Z front — includes logo, skin and ★ cup.</p><p class="muted" id="copied" style="display:none"></p>
+  </section>
+
+  <section class="section"><h2>Engineering notes</h2>
+    <details open><summary>Ice-safe sliding base</summary><ul>
+      <li>UHMW-PE runners/skids: low friction on ice, non-marking, tough in the cold. No rubber (grabs, scuffs) or bare metal edges (cuts).</li>
+      <li>Radiused or beveled leading edges; fasteners counterbored from the top so no metal touches the ice.</li>
+      <li>~250 lb over the runners is a few psi — far below a skate blade. Add a perimeter drip lip.</li></ul></details>
+    <details><summary>Freezer integration · Meling DW-XL90</summary><ul>
+      <li><b>It's a freezer</b> (−15 to −30 °C): beer stored inside would freeze and burst. Use it as an ice / cold-pack reserve, or swap to a same-size +2–8 °C medical refrigerator.</li>
+      <li>Front-ventilated: door grille must line up with the bottom-front vent. ~1″ behind for the cord.</li>
+      <li>The enclosure is a <b>sleeve</b> that drops over the freezer and pins to the sled.</li>
+      <li>Confirm what the "48 hr backup battery" powers — often alarm/display only, not the compressor.</li>
+      <li>Transport upright; let it stand before power-up per Meling.</li></ul></details>
+    <details><summary>Cup / cooler</summary><ul>
+      <li>Double wall: decorative shell around a stainless or food-grade liner, foam-filled to cut sweating.</li>
+      <li>Melt water drains through the neck to a sealed reservoir — never onto the freezer or ice.</li>
+      <li>Twist-lock mount on the enclosure cap; carry it on empty, load beer + ice on the ice.</li></ul></details>
+    <details><summary>Getting it onto the ice</summary><ul>
+      <li>Three lifts, not one: freezer + sled by cart, sleeve by two people, cup by one.</li>
+      <li>Check on-ice equipment rules and approvals with the venue and league before fabrication.</li></ul></details>
+    <details><summary>Design language</summary><p>Inspired by the luxury sports-object approach associated with Victor Solomon — stained glass, mirror chrome and gold, sports icons scaled into precious objects. Forms are original, not copies of his pieces.</p></details>
+  </section>
+  <div class="disclaimer">Visual concept, not a fabrication model or a venue-approved installation. Weights and clearances are estimates and require technical validation. Brand marks are placeholders until approved artwork is uploaded.</div>
+</aside>
+
+<main id="stage" aria-label="Interactive trophy cooler 3D viewer">
+  <div class="viewbar" id="viewbar"><button data-view="hero" class="active">3D</button><button data-view="front">Front</button><button data-view="back">Back</button><button data-view="top">Top</button><button data-view="side">Side</button><button data-view="rink">Rink</button></div>
+  <button class="focusbtn" id="fit">Fit view</button>
+  <div class="legend" id="legend">Drag the background to explore the model.</div>
+  <div class="scene-label" id="scene-label">03 modules · freezer enclosed · 12 beers on ice</div>
+  <div class="hint">Drag to orbit<span>·</span>Scroll to zoom<span>·</span>Right-drag to pan</div>
+  <div id="toast" role="status" aria-live="polite"></div>
+  <div class="loader" id="loading"><div class="loadbox"><div class="spin"></div><h3>Preparing the 3D study</h3><p>Building the base, sleeve and cup.</p></div></div>
+</main>
+</div>
+<footer class="wordmark-footer"><span id="wordmark-out">Trophy Cooler</span></footer>
+<script type="module">
+import * as THREE from 'three';
+import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
+import { GLTFExporter } from 'three/addons/exporters/GLTFExporter.js';
+import * as D from './designs.js';
+
+const $ = (id) => document.getElementById(id);
+const fresh = (p) => ({ base: p.base, enc: p.enc, cup: p.cup, metal: p.metal, primary: p.primary, accent: p.accent });
+const S = { preset: D.PRESETS[0].id, ...fresh(D.PRESETS[0]), brand: 'MICHELOB ULTRA', xray: false, contents: true, rink: true, spin: false, door: 0, explode: 0,
+  skin: 'default', skinScale: 1, palette: null, paletteSrc: null, cupProfile: null, profileSrc: null, facets: 0, wordmark: 'Trophy Cooler',
+  sel: 'cup', isolate: false, view: 'hero', vis: { cup: true, contents: true, enc: true, fridge: true, base: true } };
+const B = { logo: null, logoSrc: null, mode: 'tint', use: true, font: null, colors: [], tints: {} };   // brand assets
+const REFS = [];                                                                                         // design references
+
+// ---------- renderer / scene ----------
+const view = $('stage');
+const renderer = new THREE.WebGLRenderer({ antialias: true, alpha: true, preserveDrawingBuffer: true });
+renderer.setClearColor(0x000000, 0);
+renderer.setPixelRatio(Math.min(devicePixelRatio, 2));
+renderer.toneMapping = THREE.ACESFilmicToneMapping; renderer.toneMappingExposure = 1.05;
+renderer.shadowMap.enabled = true; renderer.shadowMap.type = THREE.PCFSoftShadowMap;
+view.prepend(renderer.domElement);
+const scene = new THREE.Scene();
+const pmrem = new THREE.PMREMGenerator(renderer);
+// arena-style HDR environment: bright overhead light strips, pale ice below → chrome reads as chrome
+function arenaEnv() {
+  const s = new THREE.Scene(), geo = new THREE.SphereGeometry(100, 64, 32), pos = geo.attributes.position, col = [];
+  const top = new THREE.Color(0x26324a), hor = new THREE.Color(0xd2dceb), lo = new THREE.Color(0xf2f6fa), deep = new THREE.Color(0x8c99ab), c = new THREE.Color();
+  for (let i = 0; i < pos.count; i++) { const y = pos.getY(i) / 100; if (y >= 0) c.lerpColors(hor, top, Math.pow(y, 0.55)); else c.lerpColors(lo, deep, Math.pow(-y, 0.7)); col.push(c.r, c.g, c.b); }
+  geo.setAttribute('color', new THREE.Float32BufferAttribute(col, 3));
+  s.add(new THREE.Mesh(geo, new THREE.MeshBasicMaterial({ vertexColors: true, side: THREE.BackSide })));
+  const hot = new THREE.MeshBasicMaterial({ color: new THREE.Color(6, 6, 6.4) });
+  for (let k = 0; k < 10; k++) { const a = k / 10 * Math.PI * 2, m = new THREE.Mesh(new THREE.BoxGeometry(26, 1.5, 5), hot); m.position.set(Math.cos(a) * 55, 62, Math.sin(a) * 55); m.lookAt(0, 62, 0); s.add(m); }
+  const soft = new THREE.Mesh(new THREE.PlaneGeometry(60, 30), new THREE.MeshBasicMaterial({ color: new THREE.Color(3, 3.1, 3.4), side: THREE.DoubleSide })); soft.position.set(40, 30, 70); soft.lookAt(0, 0, 0); s.add(soft);
+  const blue = new THREE.Mesh(new THREE.PlaneGeometry(90, 8), new THREE.MeshBasicMaterial({ color: new THREE.Color(0.6, 1.2, 3.2), side: THREE.DoubleSide })); blue.position.set(-70, 12, -50); blue.lookAt(0, 12, 0); s.add(blue);
+  return s;
+}
+scene.environment = pmrem.fromScene(arenaEnv(), 0.02).texture;
+const camera = new THREE.PerspectiveCamera(34, 1, 1, 20000);
+const controls = new OrbitControls(camera, renderer.domElement);
+controls.enableDamping = true; controls.minDistance = 40; controls.maxDistance = 700; controls.maxPolarAngle = 1.53;
+
+scene.add(new THREE.HemisphereLight(0xdfe9ff, 0x1a2440, 0.6));
+const sun = new THREE.DirectionalLight(0xffffff, 2.2);
+sun.position.set(80, 160, 110); sun.castShadow = true;
+Object.assign(sun.shadow.camera, { left: -80, right: 80, top: 100, bottom: -40, near: 10, far: 500 });
+sun.shadow.mapSize.set(2048, 2048); sun.shadow.bias = -0.0004; sun.shadow.normalBias = 0.3;
+scene.add(sun);
+const rim = new THREE.DirectionalLight(0x8fb8ff, 1.0); rim.position.set(-120, 60, -100); scene.add(rim);
+
+// ---------- rink: an ice disc that fades into the dot-grid stage ----------
+function iceTexture(markings) {
+  const N = 2048, R = 170, c = document.createElement('canvas'); c.width = c.height = N; const x = c.getContext('2d'), k = N / (2 * R);
+  x.fillStyle = '#aab6c2'; x.fillRect(0, 0, N, N);
+  if (markings) {
+    const line = (z, col, w = 12) => { x.fillStyle = col; x.fillRect(0, N / 2 + z * k - w * k / 2, N, w * k); };
+    line(-62, '#c8102e', 8); line(118, '#1a49b8', 8);
+    x.strokeStyle = '#c8102e'; x.lineWidth = 2 * k; x.beginPath(); x.arc(N / 2, N / 2, 92 * k, 0, Math.PI * 2); x.stroke();
+  }
+  x.globalCompositeOperation = 'destination-in';
+  const g = x.createRadialGradient(N / 2, N / 2, N * 0.18, N / 2, N / 2, N / 2); g.addColorStop(0, 'rgba(0,0,0,.82)'); g.addColorStop(0.5, 'rgba(0,0,0,.42)'); g.addColorStop(1, 'rgba(0,0,0,0)');
+  x.fillStyle = g; x.fillRect(0, 0, N, N);
+  const t = new THREE.CanvasTexture(c); t.colorSpace = THREE.SRGBColorSpace; t.anisotropy = 8; return t;
+}
+const iceTex = { on: iceTexture(true), off: iceTexture(false) };
+const ice = new THREE.Mesh(new THREE.PlaneGeometry(340, 340), new THREE.MeshPhysicalMaterial({ map: iceTex.on, transparent: true, depthWrite: false, roughness: 0.22, clearcoat: 0.6, clearcoatRoughness: 0.12 }));
+ice.rotation.x = -Math.PI / 2; ice.receiveShadow = true; scene.add(ice);
+
+// ---------- labels ----------
+function makeLabel(text, { aspect = 4, repeat = 1, fg = '#ffffff', bg = null }) {
+  let W = 2048, H = Math.round(W / aspect);
+  if (H < 96) { H = 96; W = Math.min(8192, Math.round(H * aspect)); }
+  if (H > 1024) { H = 1024; W = Math.round(H * aspect); }
+  const c = document.createElement('canvas'); c.width = W; c.height = H; const x = c.getContext('2d');
+  if (bg) { x.fillStyle = bg; x.fillRect(0, 0, W, H); }
+  const seg = W / repeat, logo = B.logo && B.use ? logoVariant(fg) : null, fam = B.font ? `"${B.font}", "Barlow Condensed"` : '"Barlow Condensed"';
+  if (logo) {
+    for (let i = 0; i < repeat; i++) {
+      let h = H * 0.74, w = h * logo.width / logo.height; if (w > seg * 0.86) { w = seg * 0.86; h = w * logo.height / logo.width; }
+      x.drawImage(logo, seg * (i + 0.5) - w / 2, H / 2 - h / 2, w, h);
+    }
+    const t = new THREE.CanvasTexture(c); t.colorSpace = THREE.SRGBColorSpace; t.anisotropy = renderer.capabilities.getMaxAnisotropy(); return t;
+  }
+  for (let i = 0; i < repeat; i++) {
+    let fs = H * 0.62; x.font = `700 ${fs}px ${fam}, sans-serif`;
+    try { x.letterSpacing = (fs * 0.14) + 'px'; } catch {}
+    const tw = x.measureText(text).width; if (tw > seg * 0.84) { fs *= seg * 0.84 / tw; x.font = `700 ${fs}px ${fam}, sans-serif`; try { x.letterSpacing = (fs * 0.14) + 'px'; } catch {} }
+    x.fillStyle = fg; x.textAlign = 'center'; x.textBaseline = 'middle';
+    x.fillText(text, seg * (i + 0.5) + fs * 0.07, H * 0.53);
+    const w2 = Math.min(seg * 0.84, x.measureText(text).width);
+    x.fillRect(seg * (i + 0.5) - w2 / 2, H * 0.53 + fs * 0.5, w2, Math.max(2, H * 0.025));
+  }
+  const t = new THREE.CanvasTexture(c); t.colorSpace = THREE.SRGBColorSpace; t.anisotropy = renderer.capabilities.getMaxAnisotropy(); return t;
+}
+
+// ---------- build ----------
+let root = null, parts = {}, skinTex = null;
+const ghost = new THREE.MeshStandardMaterial({ color: 0x9cc4ff, transparent: true, opacity: 0.1, depthWrite: false, roughness: 0.2 });
+const ghostEdge = new THREE.LineBasicMaterial({ color: 0x9cc4ff, transparent: true, opacity: 0.35 });
+
+function dispose(o) { o.traverse((m) => { if (m.geometry) m.geometry.dispose(); const ms = m.userData.orig ? [m.userData.orig] : [m.material]; ms.flat().forEach((mt) => { if (mt && mt !== ghost && mt !== ghostEdge) { mt.map && mt.map.dispose(); mt.dispose(); } }); }); }
+
+function build() {
+  if (root) { scene.remove(root); dispose(root); }
+  root = new THREE.Group(); scene.add(root);
+  if (skinTex) skinTex.dispose();
+  skinTex = makeSkin();
+  const o = { ...S, makeLabel, skinTexture: skinTex };
+  const M = D.makeMaterials(o);
+  const base = D.byId(D.BASES, S.base), enc = D.byId(D.ENCLOSURES, S.enc), cup = D.byId(D.CUPS, S.cup);
+  parts.base = base.build(M, o); parts.enc = enc.build(M, o); parts.fridge = D.buildFridge(M);
+  parts.cupGroup = new THREE.Group(); parts.cup = cup.build(M, o); parts.cupGroup.add(parts.cup);
+  parts.contents = D.buildContents(M, parts.cup.userData.bowl); parts.cupGroup.add(parts.contents);
+  root.add(parts.base, parts.fridge, parts.enc, parts.cupGroup);
+  parts.enc.traverse((m) => { if (m.isMesh) { m.userData.orig = m.material; } });
+  parts.meta = { base, enc, cup };
+  applyView(); specs(); syncUI();
+  const w = parts.cup.userData.warn; $('cup-warn').style.display = w ? 'block' : 'none'; $('cup-warn').textContent = w || '';
+  saveSoon();
+}
+function applyView() {
+  if (!root) return;
+  parts.enc.traverse((m) => { if (m.isMesh) { m.material = S.xray ? ghost : m.userData.orig; m.castShadow = !S.xray; } });
+  ice.material.map = S.rink ? iceTex.on : iceTex.off;
+  const V = S.vis, only = S.isolate ? S.sel : null;
+  parts.cupGroup.visible = only ? only === 'cup' : V.cup;
+  parts.contents.visible = S.contents && V.contents;
+  parts.enc.visible = only ? only === 'enc' : V.enc;
+  parts.fridge.visible = only ? only === 'enc' && V.fridge : V.fridge;
+  parts.base.visible = only ? only === 'base' : V.base;
+  parts.enc.userData.setDoor && parts.enc.userData.setDoor(S.door);
+  parts.enc.position.y = S.explode * 40;
+  parts.cupGroup.position.y = D.CUP_Y + S.explode * 64;
+  parts.base.position.y = 0;
+}
+
+// ---------- specs ----------
+const ftin = (i) => { const f = Math.floor(i / 12), r = Math.round(i - f * 12); return r === 12 ? `${f + 1}′0″` : `${f}′${r}″`; };
+function specs() {
+  const { base, enc, cup } = parts.meta, bowl = parts.cup.userData.bowl;
+  const top = D.CUP_Y + Math.max(bowl.rim, bowl.floor + 9 * Math.cos(bowl.tilt));
+  const beer = D.BEER.count * D.BEER.lbEach, iceLb = bowl.iceLb, fr = D.FRIDGE.weight;
+  const total = base.lb + enc.lb + cup.lb + fr + beer + iceLb;
+  $('s-h').textContent = `${ftin(top)}`;
+  $('s-f').textContent = `${base.footprint[0]}″ × ${base.footprint[1]}″`;
+  $('s-w').textContent = `≈ ${Math.round(total)} lb`;
+  const c = enc.clear; $('s-c').textContent = `${c.side} / ${c.back} / ${c.front} / ${c.top}″`;
+  $('wt').innerHTML = [
+    ['01 · ' + base.name + ' (UHMW + frame)', base.lb], ['02 · ' + enc.name + ' sleeve', enc.lb], ['03 · ' + cup.name + ' (empty)', cup.lb],
+    ['Meling DW-XL90 (listed gross wt)', fr], ['12 × 12 oz long-necks', beer], ['Ice (est.)', iceLb],
+  ].map(([k, v]) => `<tr><td>${k}</td><td>${v.toFixed(v % 1 ? 1 : 0)} lb</td></tr>`).join('') + `<tr class="tot"><td>Fully loaded</td><td>${Math.round(total)} lb</td></tr>`;
+  const lim = 51, scale = 140;
+  const lifts = [
+    ['One-piece carry, 2 people', total / 2, 'Not recommended'],
+    ['Freezer + sled, on cart → slide', (fr + base.lb) / 4, '4-person lift at the boards'],
+    ['Enclosure sleeve, 2 people', enc.lb / 2, ''],
+    ['Empty cup, 1 person', cup.lb, 'Load beer + ice on the ice'],
+  ];
+  $('lift').innerHTML = lifts.map(([k, v, n]) => {
+    const cls = v <= lim * 0.8 ? 'ok' : v <= lim ? 'warn' : 'bad', col = getComputedStyle(document.documentElement).getPropertyValue('--' + cls);
+    return `<div class="l"><span>${k}${n ? ` <small>· ${n}</small>` : ''}</span><b class="${cls}">${Math.round(v)} lb/person</b><div class="bar"><i style="width:${Math.min(100, v / scale * 100)}%;background:${col}"></i><em style="left:${lim / scale * 100}%"></em></div></div>`;
+  }).join('');
+  const pn = D.PRESETS.find((p) => p.id === S.preset);
+  $('study-sub').textContent = `· ${pn ? pn.name.replace('·', '') : 'Custom mix'} — ${cup.name} + ${enc.name} + ${base.name}`;
+  $('pill-txt').textContent = pn ? 'Concept ' + pn.name.slice(0, 2) + ' of 05' : 'Custom configuration';
+  $('dims-readout').textContent = `Overall ${ftin(top)} · footprint ${base.footprint[0]}″ × ${base.footprint[1]}″ · freezer 23.6 × 32.0 × 24.6″`;
+}
+
+// ---------- UI ----------
+const MODS = { cup: { n: '03', label: 'Cup · beer cooler', list: D.CUPS, key: 'cup' }, enc: { n: '02', label: 'Enclosure · freezer sleeve', list: D.ENCLOSURES, key: 'enc' }, base: { n: '01', label: 'Sliding base · UHMW', list: D.BASES, key: 'base' } };
+function toast(msg) { const t = $('toast'); t.textContent = msg; t.classList.add('show'); clearTimeout(toast.t); toast.t = setTimeout(() => t.classList.remove('show'), 2600); }
+function markCustom() {
+  const p = D.PRESETS.find((p) => ['base', 'enc', 'cup', 'metal', 'primary', 'accent'].every((k) => p[k] === S[k]));
+  S.preset = p ? p.id : 'custom';
+}
+function renderPresets() {
+  $('presets').innerHTML = D.PRESETS.map((p) => {
+    const metal = p.metal === 'gold' ? '#d9b45b' : '#dfe4ea';
+    return `<div class="layer ${S.preset === p.id ? 'selected' : ''}"><button class="select" data-id="${p.id}"><span class="sw" style="background:linear-gradient(135deg,${p.primary} 0 45%,${p.accent} 45% 72%,${metal} 72%)"></span>${p.name.replace(' · ', ' ')}<small>${D.byId(D.CUPS, p.cup).name}</small></button></div>`;
+  }).join('');
+}
+$('presets').onclick = (e) => { const b = e.target.closest('[data-id]'); if (!b) return; const p = D.byId(D.PRESETS, b.dataset.id); Object.assign(S, fresh(p), { preset: p.id }); build(); toast(p.name + ' loaded'); };
+function renderLayers() {
+  const V = S.vis, row = (id, name, sub, eyeKey, selKey, cls = '') =>
+    `<div class="layer ${cls} ${S.sel === selKey && !cls ? 'selected' : ''}"><button class="select" data-sel="${selKey}">${cls ? '↳ ' : `<span class="num">${MODS[selKey].n}</span>`}${name}${sub ? `<small>${sub}</small>` : ''}</button><button class="eye ${V[eyeKey] ? '' : 'off'}" data-eye="${eyeKey}" aria-label="Toggle ${name}">◉</button></div>`;
+  const m = parts.meta;
+  $('layers').innerHTML =
+    row('cup', 'Cup', m.cup.name, 'cup', 'cup') + row('', '12 beers + ice', '', 'contents', 'cup', 'sub') +
+    row('enc', 'Enclosure', m.enc.name, 'enc', 'enc') + row('', 'Freezer · Meling DW-XL90', '', 'fridge', 'enc', 'sub') +
+    row('base', 'Sliding base', m.base.name, 'base', 'base');
+  $('isolate').textContent = S.isolate ? 'Show all objects' : 'Isolate selected';
+  $('isolate').classList.toggle('active', S.isolate);
+}
+$('layers').onclick = (e) => {
+  const eye = e.target.closest('[data-eye]'); if (eye) { const k = eye.dataset.eye; S.vis[k] = !S.vis[k]; if (k === 'contents') S.contents = S.vis.contents; applyView(); renderLayers(); syncToggles(); return; }
+  const s = e.target.closest('[data-sel]'); if (s) { S.sel = s.dataset.sel; applyView(); renderLayers(); renderModule(); }
+};
+$('isolate').onclick = () => { S.isolate = !S.isolate; applyView(); renderLayers(); };
+function renderModule() {
+  const md = MODS[S.sel];
+  $('mod-title').textContent = `${md.n} · ${md.label}`;
+  $('variants').innerHTML = md.list.map((v) => `<button class="variant ${S[md.key] === v.id ? 'active' : ''}" data-v="${v.id}">${v.name}<small>≈ ${v.lb} lb</small></button>`).join('');
+  $('v-blurb').textContent = D.byId(md.list, S[md.key]).blurb;
+  $('mod-cup').style.display = S.sel === 'cup' ? '' : 'none';
+  $('mod-enc').style.display = S.sel === 'enc' ? '' : 'none';
+  $('mod-base').style.display = S.sel === 'base' ? '' : 'none';
+}
+$('variants').onclick = (e) => { const b = e.target.closest('[data-v]'); if (!b) return; S[MODS[S.sel].key] = b.dataset.v; markCustom(); build(); };
+$('metal').onclick = (e) => { const b = e.target.closest('button'); if (!b) return; S.metal = b.dataset.v; markCustom(); build(); };
+let colorT; for (const k of ['primary', 'accent']) $(k).oninput = (e) => { S[k] = e.target.value; $(k + '-v').textContent = S[k]; markCustom(); clearTimeout(colorT); colorT = setTimeout(build, 120); };
+let brandT; $('brand').oninput = (e) => { S.brand = e.target.value || ' '; clearTimeout(brandT); brandT = setTimeout(build, 250); };
+$('wordmark').oninput = (e) => { S.wordmark = e.target.value; $('wordmark-out').textContent = S.wordmark || ' '; saveSoon(); };
+for (const k of ['xray', 'contents', 'rink', 'spin']) $(k).onchange = (e) => { S[k] = e.target.checked; if (k === 'contents') S.vis.contents = S[k]; controls.autoRotate = S.spin; applyView(); renderLayers(); };
+$('door').oninput = (e) => { S.door = +e.target.value; $('door-v').textContent = S.door < 0.02 ? 'Closed' : Math.round(S.door * 100) + '%'; applyView(); };
+$('explode').oninput = (e) => { S.explode = +e.target.value; $('explode-v').textContent = Math.round(S.explode * 100) + '%'; applyView(); };
+$('reset').onclick = () => { const p = D.PRESETS.find((p) => p.id === S.preset) || D.PRESETS[0]; Object.assign(S, fresh(p), { preset: p.id, door: 0, explode: 0, xray: false, isolate: false, vis: { cup: true, contents: true, enc: true, fridge: true, base: true }, contents: true }); build(); toast('Concept reset'); };
+$('copy').onclick = async () => {
+  const cfg = { preset: S.preset, base: S.base, enclosure: S.enc, cup: S.cup, metal: S.metal, primary: S.primary, accent: S.accent, brand: S.brand, facets: S.facets, cupProfile: S.cupProfile };
+  try { await navigator.clipboard.writeText(JSON.stringify(cfg, null, 2)); toast('Config copied to clipboard'); }
+  catch { $('copied').style.display = ''; $('copied').textContent = JSON.stringify(cfg); }
+};
+$('mobileToggle').onclick = () => { const o = $('panel').classList.toggle('open'); $('mobileToggle').setAttribute('aria-expanded', o); };
+function syncToggles() { $('xray').checked = S.xray; $('contents').checked = S.contents; $('rink').checked = S.rink; $('spin').checked = S.spin; }
+function syncUI() {
+  renderPresets(); renderLayers(); renderModule(); syncToggles();
+  document.querySelectorAll('#metal button').forEach((b) => b.classList.toggle('active', b.dataset.v === S.metal));
+  $('primary').value = S.primary; $('accent').value = S.accent; $('primary-v').textContent = S.primary; $('accent-v').textContent = S.accent;
+  if (document.activeElement !== $('brand')) $('brand').value = S.brand;
+  if (document.activeElement !== $('wordmark')) $('wordmark').value = S.wordmark; $('wordmark-out').textContent = S.wordmark || ' ';
+  $('door').value = S.door; $('door-v').textContent = S.door < 0.02 ? 'Closed' : Math.round(S.door * 100) + '%';
+  $('explode').value = S.explode; $('explode-v').textContent = Math.round(S.explode * 100) + '%';
+  $('facets').value = S.facets; $('facets-v').textContent = S.facets || 'Smooth';
+  $('skin-scale').value = S.skinScale; $('skin-scale-v').textContent = S.skinScale.toFixed(1) + '×';
+  $('skin').innerHTML = [['default', 'Concept default'], ...(B.logo ? [['logo', 'Logo monogram']] : []), ...REFS.map((r) => [r.id, 'Ref · ' + r.name])].map(([v, l]) => `<option value="${v}">${l}</option>`).join('');
+  if (![...$('skin').options].some((o) => o.value === S.skin)) S.skin = 'default';
+  $('skin').value = S.skin;
+  $('pal-src').textContent = S.palette ? S.paletteSrc : 'Auto from accent'; $('pal-reset').style.display = S.palette ? '' : 'none';
+  document.querySelectorAll('#logo-mode button').forEach((b) => b.classList.toggle('active', b.dataset.v === B.mode));
+  renderBrand(); renderRefs();
+}
+
+// =====================================================================
+// INPUTS · brand assets + design references
+// =====================================================================
+const mk = (w, h) => { const c = document.createElement('canvas'); c.width = w; c.height = h; return c; };
+const hex = (r, g, b) => '#' + [r, g, b].map((v) => Math.round(v).toString(16).padStart(2, '0')).join('');
+const loadImg = (src) => new Promise((res, rej) => { const im = new Image(); im.onload = () => res(im); im.onerror = rej; im.src = src; });
+const readURL = (file) => new Promise((res) => { const r = new FileReader(); r.onload = () => res(r.result); r.readAsDataURL(file); });
+function toCanvas(im, max = 1024) {
+  let w = im.naturalWidth || im.width || 1024, h = im.naturalHeight || im.height || 1024;
+  const k = Math.min(1, max / Math.max(w, h)); w = Math.max(1, Math.round(w * k)); h = Math.max(1, Math.round(h * k));
+  const c = mk(w, h); c.getContext('2d').drawImage(im, 0, 0, w, h); return c;
+}
+function hasAlpha(c) { const d = c.getContext('2d').getImageData(0, 0, c.width, c.height).data; for (let i = 3; i < d.length; i += 4 * 7) if (d[i] < 245) return true; return false; }
+function borderColor(d, w, h) {
+  let r = 0, g = 0, b = 0, n = 0; const add = (x, y) => { const i = (y * w + x) * 4; r += d[i]; g += d[i + 1]; b += d[i + 2]; n++; };
+  for (let x = 0; x < w; x += 2) { add(x, 0); add(x, h - 1); } for (let y = 0; y < h; y += 2) { add(0, y); add(w - 1, y); }
+  return [r / n, g / n, b / n];
+}
+// remove a flat background from JPG logos so they can sit on any panel
+function keyBackground(c) {
+  if (hasAlpha(c)) return c;
+  const ctx = c.getContext('2d'), id = ctx.getImageData(0, 0, c.width, c.height), d = id.data, [br, bg, bb] = borderColor(d, c.width, c.height);
+  for (let i = 0; i < d.length; i += 4) { const dist = Math.hypot(d[i] - br, d[i + 1] - bg, d[i + 2] - bb); d[i + 3] = Math.max(0, Math.min(255, (dist - 28) * 10)); }
+  ctx.putImageData(id, 0, 0); return c;
+}
+function logoVariant(fg) {
+  if (B.mode === 'original') return B.logo;
+  if (!B.tints[fg]) { const c = mk(B.logo.width, B.logo.height), x = c.getContext('2d'); x.drawImage(B.logo, 0, 0); x.globalCompositeOperation = 'source-in'; x.fillStyle = fg; x.fillRect(0, 0, c.width, c.height); B.tints[fg] = c; }
+  return B.tints[fg];
+}
+// k-means palette (by pixel share)
+function extractPalette(src, k = 6) {
+  const n = 64, c = mk(n, n), x = c.getContext('2d'); x.drawImage(src, 0, 0, n, n);
+  const d = x.getImageData(0, 0, n, n).data, px = [];
+  for (let i = 0; i < d.length; i += 4) if (d[i + 3] > 128) px.push([d[i], d[i + 1], d[i + 2]]);
+  if (px.length < k) return [];
+  const d2 = (a, b) => (a[0] - b[0]) ** 2 + (a[1] - b[1]) ** 2 + (a[2] - b[2]) ** 2;
+  const cent = [px[Math.floor(px.length / 2)].slice()];
+  while (cent.length < k) { let best = px[0], bd = -1; for (const p of px) { let m = Infinity; for (const q of cent) m = Math.min(m, d2(p, q)); if (m > bd) { bd = m; best = p; } } cent.push(best.slice()); }
+  let cnt = [];
+  for (let it = 0; it < 10; it++) {
+    const sum = cent.map(() => [0, 0, 0]); cnt = cent.map(() => 0);
+    for (const p of px) { let bi = 0, bd = Infinity; cent.forEach((q, i) => { const v = d2(p, q); if (v < bd) { bd = v; bi = i; } }); sum[bi][0] += p[0]; sum[bi][1] += p[1]; sum[bi][2] += p[2]; cnt[bi]++; }
+    cent.forEach((q, i) => { if (cnt[i]) for (let j = 0; j < 3; j++) q[j] = sum[i][j] / cnt[i]; });
+  }
+  return cent.map((q, i) => ({ c: hex(...q), n: cnt[i] })).filter((e) => e.n > px.length * 0.02).sort((a, b) => b.n - a.n).map((e) => e.c);
+}
+// finish analysis: edge crispness + warm-metal share
+function analyze(src) {
+  const n = 128, c = mk(n, n), x = c.getContext('2d'); x.drawImage(src, 0, 0, n, n);
+  const d = x.getImageData(0, 0, n, n).data, gray = new Float32Array(n * n); let warm = 0, tot = 0;
+  for (let i = 0; i < n * n; i++) {
+    const r = d[i * 4] / 255, g = d[i * 4 + 1] / 255, b = d[i * 4 + 2] / 255; gray[i] = 0.299 * r + 0.587 * g + 0.114 * b;
+    if (d[i * 4 + 3] < 128) continue; tot++;
+    const mx = Math.max(r, g, b), mn = Math.min(r, g, b), l = (mx + mn) / 2, s = mx === mn ? 0 : (mx - mn) / (1 - Math.abs(2 * l - 1));
+    let h = 0; if (mx !== mn) { h = mx === r ? ((g - b) / (mx - mn)) % 6 : mx === g ? (b - r) / (mx - mn) + 2 : (r - g) / (mx - mn) + 4; h *= 60; if (h < 0) h += 360; }
+    if (s > 0.25 && h >= 25 && h <= 62 && l > 0.25 && l < 0.85) warm++;
+  }
+  let e = 0, strong = 0;
+  for (let y = 1; y < n - 1; y++) for (let xx = 1; xx < n - 1; xx++) {
+    const i = y * n + xx, gx = gray[i + 1] - gray[i - 1], gy = gray[i + n] - gray[i - n], m = Math.hypot(gx, gy); e += m; if (m > 0.25) strong++;
+  }
+  const edge = strong / ((n - 2) * (n - 2)), warmth = tot ? warm / tot : 0;
+  return { edge, warmth, metal: warmth > 0.16 ? 'gold' : 'chrome', facets: edge > 0.14 ? 8 : edge > 0.08 ? 12 : 0, crisp: edge > 0.08 };
+}
+// silhouette → lathe profile [[r_in, y_in]] (bottom → top)
+function extractProfile(src) {
+  const H = 200, W = Math.max(8, Math.round(src.width * H / src.height)), c = mk(W, H), x = c.getContext('2d'); x.drawImage(src, 0, 0, W, H);
+  const d = x.getImageData(0, 0, W, H).data, alpha = hasAlpha(c), [br, bg, bb] = borderColor(d, W, H);
+  const on = (i) => alpha ? d[i + 3] > 60 : Math.hypot(d[i] - br, d[i + 1] - bg, d[i + 2] - bb) > 46;
+  const rows = [];
+  for (let y = 0; y < H; y++) { let l = -1, r = -1, k = 0; for (let xx = 0; xx < W; xx++) if (on((y * W + xx) * 4)) { k++; if (l < 0) l = xx; r = xx; } rows.push(k >= 3 ? [l, r] : null); }
+  const idx = rows.map((r, i) => (r ? i : -1)).filter((i) => i >= 0); if (idx.length < 24) return null;
+  if (idx.filter((i) => rows[i][0] <= 2 && rows[i][1] >= W - 3).length > idx.length * 0.4) return null; // full-bleed texture, not an object
+  const top = idx[0], bot = idx[idx.length - 1];
+  let last = null; const hw = []; for (let y = top; y <= bot; y++) { if (rows[y]) last = rows[y]; hw.push((last[1] - last[0]) / 2); }
+  const N = 34, samp = [];
+  for (let i = 0; i < N; i++) { const t = Math.round((hw.length - 1) * (1 - i / (N - 1))); const a = hw[Math.max(0, t - 1)], b = hw[t], cc = hw[Math.min(hw.length - 1, t + 1)]; samp.push((a + b + cc) / 3); }
+  const sm = samp.map((v, i) => (samp[Math.max(0, i - 1)] + v * 2 + samp[Math.min(N - 1, i + 1)]) / 4);
+  const max = Math.max(...sm); let end = N - 1;                   // trim narrow lids/finials so the bowl opens at the top
+  while (end > N * 0.6 && sm[end] < max * 0.55) end--;
+  const keep = sm.slice(0, end + 1), hpx = (bot - top) * (end / (N - 1)), rs = 15 / max, hIn = Math.min(28, Math.max(14, hpx * rs));
+  return { pts: keep.map((v, i) => [Math.max(1.6, v * rs), +(i / end * hIn).toFixed(3)]), height: hIn, trimmed: end < N - 1 };
+}
+function drawProfile(cv, pts, color) {
+  const x = cv.getContext('2d'), W = cv.width, H = cv.height, mr = 16, mh = pts[pts.length - 1][1]; x.clearRect(0, 0, W, H);
+  x.fillStyle = color; x.beginPath();
+  pts.forEach(([r, y], i) => { const px = W / 2 + r / mr * W / 2 * 0.95, py = H - y / mh * H; i ? x.lineTo(px, py) : x.moveTo(W / 2, H) || x.lineTo(px, py); });
+  for (let i = pts.length - 1; i >= 0; i--) { const [r, y] = pts[i]; x.lineTo(W / 2 - r / mr * W / 2 * 0.95, H - y / mh * H); }
+  x.closePath(); x.fill();
+}
+function makeSkin() {
+  let c = null, rep = S.skinScale;
+  if (S.skin === 'logo' && B.logo) {
+    c = mk(512, 512); const x = c.getContext('2d'); x.fillStyle = S.primary; x.fillRect(0, 0, 512, 512);
+    const lg = logoVariant(S.accent), w = 300, h = w * lg.height / lg.width;
+    x.globalAlpha = 0.9; x.drawImage(lg, 256 - w / 2, 256 - h / 2, w, h);
+    x.globalAlpha = 0.35; for (const [cx, cy] of [[0, 0], [512, 0], [0, 512], [512, 512]]) x.drawImage(lg, cx - w / 4, cy - h / 4, w / 2, h / 2);
+    rep = 3 * S.skinScale;
+  } else { const r = REFS.find((r) => r.id === S.skin); if (r) c = r.canvas; }
+  if (!c) return null;
+  const t = new THREE.CanvasTexture(c); t.colorSpace = THREE.SRGBColorSpace; t.wrapS = t.wrapT = THREE.RepeatWrapping; t.repeat.set(rep, rep);
+  t.anisotropy = renderer.capabilities.getMaxAnisotropy(); return t;
+}
+
+// ---------- brand UI ----------
+async function setLogo(src, save = true) {
+  const im = await loadImg(src); B.logo = keyBackground(toCanvas(im, 1024)); B.logoSrc = B.logo.toDataURL('image/png'); B.tints = {};
+  const pal = extractPalette(B.logo, 5); for (const c of pal) if (!B.colors.includes(c) && B.colors.length < 10) B.colors.push(c);
+  if (save) { B.use = true; $('use-logo').checked = true; }
+  build();
+}
+function renderBrand() {
+  $('logo-prev').style.display = B.logo ? 'block' : 'none';
+  $('brand-mark').innerHTML = B.logo && B.use ? `<img alt="Brand" src="${(B.mode === 'original' ? B.logo : logoVariant('#ffffff')).toDataURL('image/png')}">` : `<span class="txt">${(S.brand || '').replace(/[<>&]/g, '')}</span>`;
+  if (B.logo) { const pv = $('logo-pv'); pv.innerHTML = ''; const c = toCanvas(B.mode === 'original' ? B.logo : logoVariant('#ffffff'), 220); pv.appendChild(c); }
+  $('brand-sw').innerHTML = B.colors.map((c, i) => `<div class="swc" data-i="${i}" title="${c}"><div class="c" style="background:${c}"></div><span class="x" data-act="x">×</span><div class="a"><button data-act="p">P</button><button data-act="a">A</button></div></div>`).join('');
+  $('brand-pal-row').style.display = B.colors.length >= 2 ? 'flex' : 'none';
+}
+$('brand-sw').onclick = (e) => {
+  const b = e.target.closest('[data-act]'), sw = e.target.closest('.swc'); if (!b || !sw) return; const c = B.colors[+sw.dataset.i];
+  if (b.dataset.act === 'x') { B.colors.splice(+sw.dataset.i, 1); renderBrand(); saveSoon(); return; }
+  S[b.dataset.act === 'p' ? 'primary' : 'accent'] = c; markCustom(); build();
+};
+$('c-add-btn').onclick = () => { const c = $('c-add').value; if (!B.colors.includes(c)) B.colors.push(c); renderBrand(); saveSoon(); };
+$('brand-pal').onclick = () => { S.palette = B.colors.slice(0, 6); S.paletteSrc = 'Brand colors'; build(); };
+$('pal-reset').onclick = () => { S.palette = null; S.paletteSrc = null; build(); };
+$('use-logo').onchange = (e) => { B.use = e.target.checked; build(); };
+$('logo-mode').onclick = (e) => { const b = e.target.closest('button'); if (!b) return; B.mode = b.dataset.v; B.tints = {}; build(); };
+$('logo-rm').onclick = () => { B.logo = null; B.logoSrc = null; if (S.skin === 'logo') S.skin = 'default'; build(); };
+$('f-font').onchange = async (e) => {
+  const f = e.target.files[0]; if (!f) return;
+  try { const ff = new FontFace('BrandFont', await f.arrayBuffer()); await ff.load(); document.fonts.add(ff); B.font = 'BrandFont'; $('font-name').textContent = f.name.slice(0, 18); build(); }
+  catch { $('font-name').textContent = 'Unreadable font'; }
+};
+
+// ---------- reference UI ----------
+let refSeq = 0;
+async function addRef(src, name, save = true) {
+  const im = await loadImg(src), canvas = toCanvas(im, 900);
+  const r = { id: 'ref' + (++refSeq), name: name.replace(/\.[a-z0-9]+$/i, '').slice(0, 40), canvas, thumb: canvas.toDataURL('image/jpeg', 0.8), palette: extractPalette(canvas, 6), ...analyze(canvas), profile: extractProfile(canvas) };
+  REFS.push(r); if (save) saveSoon(); return r;
+}
+function renderRefs() {
+  $('refs').innerHTML = REFS.map((r) => {
+    const pOn = S.paletteSrc === 'Ref · ' + r.name, sOn = S.skin === r.id, cOn = S.profileSrc === r.id && S.cup === 'custom';
+    return `<div class="ref ${pOn || sOn || cOn ? 'on' : ''}" data-id="${r.id}">
+      <img src="${r.thumb}" alt=""><div><div class="nm">${r.name}</div>
+      <div class="pal">${r.palette.map((c) => `<i style="background:${c}"></i>`).join('')}</div>
+      <div class="meta">${r.crisp ? 'Crisp, faceted edges' : 'Soft, smooth surfaces'} · ${r.metal === 'gold' ? 'warm → gold' : 'cool → chrome'}${r.profile ? ` · silhouette ${r.profile.height.toFixed(0)}″ tall${r.profile.trimmed ? ' (top trimmed)' : ''}` : ' · no clear silhouette'}</div></div>
+      ${r.profile ? '<canvas class="prof" width="68" height="88"></canvas>' : ''}
+      <span class="rm" data-act="rm" title="Remove">×</span>
+      <div class="acts">
+        <button data-act="pal" class="${pOn ? 'on' : ''}">Palette → glass</button>
+        <button data-act="skin" class="${sOn ? 'on' : ''}">Skin</button>
+        ${r.profile ? `<button data-act="cup" class="${cOn ? 'on' : ''}">Cup from silhouette</button>` : ''}
+        <button data-act="finish" title="Apply suggested metal + facet count">Finish: ${r.metal}${r.facets ? ' · ' + r.facets + ' facets' : ' · smooth'}</button>
+        <button data-act="pa">Colors → P/A</button>
+      </div></div>`;
+  }).join('');
+  $('refs').querySelectorAll('.ref').forEach((el) => { const r = REFS.find((x) => x.id === el.dataset.id), cv = el.querySelector('canvas.prof'); if (cv && r.profile) drawProfile(cv, r.profile.pts, S.accent); });
+}
+$('refs').onclick = (e) => {
+  const b = e.target.closest('[data-act]'), el = e.target.closest('.ref'); if (!b || !el) return; const r = REFS.find((x) => x.id === el.dataset.id), act = b.dataset.act;
+  if (act === 'rm') { REFS.splice(REFS.indexOf(r), 1); if (S.skin === r.id) S.skin = 'default'; if (S.profileSrc === r.id) { S.profileSrc = null; S.cupProfile = null; } if (S.paletteSrc === 'Ref · ' + r.name) { S.palette = null; S.paletteSrc = null; } }
+  if (act === 'pal') { if (S.paletteSrc === 'Ref · ' + r.name) { S.palette = null; S.paletteSrc = null; } else { S.palette = r.palette; S.paletteSrc = 'Ref · ' + r.name; } }
+  if (act === 'skin') S.skin = S.skin === r.id ? 'default' : r.id;
+  if (act === 'cup') { S.cup = 'custom'; S.cupProfile = r.profile.pts; S.profileSrc = r.id; if (!S.facets && r.facets) S.facets = r.facets; markCustom(); }
+  if (act === 'finish') { S.metal = r.metal; S.facets = r.facets; if (S.cup !== 'custom' && r.profile) { S.cup = 'custom'; S.cupProfile = r.profile.pts; S.profileSrc = r.id; } markCustom(); }
+  if (act === 'pa') { const sorted = [...r.palette]; const lum = (h) => { const c = new THREE.Color(h); return c.r * 0.3 + c.g * 0.59 + c.b * 0.11; };
+    const dark = sorted.filter((c) => lum(c) < 0.45).sort((a, b) => lum(a) - lum(b))[0] || sorted[0];
+    const vivid = sorted.map((c) => { const hsl = {}; new THREE.Color(c).getHSL(hsl); return [c, hsl.s * (1 - Math.abs(hsl.l - 0.55))]; }).sort((a, b) => b[1] - a[1])[0][0];
+    S.primary = dark; S.accent = vivid; markCustom(); }
+  build();
+};
+$('facets').oninput = (e) => { S.facets = +e.target.value; $('facets-v').textContent = S.facets || 'Smooth'; clearTimeout(colorT); colorT = setTimeout(build, 80); };
+$('skin').onchange = (e) => { S.skin = e.target.value; build(); };
+$('skin-scale').oninput = (e) => { S.skinScale = +e.target.value; $('skin-scale-v').textContent = S.skinScale.toFixed(1) + '×'; if (skinTex) { const k = S.skin === 'logo' ? 3 : 1; skinTex.repeat.set(k * S.skinScale, k * S.skinScale); } saveSoon(); };
+
+// drag & drop + file pickers
+function wireDrop(zone, input, onFiles) {
+  input.onchange = (e) => { onFiles([...e.target.files]); input.value = ''; };
+  zone.addEventListener('dragover', (e) => { e.preventDefault(); zone.classList.add('over'); });
+  zone.addEventListener('dragleave', () => zone.classList.remove('over'));
+  zone.addEventListener('drop', (e) => { e.preventDefault(); zone.classList.remove('over'); onFiles([...e.dataTransfer.files].filter((f) => f.type.startsWith('image/'))); });
+}
+wireDrop($('drop-logo'), $('f-logo'), async (fs) => { if (fs[0]) await setLogo(await readURL(fs[0])); });
+wireDrop($('drop-ref'), $('f-ref'), async (fs) => { for (const f of fs.slice(0, 12)) { try { await addRef(await readURL(f), f.name); } catch {} } build(); });
+// also: drop images anywhere on the 3D view → references
+view.addEventListener('dragover', (e) => e.preventDefault());
+view.addEventListener('drop', async (e) => { e.preventDefault(); for (const f of [...e.dataTransfer.files].filter((f) => f.type.startsWith('image/')).slice(0, 12)) { try { await addRef(await readURL(f), f.name); } catch {} } build(); });
+
+// ---------- persistence (this browser only) ----------
+const KEY = 'trophy-cooler-studio-v2'; let saveT;
+function saveSoon() { clearTimeout(saveT); saveT = setTimeout(() => {
+  const keepS = (({ preset, base, enc, cup, metal, primary, accent, brand, skin, skinScale, palette, paletteSrc, cupProfile, profileSrc, facets, wordmark }) => ({ preset, base, enc, cup, metal, primary, accent, brand, skin, skinScale, palette, paletteSrc, cupProfile, profileSrc, facets, wordmark }))(S);
+  const data = { S: keepS, B: { logo: B.logoSrc, mode: B.mode, use: B.use, colors: B.colors }, refs: REFS.map((r) => ({ id: r.id, name: r.name, src: r.canvas.width > 640 ? toCanvas(r.canvas, 640).toDataURL('image/jpeg', 0.82) : r.thumb })) };
+  try { localStorage.setItem(KEY, JSON.stringify(data)); } catch { try { data.refs = data.refs.slice(0, 3); localStorage.setItem(KEY, JSON.stringify(data)); } catch {} }
+}, 600); }
+async function restore() {
+  let data; try { data = JSON.parse(localStorage.getItem(KEY) || 'null'); } catch { data = null; } if (!data) return;
+  try {
+    Object.assign(S, data.S || {}); Object.assign(B, { mode: data.B?.mode || 'tint', use: data.B?.use !== false, colors: data.B?.colors || [] });
+    if (data.B?.logo) { const im = await loadImg(data.B.logo); B.logo = toCanvas(im, 1024); B.logoSrc = data.B.logo; }
+    for (const r of data.refs || []) { const nr = await addRef(r.src, r.name, false); if (S.skin === r.id) S.skin = nr.id; if (S.profileSrc === r.id) S.profileSrc = nr.id; }
+  } catch {}
+}
+
+// ---------- GLB export of the current design ----------
+let hostDL = null;
+if (window.claude && typeof window.claude.use === 'function') window.claude.use('downloads').then((d) => { hostDL = d; }).catch(() => {});
+const CRC = (() => { const t = new Uint32Array(256); for (let n = 0; n < 256; n++) { let c = n; for (let k = 0; k < 8; k++) c = c & 1 ? 0xedb88320 ^ (c >>> 1) : c >>> 1; t[n] = c >>> 0; } return t; })();
+const crc32 = (u) => { let c = 0xffffffff; for (let i = 0; i < u.length; i++) c = CRC[(c ^ u[i]) & 255] ^ (c >>> 8); return (c ^ 0xffffffff) >>> 0; };
+function makeZip(files) { // store-only zip
+  const parts = [], cd = []; let off = 0;
+  for (const [nm, data] of files) {
+    const n = new TextEncoder().encode(nm), crc = crc32(data), h = new DataView(new ArrayBuffer(30));
+    h.setUint32(0, 0x04034b50, true); h.setUint16(4, 20, true); h.setUint32(14, crc, true); h.setUint32(18, data.length, true); h.setUint32(22, data.length, true); h.setUint16(26, n.length, true);
+    parts.push(new Uint8Array(h.buffer), n, data);
+    const c = new DataView(new ArrayBuffer(46)); c.setUint32(0, 0x02014b50, true); c.setUint16(4, 20, true); c.setUint16(6, 20, true); c.setUint32(16, crc, true); c.setUint32(20, data.length, true); c.setUint32(24, data.length, true); c.setUint16(28, n.length, true); c.setUint32(42, off, true);
+    cd.push(new Uint8Array(c.buffer), n); off += 30 + n.length + data.length;
+  }
+  const cdSize = cd.reduce((a, b) => a + b.length, 0), e = new DataView(new ArrayBuffer(22));
+  e.setUint32(0, 0x06054b50, true); e.setUint16(8, files.length, true); e.setUint16(10, files.length, true); e.setUint32(12, cdSize, true); e.setUint32(16, off, true);
+  return new Blob([...parts, ...cd, new Uint8Array(e.buffer)]);
+}
+$('glb').onclick = async () => {
+  const what = $('glb-what').value, keep = { xray: S.xray, door: S.door, explode: S.explode };
+  Object.assign(S, { xray: false, door: 0, explode: 0 }); applyView();
+  const src = what === 'all' ? root : what === 'base' ? parts.base : what === 'enc' ? parts.enc : parts.cupGroup;
+  const wrap = new THREE.Group(); const cl = src.clone(true); if (what === 'cup') cl.position.y = 0; wrap.add(cl); wrap.scale.setScalar(D.IN_TO_M); wrap.updateMatrixWorld(true);
+  try {
+    const buf = await new GLTFExporter().parseAsync(wrap, { binary: true });
+    const name = `trophy-cooler_${S.preset}_${what}`, mb = (buf.byteLength / 1048576).toFixed(1);
+    if (hostDL) { // hosted on claude.ai: save through the downloads capability (zip-wrapped GLB)
+      const cfg = JSON.stringify({ preset: S.preset, base: S.base, enclosure: S.enc, cup: S.cup, metal: S.metal, primary: S.primary, accent: S.accent, facets: S.facets, cupProfile: S.cupProfile, units: 'meters, +Y up, +Z front' }, null, 2);
+      try { await hostDL.save({ filename: name + '.zip', data: makeZip([[name + '.glb', new Uint8Array(buf)], ['config.json', new TextEncoder().encode(cfg)]]) }); $('glb-msg').textContent = `Saved ${name}.zip (${mb} MB GLB inside).`; toast('GLB exported'); }
+      catch (e) { $('glb-msg').textContent = e && e.code === 'declined' ? 'Download cancelled.' : 'Download unavailable here — use the standalone HTML file.'; }
+    } else {
+      const url = URL.createObjectURL(new Blob([buf], { type: 'model/gltf-binary' })), a = document.createElement('a');
+      a.href = url; a.download = name + '.glb'; document.body.appendChild(a); a.click(); a.remove(); setTimeout(() => URL.revokeObjectURL(url), 4000);
+      $('glb-msg').textContent = `Exported ${name}.glb (${mb} MB).`; toast('GLB exported');
+    }
+  } catch (err) { $('glb-msg').textContent = 'Export failed: ' + err.message; }
+  Object.assign(S, keep); applyView();
+};
+
+// ---------- header actions ----------
+$('export').onclick = () => { $('glb-what').value = 'all'; $('glb').click(); };
+$('capture').onclick = async () => {
+  controls.update(); renderer.render(scene, camera);
+  const blob = await new Promise((r) => renderer.domElement.toBlob(r, 'image/png')), name = `trophy-cooler_${S.preset}_${S.view}.png`;
+  if (hostDL) { try { await hostDL.save({ filename: name, data: blob }); toast('View captured'); } catch (e) { toast(e && e.code === 'declined' ? 'Capture cancelled' : 'Capture unavailable here'); } }
+  else { const u = URL.createObjectURL(blob), a = document.createElement('a'); a.href = u; a.download = name; document.body.appendChild(a); a.click(); a.remove(); setTimeout(() => URL.revokeObjectURL(u), 4000); toast('View captured'); }
+};
+
+// ---------- cameras ----------
+const CAMS = { hero: [[100, 66, 128], [0, 31, 0]], front: [[0, 34, 170], [0, 33, 0]], back: [[0, 34, -170], [0, 33, 0]], side: [[170, 34, 0], [0, 33, 0]], top: [[0.1, 190, 30], [0, 20, 0]], rink: [[260, 110, 420], [0, 20, 0]] };
+let tween = null;
+function goCam(k, instant) {
+  S.view = k; document.querySelectorAll('#viewbar button').forEach((b) => b.classList.toggle('active', b.dataset.view === k));
+  const [p, t] = CAMS[k], fromP = camera.position.clone(), fromT = controls.target.clone(), toP = new THREE.Vector3(...p), toT = new THREE.Vector3(...t);
+  if (instant) { camera.position.copy(toP); controls.target.copy(toT); return; }
+  tween = { t0: performance.now(), fromP, fromT, toP, toT };
+}
+$('viewbar').onclick = (e) => { const b = e.target.closest('button'); if (b) goCam(b.dataset.view); };
+$('fit').onclick = () => { // frame whatever is visible
+  const box = new THREE.Box3(); root.traverse((o) => { if (o.isMesh && o.visible && o.parent && [parts.base, parts.enc, parts.fridge, parts.cupGroup].some((p) => p.visible && (p === o || p.getObjectById(o.id)))) box.expandByObject(o); });
+  if (box.isEmpty()) return; const c = box.getCenter(new THREE.Vector3()), r = box.getSize(new THREE.Vector3()).length() / 2;
+  const dir = camera.position.clone().sub(controls.target).normalize(), dist = r / Math.sin(THREE.MathUtils.degToRad(camera.fov / 2)) * 1.05;
+  tween = { t0: performance.now(), fromP: camera.position.clone(), fromT: controls.target.clone(), toP: c.clone().add(dir.multiplyScalar(dist)), toT: c };
+};
+
+function resize() { const w = view.clientWidth, h = view.clientHeight; renderer.setSize(w, h); camera.aspect = w / h; camera.updateProjectionMatrix(); }
+addEventListener('resize', resize);
+
+function loop(now) {
+  if (tween) { const k = Math.min(1, (now - tween.t0) / 900), e = 1 - Math.pow(1 - k, 3); camera.position.lerpVectors(tween.fromP, tween.toP, e); controls.target.lerpVectors(tween.fromT, tween.toT, e); if (k === 1) tween = null; }
+  controls.update(); renderer.render(scene, camera); requestAnimationFrame(loop);
+}
+
+try { await Promise.race([document.fonts.load('700 64px "Barlow Condensed"'), new Promise((r) => setTimeout(r, 2500))]); } catch {}
+await restore();
+resize(); goCam('hero', true); build(); $('loading').remove(); requestAnimationFrame(loop);
+window.__studio = { S, build, applyView, goCam };
+</script>
+</body>
+</html>
