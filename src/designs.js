@@ -38,27 +38,27 @@ const named = (g, name) => { g.name = name; return g; };
 export function makeMaterials(o) {
   const metal = o.metal === 'gold'
     ? new THREE.MeshPhysicalMaterial({ name: 'polished-gold', color: 0xd9b45b, metalness: 1, roughness: 0.14 })
-    : new THREE.MeshPhysicalMaterial({ name: 'mirror-chrome', color: 0xf3f5f8, metalness: 1, roughness: 0.05 });
+    : new THREE.MeshPhysicalMaterial({ name: 'mirror-chrome', color: 0xeef1f5, metalness: 1, roughness: 0.09 });
   const M = {
     metal,
     gunmetal: new THREE.MeshPhysicalMaterial({ name: 'gunmetal', color: 0x23262c, metalness: 1, roughness: 0.32 }),
-    primary: new THREE.MeshPhysicalMaterial({ name: 'lacquer-primary', color: o.primary, metalness: 0.15, roughness: 0.26, clearcoat: 1, clearcoatRoughness: 0.06 }),
-    white: new THREE.MeshPhysicalMaterial({ name: 'gloss-white', color: 0xf3f5f8, roughness: 0.28, clearcoat: 0.9 }),
-    uhmw: new THREE.MeshStandardMaterial({ name: 'UHMW-PE', color: 0xecece6, roughness: 0.78 }),
+    primary: new THREE.MeshPhysicalMaterial({ name: 'lacquer-primary', color: o.primary, metalness: 0.05, roughness: 0.42, clearcoat: 1, clearcoatRoughness: 0.08, sheen: 0.25, sheenColor: 0x6f8cff }),
+    white: new THREE.MeshPhysicalMaterial({ name: 'gloss-white', color: 0xeef1f5, roughness: 0.38, clearcoat: 0.9, clearcoatRoughness: 0.1 }),
+    uhmw: new THREE.MeshPhysicalMaterial({ name: 'UHMW-PE', color: 0xe9e9e3, roughness: 0.62, sheen: 0.3, sheenColor: 0xffffff }),
     rubber: new THREE.MeshStandardMaterial({ name: 'vulcanized-rubber', color: 0x131417, roughness: 0.82 }),
     grille: new THREE.MeshStandardMaterial({ name: 'vent-grille', color: 0x0b0c0f, roughness: 0.55, metalness: 0.5 }),
     led: new THREE.MeshStandardMaterial({ name: 'LED', color: o.accent, emissive: o.accent, emissiveIntensity: 2.4 }),
     acrylic: new THREE.MeshPhysicalMaterial({ name: 'frosted-acrylic', color: o.accent, roughness: 0.5, transmission: 0.55, thickness: 0.5, ior: 1.49, iridescence: 0.55, iridescenceIOR: 1.3, side: THREE.DoubleSide }),
     iridescent: new THREE.MeshPhysicalMaterial({ name: 'iridescent-shell', color: 0xffffff, roughness: 0.04, transmission: 0.8, thickness: 0.8, ior: 1.5, iridescence: 1, iridescenceIOR: 1.6, iridescenceThicknessRange: [200, 900], side: THREE.DoubleSide }),
-    ice: new THREE.MeshPhysicalMaterial({ name: 'ice', color: 0xeaf5ff, roughness: 0.12, transmission: 0.92, thickness: 1.0, ior: 1.31 }),
-    bottle: new THREE.MeshPhysicalMaterial({ name: 'bottle-glass', color: 0xe6f2ee, roughness: 0.04, transmission: 0.92, thickness: 0.25, ior: 1.5 }),
+    ice: new THREE.MeshPhysicalMaterial({ name: 'ice', color: 0xf7fbff, roughness: 0.32, transmission: 0.45, thickness: 1.4, ior: 1.31, attenuationColor: 0xe4f1ff, attenuationDistance: 8, specularIntensity: 1, clearcoat: 1, clearcoatRoughness: 0.12, sheen: 0.4, sheenColor: 0xffffff, sheenRoughness: 0.5 }),
+    bottle: new THREE.MeshPhysicalMaterial({ name: 'bottle-glass', color: 0xffffff, roughness: 0.03, transmission: 0.98, thickness: 0.18, ior: 1.52, attenuationColor: 0xd8f0e4, attenuationDistance: 3, specularIntensity: 1, clearcoat: 1, clearcoatRoughness: 0.02 }),
     labelWhite: new THREE.MeshStandardMaterial({ name: 'bottle-label', color: 0xffffff, roughness: 0.35 }),
-    labelBlue: new THREE.MeshStandardMaterial({ name: 'bottle-label-blue', color: 0x0b2a6b, roughness: 0.35 }),
+    labelBlue: new THREE.MeshPhysicalMaterial({ name: 'bottle-neck-foil', color: 0x0b2d82, metalness: 0.6, roughness: 0.28, clearcoat: 1 }),
     foil: new THREE.MeshPhysicalMaterial({ name: 'neck-foil', color: 0xcfd6de, metalness: 1, roughness: 0.2 }),
   };
   // stained-glass palette around the accent hue
   const hsl = {}; new THREE.Color(o.accent).getHSL(hsl);
-  const shifts = [[0, 0, 0], [0.03, 0.05, 0.14], [-0.04, -0.1, 0.24], [0.48, -0.3, 0.32], [0, -0.7, 0.4], [0.07, 0.1, -0.12]];
+  const shifts = [[0, 0, 0], [0.02, 0.05, 0.16], [-0.03, -0.15, 0.3], [0.01, -0.85, 0.42], [0, -0.6, 0.22], [-0.02, 0.1, -0.14]]; // Michelob blues, whites, silver
   M.glass = shifts.map(([dh, ds, dl], i) => {
     const c = new THREE.Color().setHSL((hsl.h + dh + 1) % 1, clamp(hsl.s + ds), clamp(hsl.l + dl, 0.12, 0.92));
     return new THREE.MeshPhysicalMaterial({ name: 'stained-glass-' + i, color: c, roughness: 0.1, transmission: 0.35, thickness: 0.3, ior: 1.52, iridescence: 0.4, emissive: c, emissiveIntensity: 0.35, side: THREE.DoubleSide });
@@ -130,10 +130,10 @@ function hingedDoor(M, o, { W, H, x, y, z, skin, style }) {
   p.add(rbox(W, H, 0.75, 0.3, skin, 0, 0, 0));
   grilleSlots(p, W - 4, 6, -H / 2 + 1.0, 0.42, M); // aligned with fridge's bottom-front vent
   p.add(strut([-W / 2 + 1.4, -6, 0.9], [-W / 2 + 1.4, 6, 0.9], 0.38, M.metal));
-  if (style === 'mosaic') { const mo = mosaic(M, 13, 15, 77); mo.position.set(0, 3, 0.4); mo.rotation.z = Math.PI / 4; mo.scale.setScalar(0.85); p.add(mo); }
+  if (style === 'mosaic') { const mo = mosaic(M, 13, 15, 77); mo.position.set(0, 1, 0.4); mo.rotation.z = Math.PI / 4; mo.scale.setScalar(0.85); p.add(mo); }
   if (style === 'stripes') { for (const [yy, hh, mt] of [[-H / 2 + 8.4, 0.6, M.metal], [-H / 2 + 9.85, 2.4, M.white], [-H / 2 + 11.3, 0.6, M.metal]]) p.add(box(W - 0.2, hh, 0.2, mt, 0, yy, 0.45)); }
-  if (style === 'mirror') p.add(rbox(W - 3, H - 13, 0.2, 0.08, M.metal, 0, -0.5, 0.45));
-  const lbl = labelPlane(o, W - 6, 3.2, { fg: '#ffffff' }); if (lbl) { lbl.position.set(0, H / 2 - 3, 0.42); p.add(lbl); }
+  if (style === 'mirror') p.add(rbox(W - 3, H - 15, 0.2, 0.08, M.metal, 0, -1.5, 0.45));
+  const lbl = labelPlane(o, W - 4, 4.8, { fg: '#ffffff' }); if (lbl) { lbl.position.set(0, H / 2 - 3.6, 0.48); p.add(lbl); }
   pivot.userData.setDoor = (t) => { pivot.rotation.y = t * 1.7; };
   return pivot;
 }
@@ -192,15 +192,15 @@ function encCathedral(M, o) {
   const zf = zc + D / 2, zb = zc - D / 2;
   for (const sx of [-1, 1]) for (const zz of [zf - 0.8, zb + 0.8]) g.add(box(1.6, H, 1.6, M.metal, sx * (W / 2 - 0.8), y0 + H / 2, zz));
   g.add(rbox(W + 1.2, 1.6, D + 1.2, 0.5, M.metal, 0, y0 + H - 0.8, zc));
-  const ph = 28.9, pyc = y0 + 2 + ph / 2;
+  const ph = 26.6, pyc = y0 + 2 + ph / 2;
   const sides = [[-Math.PI / 2, -W / 2 + 0.35, zc, D - 3.2], [Math.PI / 2, W / 2 - 0.35, zc, D - 3.2], [Math.PI, 0, zb + 0.35, W - 3.2]];
   sides.forEach(([ry, x, z, w], i) => {
     const s = new THREE.Group(); s.position.set(x, 0, z); s.rotation.y = ry; g.add(s);
     if (M.skin) { s.add(mesh(new THREE.PlaneGeometry(w, ph), M.skin, 0, pyc, 0.2)); s.add(box(w, ph, 0.12, M.gunmetal, 0, pyc, -0.02)); }
     else { const mo = mosaic(M, w, ph, 11 + i * 7, true, (o.encP && o.encP.tile) || 1); mo.position.y = pyc; s.add(mo); }
     s.add(box(w, 2, 0.6, M.metal, 0, y0 + 1, 0));
-    s.add(box(w, 3.5, 0.5, M.primary, 0, y0 + 30.9 + 1.75, 0));
-    const l = labelPlane(o, w - 2, 2.8, { fg: '#ffffff' }); if (l) { l.position.set(0, y0 + 32.65, 0.27); s.add(l); }
+    s.add(box(w, 5.6, 0.5, M.primary, 0, y0 + 31.4, 0));
+    const l = labelPlane(o, w - 1.2, 4.6, { fg: '#ffffff' }); if (l) { l.position.set(0, y0 + 31.4, 0.27); s.add(l); }
   });
   const door = hingedDoor(M, o, { W: W - 3.4, H: 33.6, x: W / 2 - 1.6, y: y0 + 0.4 + 16.8, z: zf - 0.4, skin: M.primary, style: 'mosaic' });
   g.add(door); g.userData.setDoor = door.userData.setDoor;
@@ -208,20 +208,20 @@ function encCathedral(M, o) {
 }
 function encHalo(M, o) {
   const g = named(new THREE.Group(), 'enclosure-halo'); const R = 19, y0 = DECK_Y, H = ENC_H, a = 0.78;
-  g.add(cyl(R, R, H, 96, M.skin || M.white, 0, y0 + H / 2, 0, true, a, Math.PI * 2 - 2 * a));
-  g.add(cyl(R - 0.6, R - 0.6, H, 96, M.white, 0, y0 + H / 2, 0, true, a, Math.PI * 2 - 2 * a));
+  g.add(cyl(R, R, H, 96, M.skin || M.primary, 0, y0 + H / 2, 0, true, a, Math.PI * 2 - 2 * a));
+  g.add(cyl(R - 0.6, R - 0.6, H, 96, M.primary, 0, y0 + H / 2, 0, true, a, Math.PI * 2 - 2 * a));
   g.add(cyl(R + 0.6, R + 0.6, 1.2, 96, M.metal, 0, y0 + H - 0.6, 0));
   g.add(torus(R + 0.05, 0.55, M.metal, y0 + 0.6));
-  g.add(torus(R + 0.05, 0.35, M.metal, y0 + 30));
-  g.add(labelBand(o, R + 0.06, 4, y0 + 32.6, a + 0.05, Math.PI * 2 - 2 * a - 0.1, { bg: '#' + M.primary.color.getHexString(), fg: '#ffffff', repeat: 3 })
-     || cyl(R + 0.06, R + 0.06, 4, 96, M.primary, 0, y0 + 32.6, 0, true, a, Math.PI * 2 - 2 * a));
+  g.add(torus(R + 0.05, 0.35, M.metal, y0 + 28.7)); g.add(torus(R + 0.05, 0.35, M.metal, y0 + 21.3));
+  g.add(labelBand(o, R + 0.06, 7, y0 + 25, a + 0.05, Math.PI * 2 - 2 * a - 0.1, { bg: '#f3f5f8', fg: '#' + M.primary.color.getHexString(), repeat: 2 })
+     || cyl(R + 0.06, R + 0.06, 7, 96, M.white, 0, y0 + 25, 0, true, a, Math.PI * 2 - 2 * a));
   // curved door, hinged at the right (+X) edge of the opening
   const hx = R * Math.sin(a), hz = R * Math.cos(a);
   const pivot = named(new THREE.Group(), 'enclosure-door'); pivot.position.set(hx, 0, hz); g.add(pivot);
   const d = new THREE.Group(); d.position.set(-hx, 0, -hz); pivot.add(d);
   d.add(cyl(R, R, H - 1.4, 96, M.primary, 0, y0 + (H - 1.4) / 2 + 0.1, 0, true, -a, 2 * a));
   for (let i = 0; i < 6; i++) d.add(cyl(R + 0.12, R + 0.12, 0.32, 48, M.grille, 0, y0 + 1.4 + i * 0.75, 0, true, -a + 0.1, 2 * a - 0.2));
-  add(d, labelBand(o, R + 0.1, 3, y0 + 28, -a + 0.1, 2 * a - 0.2, { fg: '#ffffff' }));
+  add(d, labelBand(o, R + 0.1, 5, y0 + 25, -a + 0.1, 2 * a - 0.2, { fg: '#ffffff' }));
   d.add(strut([-(R + 0.9) * Math.sin(a - 0.08), y0 + 12, (R + 0.9) * Math.cos(a - 0.08)], [-(R + 0.9) * Math.sin(a - 0.08), y0 + 24, (R + 0.9) * Math.cos(a - 0.08)], 0.38, M.metal));
   pivot.userData.setDoor = (t) => { pivot.rotation.y = t * 1.6; };
   g.userData.setDoor = pivot.userData.setDoor;
@@ -245,7 +245,7 @@ function encPrism(M, o) {
     }
     if (k === 2 || k === 6) { // brand on side faces
       const phi = k * Math.PI / 4, ri = (Rb + Rt) / 2 * Math.cos(Math.PI / 8) + 0.2;
-      const l = labelPlane(o, 13, 2.6, { fg: '#ffffff' }); if (l) { l.position.set(ri * Math.sin(phi), y0 + 26, ri * Math.cos(phi)); l.rotation.y = phi; g.add(l); }
+      const l = labelPlane(o, 15.5, 4.4, { fg: '#ffffff' }); if (l) { l.position.set(ri * Math.sin(phi), y0 + 25, ri * Math.cos(phi)); l.rotation.y = phi; g.add(l); }
     }
   }
   // inner light-tight liner keeps the freezer hidden
@@ -268,7 +268,7 @@ function encPuckTower(M, o) {
     for (const s of [-1, 1]) g.add(box(0.2, hh, D - 2, mt, s * (W / 2 + 0.05), y0 + yy, zc));
     g.add(box(W - 2, hh, 0.2, mt, 0, y0 + yy, zb - 0.05));
   }
-  for (const s of [-1, 1]) { const l = labelPlane(o, 24, 4.4, { fg: '#ffffff' }); if (l) { l.position.set(s * (W / 2 + 0.12), y0 + 24, zc); l.rotation.y = s * Math.PI / 2; g.add(l); } }
+  for (const s of [-1, 1]) { const l = labelPlane(o, 26, 7.2, { fg: '#ffffff' }); if (l) { l.position.set(s * (W / 2 + 0.12), y0 + 23.5, zc); l.rotation.y = s * Math.PI / 2; g.add(l); } }
   const door = hingedDoor(M, o, { W: W - 5.2, H: 33.2, x: W / 2 - 2.5, y: y0 + 0.3 + 16.6, z: zf - 0.45, skin: M.primary, style: 'stripes' });
   g.add(door); g.userData.setDoor = door.userData.setDoor;
   return g;
@@ -276,17 +276,17 @@ function encPuckTower(M, o) {
 function encMonolith(M, o) {
   const g = named(new THREE.Group(), 'enclosure-monolith'); const W = 28, D = 29, zc = 0.6, y0 = DECK_Y, H = ENC_H;
   const zf = zc + D / 2, zb = zc - D / 2;
-  for (const s of [-1, 1]) g.add(box(0.75, H, D, M.white, s * (W / 2 - 0.375), y0 + H / 2, zc));
-  g.add(box(W, H, 0.75, M.white, 0, y0 + H / 2, zb + 0.375));
+  for (const s of [-1, 1]) g.add(box(0.75, H, D, M.primary, s * (W / 2 - 0.375), y0 + H / 2, zc));
+  g.add(box(W, H, 0.75, M.primary, 0, y0 + H / 2, zb + 0.375));
   g.add(box(W + 0.4, 1.5, D + 0.4, M.metal, 0, y0 + H - 0.75, zc));
   for (const s of [-1, 1]) {
     g.add(box(0.5, H - 1.5, 0.5, M.metal, s * (W / 2 + 0.25), y0 + (H - 1.5) / 2, zf - 0.25));
     g.add(box(0.5, H - 1.5, 0.5, M.metal, s * (W / 2 + 0.25), y0 + (H - 1.5) / 2, zb + 0.25));
-    const panel = box(0.2, 26, D - 6, M.skin || M.primary, s * (W / 2 + 0.1), y0 + 16, zc); g.add(panel);
-    const l = labelPlane(o, D - 9, 3.6, { fg: '#ffffff' }); if (l) { l.position.set(s * (W / 2 + 0.22), y0 + 16, zc); l.rotation.y = s * Math.PI / 2; l.rotation.z = 0; g.add(l); }
+    const panel = box(0.2, 26, D - 6, M.skin || M.white, s * (W / 2 + 0.1), y0 + 16, zc); g.add(panel);
+    const l = labelPlane(o, D - 8, 8, { fg: '#' + M.primary.color.getHexString() }); if (l) { l.position.set(s * (W / 2 + 0.22), y0 + 16, zc); l.rotation.y = s * Math.PI / 2; l.rotation.z = 0; g.add(l); }
   }
   g.add(box(W - 2, 0.3, 0.3, M.led, 0, y0 + 0.3, zf - 0.1));
-  const door = hingedDoor(M, o, { W: W - 1.6, H: 34, x: W / 2 - 0.8, y: y0 + 0.5 + 17, z: zf - 0.38, skin: M.white, style: 'mirror' });
+  const door = hingedDoor(M, o, { W: W - 1.6, H: 34, x: W / 2 - 0.8, y: y0 + 0.5 + 17, z: zf - 0.38, skin: M.primary, style: 'mirror' });
   g.add(door); g.userData.setDoor = door.userData.setDoor;
   return g;
 }
@@ -314,7 +314,7 @@ function cupChampion(M, o) {
   g.add(lathe([[0, 0], [8, 0], [8, 1.2], [6.5, 1.6], [6.5, 3], [5, 3.4], [5, 5], [3.2, 5.6], [2.8, 8], [4, 9], [10, 9.6], [13.5, 12], [15, 16], [15.4, 18.5], [14.6, 18.5], [14.2, 16.2], [12.8, 12.6], [9.5, 10.6], [0, 10.6]], 96, M.skinCup || M.metal));
   for (const y of [1.4, 3.2]) g.add(torus(y < 2 ? 7.9 : 6.4, 0.25, M.primary, y));
   for (const s of [-1, 1]) { const h = mesh(new THREE.TorusGeometry(4, 0.7, 16, 40, Math.PI), M.metal, s * 14.6, 14, 0); h.rotation.z = -s * Math.PI / 2; g.add(h); }
-  add(g, labelBand(o, 6.58, 1.2, 2.3, 0, Math.PI * 2, { fg: '#ffffff', bg: '#' + M.primary.color.getHexString(), repeat: 2 }));
+  add(g, labelBand(o, 6.58, 1.5, 2.3, 0, Math.PI * 2, { fg: '#ffffff', bg: '#' + M.primary.color.getHexString(), repeat: 2 }));
   g.userData.bowl = { floor: 10.6, rim: 18.5, rAt: interp([[9.5, 10.6], [12.8, 12.6], [14.2, 16.2], [14.6, 18.5]]), ringR: 6.4, tilt: 0.2, ice: 5.6, iceLb: 22 };
   return g;
 }
@@ -336,7 +336,7 @@ function cupPuckStack(M, o) {
   g.add(lathe([[0, 7], [6, 7], [15, 7.6], [16.2, 9], [16.4, 16.4], [16.8, 17], [15.4, 17], [15.2, 16], [15, 9.8], [0, 9.8]], 96, M.skinCup || M.primary));
   g.add(torus(16.1, 0.45, M.metal, 17));
   g.add(torus(16.25, 0.2, M.metal, 9.2));
-  add(g, labelBand(o, 16.45, 3.2, 12.8, 0, Math.PI * 2, { fg: '#ffffff', repeat: 3 }));
+  add(g, labelBand(o, 16.45, 4.8, 12.8, 0, Math.PI * 2, { fg: '#ffffff', repeat: 3 }));
   g.userData.bowl = { floor: 9.8, rim: 17, rAt: interp([[15, 9.8], [15.2, 16]]), ringR: 6.6, tilt: 0.12, ice: 5.4, iceLb: 26 };
   return g;
 }
@@ -376,11 +376,11 @@ function cupCustom(M, o) {
 // ---------- 12 beers + ice ----------
 // Bottles sit high in a heaped ice bed so their branded labels clear the rim.
 export const BEERS = [
-  { id: 'longneck', name: '12 oz long-neck', lbEach: 1.2, glass: true, label: [2.4, 4.8], blurb: 'Classic glass long-neck; the label band carries the brand (logo or label text).',
-    profile: [[0, 0], [1.2, 0], [1.22, 0.2], [1.22, 5.2], [1.1, 5.9], [0.6, 7], [0.5, 8.3], [0.55, 8.5], [0.55, 8.9], [0, 9]], cap: [0.57, 8.4, 1.2] },
-  { id: 'alubottle', name: '16 oz aluminum bottle', lbEach: 1.15, glass: false, label: [0.5, 4.2], blurb: 'Brushed aluminum bottle with a full-body printed wrap.',
+  { id: 'longneck', name: 'Michelob ULTRA 12 oz bottle', lbEach: 1.2, glass: true, label: [1.6, 4.6], neck: [6.55, 7.75], blurb: 'Clear long-neck with the white ULTRA wrap label and blue neck band.',
+    profile: [[0, 0], [1.16, 0], [1.2, 0.12], [1.2, 5.1], [1.12, 5.75], [0.74, 6.6], [0.56, 7.7], [0.52, 8.55], [0.56, 8.68], [0.56, 9.05], [0, 9.1]], cap: [0.575, 8.62, 0.48] },
+  { id: 'alubottle', name: 'Michelob ULTRA 16 oz aluminum bottle', lbEach: 1.15, glass: false, label: [0.5, 4.2], blurb: 'Brushed aluminum bottle with a full-body printed wrap.',
     profile: [[0, 0], [1.3, 0], [1.32, 0.15], [1.32, 4.3], [1.1, 5.3], [0.62, 6.4], [0.55, 7.0], [0.6, 7.1], [0, 7.25]], cap: [0.6, 6.98, 0.3] },
-  { id: 'can', name: '12 oz can', lbEach: 0.85, glass: false, label: [0.45, 4.4], blurb: 'Standard 12 oz can; the whole body is the brand wrap.',
+  { id: 'can', name: 'Michelob ULTRA 12 oz can', lbEach: 0.85, glass: false, label: [0.45, 4.4], blurb: 'Standard 12 oz can; the whole body is the brand wrap.',
     profile: [[0, 0], [1.05, 0], [1.3, 0.35], [1.3, 4.45], [1.08, 4.75], [1.1, 4.83], [0, 4.83]], cap: null },
   { id: 'custom', name: '★ From reference', lbEach: 1.2, glass: true, label: null, blurb: 'Lathed from a bottle silhouette in your references (default long-neck until you pick one).', profile: null, cap: null },
 ];
@@ -401,7 +401,8 @@ export function buildContents(M, bowl, { instanced = true, seed = 5, beer = {}, 
     if (m) { m.map.wrapS = THREE.RepeatWrapping; m.map.offset.x = 0.25; m.metalness = T.glass ? 0 : 0.3; m.name = 'bottle-label-brand'; lmat = m; } // label faces outward
   }
   parts.push([labelGeo, lmat]);
-  if (T.cap) { const [cr, cy, ch] = T.cap, cg = new THREE.CylinderGeometry(cr, cr, ch, 24); cg.translate(0, cy + ch / 2 - (T.id === 'longneck' ? ch / 2 : 0), 0); parts.push([cg, M.foil]); }
+  if (T.cap) { const [cr, cy, ch] = T.cap, cg = new THREE.CylinderGeometry(cr, cr, ch, 24); cg.translate(0, cy + ch / 2, 0); parts.push([cg, M.foil]); }
+  if (T.neck) { const [n0, n1] = T.neck, ng = new THREE.CylinderGeometry(rP(n1) + 0.02, rP(n0) + 0.02, n1 - n0, 32, 1, true); ng.translate(0, (n0 + n1) / 2, 0); parts.push([ng, M.labelBlue]); }
   // placement: label bottom ~ at the rim, ring as close to the wall as the bowl allows
   const tilt = tiltIn, baseY = Math.max(bowl.floor + 0.05, bowl.rim - (l0 + (l1 - l0) * 0.25));
   // ring radius: as close to the wall as the bowl allows at every height the bottle is inside it
@@ -527,10 +528,10 @@ export const CUPS = [
   { id: 'custom', name: '★ From Reference', build: cupCustom, lb: 20, blurb: 'Lathed from the silhouette of a design reference (default profile until you pick one). Facet count applies here.' },
 ];
 export const PRESETS = [
-  { id: 'cathedral', name: '01 · Cathedral', base: 'rink', enc: 'cathedral', cup: 'chalice', metal: 'chrome', primary: '#0b1d3a', accent: '#3d7bd9' },
-  { id: 'halo', name: '02 · Halo', base: 'puck', enc: 'halo', cup: 'champion', metal: 'gold', primary: '#0b1d3a', accent: '#c9a64a' },
-  { id: 'prism', name: '03 · Prism', base: 'octa', enc: 'prism', cup: 'hex', metal: 'chrome', primary: '#11151d', accent: '#62c8ff' },
-  { id: 'hattrick', name: '04 · Hat Trick', base: 'ski', enc: 'pucktower', cup: 'puckstack', metal: 'gold', primary: '#0a2a66', accent: '#d4af37' },
-  { id: 'monolith', name: '05 · Monolith', base: 'float', enc: 'monolith', cup: 'torch', metal: 'chrome', primary: '#0b2a6b', accent: '#4aa3ff' },
+  { id: 'cathedral', name: '01 · Cathedral', base: 'rink', enc: 'cathedral', cup: 'chalice', metal: 'chrome', primary: '#0b2d82', accent: '#3b7cff' },
+  { id: 'halo', name: '02 · Halo', base: 'puck', enc: 'halo', cup: 'champion', metal: 'chrome', primary: '#0b2d82', accent: '#3b7cff' },
+  { id: 'prism', name: '03 · Prism', base: 'octa', enc: 'prism', cup: 'hex', metal: 'chrome', primary: '#0b2d82', accent: '#3b7cff' },
+  { id: 'hattrick', name: '04 · Hat Trick', base: 'ski', enc: 'pucktower', cup: 'puckstack', metal: 'chrome', primary: '#0b2d82', accent: '#3b7cff' },
+  { id: 'monolith', name: '05 · Monolith', base: 'float', enc: 'monolith', cup: 'torch', metal: 'chrome', primary: '#0b2d82', accent: '#3b7cff' },
 ];
 export const byId = (list, id) => list.find((x) => x.id === id) || list[0];

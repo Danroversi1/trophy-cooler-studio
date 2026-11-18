@@ -3,7 +3,7 @@
 Interactive 3D concept studio for an oversize, trophy-style beer cooler: a Meling DW-XL90 medical freezer hidden in the base, 12 beers on ice in the cup, and a UHMW-PE sliding base for NHL ice. Built for a Michelob ULTRA on-ice activation.
 
 - **5 concepts.** Cathedral, Halo, Prism, Hat Trick, Monolith. Every cup, enclosure and base is interchangeable.
-- **Inputs.** Upload brand assets (logo, font, colors) and design references (palette → glass, finish → metal/facets, silhouette → lathed cup, image → skin).
+- **Brand assets.** Upload a logo, font and colors; they apply to every concept, every label and the Michelob ULTRA bottles.
 - **Export.** GLB of the current design from the page; `npm run export-models` writes GLB (meters) + STL (inches) for every module.
 
 ## Structure
@@ -25,28 +25,14 @@ Deployed on Vercel: `vercel.json` runs `npm run build` and serves `dist/`.
 
 > Visual concept, not a fabrication model or venue-approved installation. Brand marks are placeholders until approved artwork is uploaded.
 
-## Design references (Google Slides)
-References live in a Google Slides deck, not in this repo, Vercel or Supabase.
-1. Share the deck as **Anyone with the link can view**.
-2. In the studio, paste the deck link → **Connect deck**, select a concept, then click thumbnails to pin them **to that concept**.
-3. Each concept (Cathedral, Halo, Prism, Hat Trick, Monolith) has its own pins and its own look (modules, finish, skin, palette, ★ cup). Brand assets are shared by all concepts. Badges on thumbnails show which other concepts use a slide.
-4. In **Module**, pick a reference thumbnail for each element of the concept:
-   - **Cup:** shape from its silhouette and/or a skin.
-   - **Enclosure:** a skin and/or glass/LED colors.
-   - **Base:** a skin.
-   - **Bottles:** label art and/or the bottle shape.
-5. Pins are saved in your browser as slide **object IDs**, so they stay fixed when slides are reordered, inserted or edited. The `p.N` badge only shows the slide's current position.
-
-`api/slides.js` is a pass-through. It reads the deck's slide list and streams slide images from Google on request, and stores nothing.
 
 ## Section workshop (Cup · Enclosure · Sliding base)
 Each concept has three independently designed sections. Select one in **Scene objects** or the workshop tabs:
-- **References:** use **Choose reference…** to browse the connected Google Slides treatment (page number + title) and assign one or more slides to this section only. If the deck can't be loaded, import slide images, pasted screenshots or a **PDF export** of the deck instead (File → Download → PDF). The primary reference can drive shape, skin, palette or bottle label, but only when you tick that option. To use only part of a slide (or of an imported image), hover it, click **✂ Crop** and drag a rectangle. Each crop becomes its own reference, stored as the slide ID plus the crop rectangle, and is rebuilt live from the slide.
 - **Design prompt → Generate iteration:** creates an iteration for this section only. The iteration previews in the viewport.
 - **Iterations:** rename, preview, compare side by side, apply to the trophy, or delete. **Save current** stores manual parameter edits as an iteration.
 - **Design parameters:** variant, finish and section sliders (manual, no generation).
 
-Prompts and iteration history are stored per concept and per section, in this browser.
+Prompts and iteration history are stored per concept and per section, in this browser. All concepts use Michelob blue with chrome.
 
 ### Fixed constraints
 - The freezer (23.6 × 32.0 × 24.6 in) never changes. The enclosure can only grow, and always stays 36 in tall.
@@ -66,3 +52,6 @@ The model returns **section parameters as JSON**, which are clamped to the allow
 Only `localhost`, `127.x`, `*.local` and private-network addresses are accepted. If the local engine is unreachable, generation stops with a clear message; it never falls back to a cloud API.
 
 Chrome may ask once for permission to access devices on your local network.
+
+## Rendering
+Physically based materials (clear-coat lacquer, chrome, flint glass, frosted ice, UHMW), an arena-style lighting environment, soft shadows, a contact shadow on the ice, and ground-truth ambient occlusion (GTAO) on a multisampled render target. Turn off **View settings → Realistic shading** on slower machines.

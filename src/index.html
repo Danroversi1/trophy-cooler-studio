@@ -23,8 +23,8 @@ button.ghost:hover{background:#252832;border-color:#4d6db0;color:#fff}
 /* top bar */
 .topbar{height:80px;flex-shrink:0;position:relative;display:flex;align-items:center;justify-content:space-between;padding:0 28px;background:#060709;z-index:10}
 .brand{position:absolute;left:50%;top:50%;transform:translate(-50%,-50%);pointer-events:none;display:flex;align-items:center}
-.brand img{display:block;max-width:280px;max-height:40px;object-fit:contain}
-.brand .txt{font:700 30px/1 "Barlow Condensed",Arial,sans-serif;letter-spacing:.14em;white-space:nowrap}
+.brand img{display:block;max-width:360px;max-height:56px;object-fit:contain}
+.brand .txt{font:700 38px/1 "Barlow Condensed",Arial,sans-serif;letter-spacing:.14em;white-space:nowrap}
 .header-left,.header-actions{display:flex;align-items:center;gap:10px}
 .header-actions button{height:36px;padding:0 17px}
 .pill{font-size:11px;color:#9195a0;display:inline-flex;align-items:center;gap:8px}
@@ -100,48 +100,7 @@ select{background:var(--field);border:1px solid #34363e;border-radius:7px;color:
 .swc .a button:hover{color:#fff;background:#0c2254}
 .swc .x{position:absolute;top:1px;right:3px;color:#fff;cursor:pointer;font-size:11px;text-shadow:0 0 3px #000;display:none}
 .swc:hover .x{display:block}
-.refs{display:grid;gap:8px;margin-top:8px}
-.ref{background:#191c24;border:1px solid #2a3348;border-radius:10px;padding:8px;display:grid;grid-template-columns:64px 1fr;gap:9px;position:relative}
-.ref.on{border-color:#345496;background:linear-gradient(100deg,#0e1a3a,#141f3d)}
-.ref img{width:64px;height:64px;object-fit:cover;border-radius:6px;background:#000}
-.ref .nm{font-size:11.5px;font-weight:500;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;padding-right:16px}
-.ref .pal{display:flex;height:9px;border-radius:3px;overflow:hidden;margin:6px 0}
-.ref .pal i{flex:1}
-.ref .meta{color:#8f95a1;font-size:9.5px;line-height:1.5}
-.ref .acts{grid-column:1/-1;display:flex;flex-wrap:wrap;gap:4px}
-.ref .acts button{background:#1d1f25;border:1px solid #34363e;color:#c6cbd4;border-radius:6px;padding:6px 8px;font-size:10px}
-.ref .acts button:hover{border-color:#4d6db0;color:#fff}
-.ref .acts button.on{background:linear-gradient(180deg,#244da6,#08277d);border-color:#5d7ab5;color:#fff}
-.ref .rm{position:absolute;top:6px;right:9px;color:#8f95a1;cursor:pointer;font-size:13px}
-.ref canvas.prof{position:absolute;right:9px;top:28px;width:26px;height:34px;opacity:.9}
 .chipsrc{display:inline-flex;align-items:center;gap:6px;font-size:10.5px;color:#8f95a1}
-/* google slides thumbnails */
-.thumbs{display:grid;grid-template-columns:repeat(3,1fr);gap:6px;margin-top:10px;max-height:330px;overflow:auto;scrollbar-width:thin;scrollbar-color:#353941 transparent}
-.thumb{position:relative;padding:0;border:1px solid #34363e;background:#0b0c10;border-radius:6px;overflow:hidden;aspect-ratio:4/3}
-.thumb img{width:100%;height:100%;object-fit:cover;display:block;opacity:.88;transition:opacity .15s}
-.thumb:hover{border-color:#4d6db0}.thumb:hover img{opacity:1}
-.thumb .pn{position:absolute;left:4px;bottom:4px;font-size:9px;background:#000b;color:#cfd6e4;border-radius:4px;padding:1px 5px}
-.thumb.on{border-color:#5d7ab5;box-shadow:0 0 0 2px #2c57b8 inset}
-.thumb.on::after{content:"✓";position:absolute;right:4px;top:4px;width:16px;height:16px;border-radius:50%;background:#2a5bc4;color:#fff;font-size:10px;display:grid;place-items:center}
-.deck-head{display:flex;align-items:center;gap:8px;margin-top:10px;font-size:11px;color:#c6cbd4}
-.deck-head b{font-weight:500;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;flex:1}
-.deck-head a{color:#a8bce6;font-size:10px}
-.ref .src{display:inline-block;font-size:8.5px;letter-spacing:.4px;color:#b8ceff;background:#092368;border-radius:3px;padding:2px 4px;margin-right:5px;vertical-align:1px}
-.ref.missing{opacity:.6}
-.mthumbs{display:grid;grid-template-columns:repeat(4,1fr);gap:5px;margin-top:10px}
-.mthumbs button{position:relative;padding:0;border:1px solid #34363e;background:#0b0c10;border-radius:6px;overflow:hidden;aspect-ratio:4/3;font-size:9.5px;color:#8f95a1}
-.mthumbs button img{width:100%;height:100%;object-fit:cover;display:block}
-.mthumbs button.on{border-color:#5d7ab5;box-shadow:0 0 0 2px #2c57b8 inset}
-.mthumbs button.on::after{content:"✓";position:absolute;right:3px;top:3px;width:14px;height:14px;border-radius:50%;background:#2a5bc4;color:#fff;font-size:9px;display:grid;place-items:center}
-.mthumbs .none{display:grid;place-items:center}
-.ref .as{display:inline-flex;gap:3px;margin-left:4px}
-.ref .as i{font-style:normal;font-size:8.5px;color:#04101f;background:#8fb2ff;border-radius:3px;padding:1px 4px}
-.thumb .cb{position:absolute;right:4px;bottom:4px;display:flex;gap:2px}
-.thumb .cb i{font-style:normal;font-size:8px;background:#0c2254e6;color:#b8ceff;border:1px solid #345496;border-radius:3px;padding:0 3px;line-height:12px}
-.edot{width:5px;height:5px;border-radius:50%;background:#e0b24a;display:inline-block;margin-left:2px;flex:none}
-.rc{color:#b8ceff;background:#092368;border-radius:4px;padding:2px 6px;font-size:9.5px}
-details.localref{border:0;padding:8px 0 0}
-details.localref summary{font-size:10.5px;color:#a8bce6}
 /* workshop */
 .seg3{display:grid;grid-template-columns:repeat(3,1fr);gap:5px}
 .seg3 button{font-size:11px;padding:9px 4px;background:#1d1f25;border-color:#34363e;color:#a9b0bf}
@@ -176,52 +135,6 @@ code{font-size:10px;background:#0b0c10;border:1px solid #2a3348;border-radius:4p
 .vchip .dotb{width:7px;height:7px;border-radius:50%;background:#4d7dff;box-shadow:0 0 0 3px #4d7dff33}
 .vchip button{padding:6px 10px;font-size:10.5px}
 .vchip.pv{border-color:#b08a2e}.vchip.pv .dotb{background:#e0b24a;box-shadow:0 0 0 3px #e0b24a33}
-/* modal */
-.modal{position:fixed;inset:0;z-index:50;background:#05060acc;backdrop-filter:blur(6px);display:grid;place-items:center;padding:20px}
-.modal[hidden]{display:none}
-.modal-box{width:min(980px,100%);max-height:min(860px,100%);display:flex;flex-direction:column;background:#141519;border:1px solid #2a3348;border-radius:14px;box-shadow:0 30px 80px #000a}
-.modal-head{display:flex;justify-content:space-between;align-items:flex-start;padding:18px 20px 12px}
-.modal-head h3{margin:4px 0 0;font-size:16px;font-weight:500}
-.pk-eyebrow{font-size:10px;letter-spacing:1.4px;text-transform:uppercase;color:#9297a2}
-.pk-tabs{margin:0 20px;max-width:420px}
-#pk-slides,#pk-import{padding:12px 20px 0;overflow:auto;flex:1;min-height:200px}
-.pk-deck{display:flex;gap:7px}
-.pk-deck button{font-size:11px}
-.pk-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(170px,1fr));gap:10px;margin:12px 0 16px}
-.pk-card{position:relative;text-align:left;padding:0;background:#0f1014;border:1px solid #2a2d36;border-radius:9px;overflow:hidden;color:#e8ebf2}
-.pk-card:hover{border-color:#4d6db0;background:#0f1014}
-.pk-card img{display:block;width:100%;aspect-ratio:4/3;object-fit:cover;background:#0b0c10}
-.pk-card .cap{padding:7px 9px 8px;font-size:10.5px;line-height:1.4}
-.pk-card .cap b{font-weight:500;color:#b8ceff;margin-right:5px}
-.pk-card .cap span{color:#c6cbd4;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden}
-.pk-card.on{border-color:#5d7ab5;box-shadow:0 0 0 2px #2c57b8 inset}
-.pk-card.on::after{content:"✓";position:absolute;right:7px;top:7px;width:20px;height:20px;border-radius:50%;background:#2a5bc4;color:#fff;font-size:12px;display:grid;place-items:center}
-.pk-card .asg{position:absolute;left:7px;top:7px;display:flex;gap:3px}
-.pk-card .asg i{font-style:normal;font-size:9px;background:#0c2254ee;color:#b8ceff;border:1px solid #345496;border-radius:4px;padding:1px 5px}
-.modal-foot{display:flex;align-items:center;gap:8px;padding:12px 20px;border-top:1px solid #ffffff10;font-size:11px;color:#9aa1ad}
-.modal-foot button{font-size:11.5px;padding:9px 16px}
-.modal-foot button:disabled{opacity:.45;cursor:default}
-/* crop */
-.modal-box{position:relative;min-height:min(640px,calc(100vh - 40px))}
-.cropbtn{position:absolute;right:7px;bottom:58px;font-size:10px;background:#0a0b0ee6;border:1px solid #34405e;color:#dfe6f5;border-radius:6px;padding:4px 8px;opacity:0;transition:opacity .15s}
-.pk-card:hover .cropbtn{opacity:1}
-.cropbtn:hover{border-color:#5d7ab5;background:#0c2254}
-.pk-crop{position:absolute;inset:0;background:#141519;border-radius:14px;z-index:5;display:flex;flex-direction:column;padding:16px 20px}
-.pk-crop[hidden]{display:none}
-.pk-crop-head{display:flex;align-items:center;gap:10px;margin-bottom:10px;font-size:12px}
-.pk-crop-head b{font-weight:500;color:#dfe6f5;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
-.pk-crop-head button{font-size:11.5px}
-.pk-crop-head button:disabled{opacity:.45;cursor:default}
-.pk-crop-stage{flex:1;min-height:0;display:grid;place-items:center;background:#0b0c10;border:1px solid #2a2d36;border-radius:10px;cursor:crosshair;touch-action:none;user-select:none;padding:10px}
-.pk-crop-wrap{position:relative;max-width:100%;max-height:100%;line-height:0}
-.pk-crop-wrap img{max-width:100%;max-height:min(520px,calc(100vh - 260px));display:block;pointer-events:none}
-.pk-crop-rect{position:absolute;display:none;border:2px solid #6d94ff;background:#4d7dff22;box-shadow:0 0 0 9999px #000a;pointer-events:none}
-.pk-crops{display:flex;align-items:center;gap:5px;max-width:55%;overflow:auto}
-.pk-crops span{font-size:10px;color:#9aa1ad;margin-right:2px}
-.pk-cthumb{position:relative;padding:0;width:44px;height:30px;border-radius:5px;overflow:hidden;border:1px solid #5d7ab5;background:#0b0c10;flex:none}
-.pk-cthumb img{width:100%;height:100%;object-fit:cover;display:block}
-.pk-cthumb i{position:absolute;inset:0;display:none;place-items:center;background:#000a;color:#fff;font-style:normal}
-.pk-cthumb:hover i{display:grid}
 /* specs */
 .stat{display:grid;grid-template-columns:1fr 1fr;gap:6px}
 .stat div{background:#191c24;border:1px solid #2a3348;border-radius:8px;padding:9px 10px}
@@ -248,7 +161,7 @@ details ul{padding-left:16px;margin:4px 0 0}
 details b{color:#d6dbe4;font-weight:600}
 .disclaimer{font-size:9px;line-height:1.7;color:#808793;padding:17px 18px 0}
 /* stage */
-#stage{position:relative;min-height:0;min-width:0;overflow:hidden;border:1px solid #ffffff0c;border-radius:12px;background-color:#111315;background-image:radial-gradient(#5f66774d .75px,transparent .9px);background-size:22px 22px}
+#stage{position:relative;min-height:0;min-width:0;overflow:hidden;border:1px solid #ffffff0c;border-radius:12px;background-color:#0f1113}
 #stage canvas{display:block;outline:none;touch-action:none}
 .viewbar{position:absolute;left:20px;top:20px;z-index:2;display:flex;gap:4px;padding:5px;background:#0a0b0edc;border:1px solid #ffffff0c;backdrop-filter:blur(16px);border-radius:10px}
 .viewbar button{border:1px solid transparent;background:transparent;padding:8px 13px;font-size:11px;color:#a9b0bf;border-radius:6px}
@@ -291,7 +204,7 @@ details b{color:#d6dbe4;font-weight:600}
 <div class="layout">
 <aside id="panel" aria-label="Studio controls">
 
-  <section class="section"><h2>Concepts <small>each keeps its own look + references</small></h2><div id="presets"></div><p class="muted">Brand assets apply to every concept. Selecting a concept restores its modules, finish and pinned references. <span style="color:#e0b24a">●</span> = edited.</p></section>
+  <section class="section"><h2>Concepts <small>each keeps its own sections + iterations</small></h2><div id="presets"></div><p class="muted">Brand assets apply to every concept. Selecting a concept restores its sections and iteration history. <span style="color:#e0b24a">●</span> = edited.</p></section>
 
   <section class="section"><h2>Scene objects</h2>
     <div id="layers"></div>
@@ -305,14 +218,7 @@ details b{color:#d6dbe4;font-weight:600}
     <p class="muted" id="ws-sub" style="margin:0 0 12px"></p>
     <div class="seg"><button id="ws-isolate">Isolate section</button><button id="ws-assembled" class="ghost">Assembled trophy</button></div>
 
-    <div class="box" style="margin-top:14px">
-      <div class="box-head"><span>References for this section</span><span class="badge" id="ws-refcount">0</span></div>
-      <div class="mthumbs" id="ws-refs"></div>
-      <button class="wide" id="ws-choose">Choose reference…</button>
-      <div id="ws-refopts"></div>
-      <p class="muted" id="ws-refhint"></p>
-    </div>
-
+    <div style="height:14px"></div>
     <div class="box">
       <div class="box-head"><span>Design prompt</span><span class="badge" id="ws-engine-badge">procedural</span></div>
       <textarea id="ws-prompt" rows="3" placeholder="e.g. Taller bowl with a flared rim, gold finish, more ice heaped above the rim"></textarea>
@@ -336,12 +242,8 @@ details b{color:#d6dbe4;font-weight:600}
         <input class="range" id="skin-scale" type="range" min="0.5" max="4" step="0.1" value="1">
       </div>
       <div id="mod-cup">
-        <div class="slider-head"><label for="facets">Cup facets <span style="color:#6b717d">· ★ cup, 0 = smooth</span></label><output id="facets-v">0</output></div>
-        <input class="range" id="facets" type="range" min="0" max="16" step="1" value="0">
-        <div class="subhead" style="margin-top:16px">Bottles + ice <small>always 12 bottles</small></div>
+        <div class="subhead" style="margin-top:6px">Bottles + ice <small>always 12 Michelob ULTRA</small></div>
         <div class="input-row"><label>Bottle</label><select id="beer-type"></select></div>
-        <div class="input-row"><label>Label art</label><select id="beer-label"></select></div>
-        <label class="toggle-row" id="beer-shape-row"><input type="checkbox" id="beer-shape">Bottle shape from the label reference</label>
         <div class="warnbox" id="cup-warn"></div>
       </div>
       <div id="mod-enc">
@@ -363,8 +265,7 @@ details b{color:#d6dbe4;font-weight:600}
     <div class="input-row"><label>Footer wordmark</label><div class="input-wrap" style="width:150px"><input type="text" id="wordmark" maxlength="22"></div></div>
   </section>
 
-  <section class="section" id="inputs"><h2>Inputs <small>inform geometry + skin</small></h2>
-    <div class="subhead">01 · Brand assets <small>shared by all 5 concepts</small></div>
+  <section class="section" id="inputs"><h2>Brand assets <small>shared by all 5 concepts</small></h2>
     <label class="drop" id="drop-logo"><input type="file" id="f-logo" accept="image/png,image/svg+xml,image/jpeg,image/webp"><b>Drop logo</b>PNG / SVG / JPG → labels, header, monogram skin</label>
     <div class="box" id="logo-prev" style="display:none;margin:8px 0 0">
       <div class="box-head"><span>Logo on labels</span><label class="toggle-row" style="margin:0"><input type="checkbox" id="use-logo" checked>On</label></div>
@@ -375,19 +276,6 @@ details b{color:#d6dbe4;font-weight:600}
     <div class="swatches" id="brand-sw"></div>
     <div id="brand-pal-row" style="display:none"><p class="muted">Swatch → <b>P</b> primary · <b>A</b> accent</p><button class="wide" id="brand-pal">Use brand colors as glass palette</button></div>
 
-    <div class="subhead" style="margin-top:20px">02 · Design references <small>per concept · Google Slides</small></div>
-    <div class="input-wrap" style="width:100%"><input type="text" id="deck-url" placeholder="Paste a Google Slides link…" spellcheck="false"></div>
-    <div class="seg blue" style="margin-top:8px"><button id="deck-connect">Connect deck</button><button id="deck-refresh" class="ghost">Refresh</button></div>
-    <div class="deck-head" id="deck-head" style="display:none"><b id="deck-title"></b><a id="deck-open" href="#" target="_blank" rel="noopener">Open ↗</a></div>
-    <p class="muted" id="deck-status">Share the deck as “Anyone with the link can view”. Slides stream live from Google — nothing is copied or stored.</p>
-    <div class="thumbs" id="thumbs"></div>
-    <p class="muted" id="pin-hint" style="display:none">Pins belong to the concept selected above — switch concepts to give each its own references (badges show other concepts using a slide). Click thumbnails to pin them. Pins follow each slide's permanent ID, so they stay put when you reorder, insert or edit slides — the “p.” number just shows where it sits now.</p>
-    <div class="subhead" style="margin-top:14px">Pinned for <b id="refs-for" style="font-weight:500;color:#fff;margin:0 4px 0 3px"></b><small id="pin-count" style="margin-left:auto">0</small></div>
-    <div class="refs" id="refs"></div>
-    <p class="muted">Each pin is read for <b style="color:#c6cbd4">palette</b> → glass + LEDs, <b style="color:#c6cbd4">finish</b> → metal + facets, and <b style="color:#c6cbd4">silhouette</b> → a lathed ★ cup. <b style="color:#c6cbd4">Skin</b> wraps it onto the enclosure.</p>
-    <details class="localref"><summary>Add a local image instead (this browser only)</summary>
-      <label class="drop" id="drop-ref" style="margin-top:8px"><input type="file" id="f-ref" accept="image/*" multiple><b>Drop images</b>Kept only in this browser, never uploaded</label>
-    </details>
   </section>
 
   <section class="section" id="gen"><h2>Local generator <small>your computer only</small></h2>
@@ -395,14 +283,13 @@ details b{color:#d6dbe4;font-weight:600}
     <div id="gen-llm">
       <div class="input-row"><label>Endpoint</label><div class="input-wrap" style="width:170px"><input type="text" id="gen-url" spellcheck="false"></div></div>
       <div class="input-row"><label>Model</label><select id="gen-model" style="width:170px"><option value="">— test connection —</option></select></div>
-      <label class="toggle-row"><input type="checkbox" id="gen-vision">Send section references to the model (vision models only)</label>
       <button class="wide" id="gen-test">Test connection</button>
     </div>
     <p class="muted" id="gen-state"></p>
     <details><summary>How local generation works</summary>
       <ul>
         <li>Each iteration is <b>editable parameters</b> for one section (shape, proportions, finish, bottle arrangement), checked against the freezer fit and the 12-bottle capacity before it's shown.</li>
-        <li><b>Ollama:</b> install from ollama.com, run <code>ollama pull qwen2.5:7b</code> (or <code>llama3.2-vision</code> to send reference images), then start it allowing this site: <code>OLLAMA_ORIGINS="https://trophy-cooler-studio.vercel.app" ollama serve</code>. For the standalone file use <code>OLLAMA_ORIGINS="*"</code>.</li>
+        <li><b>Ollama:</b> install from ollama.com, run <code>ollama pull qwen2.5:7b</code>, then start it allowing this site: <code>OLLAMA_ORIGINS="https://trophy-cooler-studio.vercel.app" ollama serve</code>. For the standalone file use <code>OLLAMA_ORIGINS="*"</code>.</li>
         <li><b>LM Studio:</b> load a model, open Developer → Local Server, enable CORS and start it (default <code>http://localhost:1234</code>). llama.cpp's <code>llama-server --port 8080</code> also works.</li>
         <li>Only <b>localhost / private-network</b> addresses are accepted, and nothing ever falls back to a cloud API. The built-in procedural engine runs in this page with no model at all.</li>
       </ul></details>
@@ -412,6 +299,7 @@ details b{color:#d6dbe4;font-weight:600}
     <label class="toggle-row"><input type="checkbox" id="contents" checked>Show 12 beers + ice</label>
     <label class="toggle-row"><input type="checkbox" id="rink" checked>Show rink markings</label>
     <label class="toggle-row"><input type="checkbox" id="spin">Auto-rotate</label>
+    <label class="toggle-row"><input type="checkbox" id="hq" checked>Realistic shading (ambient occlusion)</label>
     <div class="slider-head"><label for="explode">Explode modules</label><output id="explode-v">0%</output></div>
     <input class="range" id="explode" type="range" min="0" max="1" step="0.01" value="0">
     <button id="reset" class="wide">Reset this concept's look</button>
@@ -471,31 +359,13 @@ details b{color:#d6dbe4;font-weight:600}
 </main>
 </div>
 <footer class="wordmark-footer"><span id="wordmark-out">Trophy Cooler</span></footer>
-<div class="modal" id="picker" hidden>
-  <div class="modal-box" role="dialog" aria-modal="true" aria-labelledby="pk-title">
-    <div class="modal-head"><div><div class="pk-eyebrow">Choose reference</div><h3 id="pk-title">03 · Cup</h3></div><button class="ghost" id="pk-close" aria-label="Close">✕</button></div>
-    <div class="seg pk-tabs" id="pk-tabs"><button data-tab="slides">Google Slides treatment</button><button data-tab="import">Import images / PDF</button></div>
-    <div id="pk-slides">
-      <div class="pk-deck"><div class="input-wrap" style="flex:1;width:auto"><input type="text" id="pk-url" placeholder="Paste a Google Slides link…" spellcheck="false"></div><button id="pk-connect">Connect</button><button class="ghost" id="pk-refresh">Refresh</button></div>
-      <p class="muted" id="pk-status">Share the treatment as “Anyone with the link can view”. Slides stream live from Google, and pins follow each slide's permanent ID.</p>
-      <div class="pk-grid" id="pk-grid"></div>
-    </div>
-    <div id="pk-import" hidden>
-      <label class="drop" id="pk-drop"><input type="file" id="pk-file" accept="image/*,application/pdf" multiple><b>Drop slide images, screenshots or a PDF of the treatment</b>…or paste a screenshot (⌘/Ctrl + V). From Google Slides: File → Download → PDF document.</label>
-      <p class="muted" id="pk-imp-status"></p>
-      <div class="pk-grid" id="pk-imp-grid"></div>
-    </div>
-    <div class="pk-crop" id="pk-crop" hidden>
-      <div class="pk-crop-head"><button class="ghost" id="pk-crop-back">← Back to slides</button><b id="pk-crop-label"></b><span style="flex:1"></span><button id="pk-crop-add" disabled>Add crop to selection</button></div>
-      <p class="muted" id="pk-crop-hint" style="margin:0 0 10px">Drag a rectangle over the part of the slide you want to use as a reference.</p>
-      <div class="pk-crop-stage" id="pk-crop-stage"><div class="pk-crop-wrap"><img id="pk-crop-img" alt="" draggable="false"><div class="pk-crop-rect" id="pk-crop-rect"></div></div></div>
-    </div>
-    <div class="modal-foot"><div class="pk-crops" id="pk-crops"></div><span id="pk-count">0 selected</span><span style="flex:1"></span><button class="ghost" id="pk-cancel">Cancel</button><button id="pk-assign" disabled>Assign</button></div>
-  </div>
-</div>
 <script type="module">
 import * as THREE from 'three';
 import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
+import { EffectComposer } from 'three/addons/postprocessing/EffectComposer.js';
+import { RenderPass } from 'three/addons/postprocessing/RenderPass.js';
+import { GTAOPass } from 'three/addons/postprocessing/GTAOPass.js';
+import { OutputPass } from 'three/addons/postprocessing/OutputPass.js';
 import { GLTFExporter } from 'three/addons/exporters/GLTFExporter.js';
 import * as D from './designs.js';
 
@@ -522,46 +392,72 @@ const isEdited = (id) => { const d = lookDefaults(D.byId(D.PRESETS, id)), c = C[
 const B = { logo: null, logoSrc: null, mode: 'tint', use: true, font: null, colors: [], tints: {} };   // brand assets
 const REFS = [];                                                                                         // design references
 
-// ---------- renderer / scene ----------
+// ---------- renderer / scene (physically based, ambient occlusion, soft shadows) ----------
 const view = $('stage');
-const renderer = new THREE.WebGLRenderer({ antialias: true, alpha: true, preserveDrawingBuffer: true });
-renderer.setClearColor(0x000000, 0);
+const renderer = new THREE.WebGLRenderer({ antialias: true, preserveDrawingBuffer: true });
 renderer.setPixelRatio(Math.min(devicePixelRatio, 2));
-renderer.toneMapping = THREE.ACESFilmicToneMapping; renderer.toneMappingExposure = 1.05;
-renderer.shadowMap.enabled = true; renderer.shadowMap.type = THREE.PCFSoftShadowMap;
+renderer.toneMapping = THREE.ACESFilmicToneMapping; renderer.toneMappingExposure = 1.0;
+renderer.shadowMap.enabled = true; renderer.shadowMap.type = THREE.VSMShadowMap;
 view.prepend(renderer.domElement);
 const scene = new THREE.Scene();
 const pmrem = new THREE.PMREMGenerator(renderer);
-// arena-style HDR environment: bright overhead light strips, pale ice below → chrome reads as chrome
+// arena environment: dark roof with LED light rows, bright ice below, blue rink-board glow → believable reflections
 function arenaEnv() {
   const s = new THREE.Scene(), geo = new THREE.SphereGeometry(100, 64, 32), pos = geo.attributes.position, col = [];
-  const top = new THREE.Color(0x26324a), hor = new THREE.Color(0xd2dceb), lo = new THREE.Color(0xf2f6fa), deep = new THREE.Color(0x8c99ab), c = new THREE.Color();
-  for (let i = 0; i < pos.count; i++) { const y = pos.getY(i) / 100; if (y >= 0) c.lerpColors(hor, top, Math.pow(y, 0.55)); else c.lerpColors(lo, deep, Math.pow(-y, 0.7)); col.push(c.r, c.g, c.b); }
+  const top = new THREE.Color(0x0b0f18), hor = new THREE.Color(0x5d6b82), lo = new THREE.Color(0xe9eff6), deep = new THREE.Color(0xb7c3d2), c = new THREE.Color();
+  for (let i = 0; i < pos.count; i++) { const y = pos.getY(i) / 100; if (y >= 0) c.lerpColors(hor, top, Math.pow(y, 0.45)); else c.lerpColors(lo, deep, Math.pow(-y, 0.6)); col.push(c.r, c.g, c.b); }
   geo.setAttribute('color', new THREE.Float32BufferAttribute(col, 3));
   s.add(new THREE.Mesh(geo, new THREE.MeshBasicMaterial({ vertexColors: true, side: THREE.BackSide })));
-  const hot = new THREE.MeshBasicMaterial({ color: new THREE.Color(6, 6, 6.4) });
-  for (let k = 0; k < 10; k++) { const a = k / 10 * Math.PI * 2, m = new THREE.Mesh(new THREE.BoxGeometry(26, 1.5, 5), hot); m.position.set(Math.cos(a) * 55, 62, Math.sin(a) * 55); m.lookAt(0, 62, 0); s.add(m); }
-  const soft = new THREE.Mesh(new THREE.PlaneGeometry(60, 30), new THREE.MeshBasicMaterial({ color: new THREE.Color(3, 3.1, 3.4), side: THREE.DoubleSide })); soft.position.set(40, 30, 70); soft.lookAt(0, 0, 0); s.add(soft);
-  const blue = new THREE.Mesh(new THREE.PlaneGeometry(90, 8), new THREE.MeshBasicMaterial({ color: new THREE.Color(0.6, 1.2, 3.2), side: THREE.DoubleSide })); blue.position.set(-70, 12, -50); blue.lookAt(0, 12, 0); s.add(blue);
+  const hot = new THREE.MeshBasicMaterial({ color: new THREE.Color(9, 9, 9.4) });
+  for (let row = -2; row <= 2; row++) for (let k = -3; k <= 3; k++) { const m = new THREE.Mesh(new THREE.BoxGeometry(9, 0.6, 2.2), hot); m.position.set(k * 13, 70, row * 16); m.rotation.x = Math.PI / 2; s.add(m); }
+  const key = new THREE.Mesh(new THREE.PlaneGeometry(46, 26), new THREE.MeshBasicMaterial({ color: new THREE.Color(5, 4.8, 4.5), side: THREE.DoubleSide })); key.position.set(45, 40, 60); key.lookAt(0, 0, 0); s.add(key);
+  const fill = new THREE.Mesh(new THREE.PlaneGeometry(60, 20), new THREE.MeshBasicMaterial({ color: new THREE.Color(1.3, 1.4, 1.6), side: THREE.DoubleSide })); fill.position.set(-70, 20, 40); fill.lookAt(0, 10, 0); s.add(fill);
+  const boards = new THREE.Mesh(new THREE.CylinderGeometry(88, 88, 7, 64, 1, true), new THREE.MeshBasicMaterial({ color: new THREE.Color(0.25, 0.55, 2.4), side: THREE.BackSide })); boards.position.y = 4; s.add(boards);
   return s;
 }
-scene.environment = pmrem.fromScene(arenaEnv(), 0.02).texture;
+scene.environment = pmrem.fromScene(arenaEnv(), 0.015).texture;
+// dot-grid stage backdrop, rendered in the scene so post-processing can work on an opaque frame
+function stageBackdrop(w, h) {
+  const k = renderer.getPixelRatio(), c = document.createElement('canvas'); c.width = Math.max(2, Math.round(w * k)); c.height = Math.max(2, Math.round(h * k)); const x = c.getContext('2d');
+  x.fillStyle = '#15181c'; x.fillRect(0, 0, c.width, c.height); x.fillStyle = 'rgba(110,118,136,.42)';
+  const step = 22 * k; for (let yy = step / 2; yy < c.height; yy += step) for (let xx = step / 2; xx < c.width; xx += step) { x.beginPath(); x.arc(xx, yy, 0.85 * k, 0, 6.283); x.fill(); }
+  const t = new THREE.CanvasTexture(c); t.colorSpace = THREE.SRGBColorSpace; return t;
+}
 const camera = new THREE.PerspectiveCamera(34, 1, 1, 20000);
 const controls = new OrbitControls(camera, renderer.domElement);
 controls.enableDamping = true; controls.minDistance = 40; controls.maxDistance = 700; controls.maxPolarAngle = 1.53;
 
-scene.add(new THREE.HemisphereLight(0xdfe9ff, 0x1a2440, 0.6));
-const sun = new THREE.DirectionalLight(0xffffff, 2.2);
-sun.position.set(80, 160, 110); sun.castShadow = true;
-Object.assign(sun.shadow.camera, { left: -80, right: 80, top: 100, bottom: -40, near: 10, far: 500 });
-sun.shadow.mapSize.set(2048, 2048); sun.shadow.bias = -0.0004; sun.shadow.normalBias = 0.3;
+scene.add(new THREE.HemisphereLight(0xdfe9ff, 0x262b36, 0.35));
+const sun = new THREE.DirectionalLight(0xfff3e4, 2.3);
+sun.position.set(70, 170, 95); sun.castShadow = true;
+Object.assign(sun.shadow.camera, { left: -70, right: 70, top: 95, bottom: -35, near: 20, far: 420 });
+sun.shadow.mapSize.set(2048, 2048); sun.shadow.bias = -0.0006; sun.shadow.normalBias = 0.25; sun.shadow.radius = 9; sun.shadow.blurSamples = 20;
 scene.add(sun);
-const rim = new THREE.DirectionalLight(0x8fb8ff, 1.0); rim.position.set(-120, 60, -100); scene.add(rim);
+const rim = new THREE.DirectionalLight(0x9cc0ff, 1.5); rim.position.set(-120, 70, -110); scene.add(rim);
+const kick = new THREE.DirectionalLight(0xffffff, 0.45); kick.position.set(-40, 20, 140); scene.add(kick);
+// post-processing: MSAA render target → ground-truth ambient occlusion → tone mapping / sRGB
+const composer = new EffectComposer(renderer, new THREE.WebGLRenderTarget(4, 4, { type: THREE.HalfFloatType, samples: 4 }));
+composer.addPass(new RenderPass(scene, camera));
+const gtao = new GTAOPass(scene, camera, 4, 4);
+gtao.updateGtaoMaterial({ radius: 6, distanceExponent: 1.6, thickness: 3, scale: 1.1, samples: 16, distanceFallOff: 1, screenSpaceRadius: false });
+gtao.updatePdMaterial({ lumaPhi: 10, depthPhi: 2, normalPhi: 3, radius: 6, rings: 2, samples: 16 });
+gtao.blendIntensity = 0.85; composer.addPass(gtao);
+composer.addPass(new OutputPass());
+let HQ = true; try { HQ = localStorage.getItem('trophy-cooler-hq') !== '0'; } catch {}
+const renderFrame = () => (HQ ? composer.render() : renderer.render(scene, camera));
+// soft contact shadow under the trophy (ambient occlusion on the ice)
+function contactTexture() {
+  const c = document.createElement('canvas'); c.width = c.height = 256; const x = c.getContext('2d'), g = x.createRadialGradient(128, 128, 0, 128, 128, 128);
+  g.addColorStop(0, 'rgba(0,0,0,.62)'); g.addColorStop(0.45, 'rgba(0,0,0,.38)'); g.addColorStop(1, 'rgba(0,0,0,0)'); x.fillStyle = g; x.fillRect(0, 0, 256, 256);
+  return new THREE.CanvasTexture(c);
+}
+const contact = new THREE.Mesh(new THREE.PlaneGeometry(1, 1), new THREE.MeshBasicMaterial({ map: contactTexture(), transparent: true, depthWrite: false, toneMapped: false }));
+contact.rotation.x = -Math.PI / 2; contact.position.y = 0.06; contact.renderOrder = 1; scene.add(contact);
 
 // ---------- rink: an ice disc that fades into the dot-grid stage ----------
 function iceTexture(markings) {
   const N = 2048, R = 170, c = document.createElement('canvas'); c.width = c.height = N; const x = c.getContext('2d'), k = N / (2 * R);
-  x.fillStyle = '#aab6c2'; x.fillRect(0, 0, N, N);
+  x.fillStyle = '#8f9cab'; x.fillRect(0, 0, N, N);
   if (markings) {
     const line = (z, col, w = 12) => { x.fillStyle = col; x.fillRect(0, N / 2 + z * k - w * k / 2, N, w * k); };
     line(-62, '#c8102e', 8); line(118, '#1a49b8', 8);
@@ -573,7 +469,7 @@ function iceTexture(markings) {
   const t = new THREE.CanvasTexture(c); t.colorSpace = THREE.SRGBColorSpace; t.anisotropy = 8; return t;
 }
 const iceTex = { on: iceTexture(true), off: iceTexture(false) };
-const ice = new THREE.Mesh(new THREE.PlaneGeometry(340, 340), new THREE.MeshPhysicalMaterial({ map: iceTex.on, transparent: true, depthWrite: false, roughness: 0.22, clearcoat: 0.6, clearcoatRoughness: 0.12 }));
+const ice = new THREE.Mesh(new THREE.PlaneGeometry(340, 340), new THREE.MeshPhysicalMaterial({ map: iceTex.on, transparent: true, depthWrite: false, roughness: 0.55, clearcoat: 0.55, clearcoatRoughness: 0.18, specularIntensity: 0.5 }));
 ice.rotation.x = -Math.PI / 2; ice.receiveShadow = true; scene.add(ice);
 
 // ---------- labels ----------
@@ -586,19 +482,17 @@ function makeLabel(text, { aspect = 4, repeat = 1, fg = '#ffffff', bg = null }) 
   const seg = W / repeat, logo = B.logo && B.use ? logoVariant(fg) : null, fam = B.font ? `"${B.font}", "Barlow Condensed"` : '"Barlow Condensed"';
   if (logo) {
     for (let i = 0; i < repeat; i++) {
-      let h = H * 0.74, w = h * logo.width / logo.height; if (w > seg * 0.86) { w = seg * 0.86; h = w * logo.height / logo.width; }
+      let h = H * 0.92, w = h * logo.width / logo.height; if (w > seg * 0.94) { w = seg * 0.94; h = w * logo.height / logo.width; }
       x.drawImage(logo, seg * (i + 0.5) - w / 2, H / 2 - h / 2, w, h);
     }
     const t = new THREE.CanvasTexture(c); t.colorSpace = THREE.SRGBColorSpace; t.anisotropy = renderer.capabilities.getMaxAnisotropy(); return t;
   }
   for (let i = 0; i < repeat; i++) {
-    let fs = H * 0.62; x.font = `700 ${fs}px ${fam}, sans-serif`;
+    let fs = H * 0.8; x.font = `700 ${fs}px ${fam}, sans-serif`;
     try { x.letterSpacing = (fs * 0.14) + 'px'; } catch {}
-    const tw = x.measureText(text).width; if (tw > seg * 0.84) { fs *= seg * 0.84 / tw; x.font = `700 ${fs}px ${fam}, sans-serif`; try { x.letterSpacing = (fs * 0.14) + 'px'; } catch {} }
+    const tw = x.measureText(text).width; if (tw > seg * 0.93) { fs *= seg * 0.93 / tw; x.font = `700 ${fs}px ${fam}, sans-serif`; try { x.letterSpacing = (fs * 0.14) + 'px'; } catch {} }
     x.fillStyle = fg; x.textAlign = 'center'; x.textBaseline = 'middle';
     x.fillText(text, seg * (i + 0.5) + fs * 0.07, H * 0.53);
-    const w2 = Math.min(seg * 0.84, x.measureText(text).width);
-    x.fillRect(seg * (i + 0.5) - w2 / 2, H * 0.53 + fs * 0.5, w2, Math.max(2, H * 0.025));
   }
   const t = new THREE.CanvasTexture(c); t.colorSpace = THREE.SRGBColorSpace; t.anisotropy = renderer.capabilities.getMaxAnisotropy(); return t;
 }
@@ -611,7 +505,7 @@ const ghostEdge = new THREE.LineBasicMaterial({ color: 0x9cc4ff, transparent: tr
 function dispose(o) { o.traverse((m) => { if (m.geometry) m.geometry.dispose(); const ms = m.userData.orig ? [m.userData.orig] : [m.material]; ms.flat().forEach((mt) => { if (mt && mt !== ghost && mt !== ghostEdge) { mt.map && mt.map.dispose(); mt.dispose(); } }); }); }
 
 function makeTex(E) {
-  return { enc: makeSkin(E.skin), cup: makeSkin(E.skinCup), base: makeSkin(E.skinBase), beer: E.refBeer && E.beerLabel ? makeBeerLabel(REFS.find((r) => r.id === E.refBeer), E.beerType) : null };
+  return { enc: makeSkin(E.skin), cup: makeSkin(E.skinCup), base: makeSkin(E.skinBase), beer: makeBottleLabel(E.beerType) };
 }
 function baseScale(E) { // the sled grows (never shrinks below its design) to carry the enclosure on ice
   const b = D.byId(D.BASES, E.base), e = D.byId(D.ENCLOSURES, E.enc);
@@ -629,7 +523,8 @@ function makeSectionParts(E, tex) {
   out.cupGroup.add(out.contents);
   return out;
 }
-let texList = [];
+let texList = [], flashUntil = 0;
+function flashSection() { flashUntil = performance.now() + 1400; if (parts.highlight) parts.highlight.visible = !S.isolate; setTimeout(() => { if (parts.highlight && performance.now() >= flashUntil) parts.highlight.visible = false; }, 1450); }
 const sectionObj = (sec, p = parts) => (sec === 'cup' ? p.cupGroup : sec === 'enc' ? p.enc : p.base);
 function build() {
   commitLook();
@@ -654,7 +549,7 @@ function build() {
     } else S.compareIter = null;
   }
   parts.highlight = new THREE.Box3Helper(new THREE.Box3(), 0x4d7dff);
-  Object.assign(parts.highlight.material, { depthTest: false, transparent: true, opacity: 0.7 }); parts.highlight.renderOrder = 10; root.add(parts.highlight);
+  Object.assign(parts.highlight.material, { depthTest: false, transparent: true, opacity: 0.35, toneMapped: false }); parts.highlight.renderOrder = 10; root.add(parts.highlight);
   applyView(); specs(); syncUI();
   const warns = [parts.cup.userData.warn, ...D.checkCup(parts.cup.userData.bowl, parts.contents)].filter(Boolean);
   $('cup-warn').style.display = warns.length ? 'block' : 'none'; $('cup-warn').textContent = warns.join(' ');
@@ -677,7 +572,8 @@ function applyView() {
   root.updateMatrixWorld(true);
   const box = new THREE.Box3().setFromObject(sectionObj(S.sel)), size = box.getSize(new THREE.Vector3());
   if (parts.compare) parts.compare.position.set(size.x + 16, 0, 0);
-  parts.highlight.box.copy(box.expandByScalar(1.2)); parts.highlight.visible = !only;
+  parts.highlight.box.copy(box.expandByScalar(1.2)); parts.highlight.visible = !only && performance.now() < flashUntil;
+  const fp = parts.meta.base.footprint, k = parts.baseAuto.s * 1.55; contact.scale.set(fp[0] * k, fp[1] * k, 1); contact.visible = parts.base.visible || parts.enc.visible;
 }
 
 // ---------- specs ----------
@@ -711,7 +607,8 @@ function specs() {
   }).join('');
   const pn = D.PRESETS.find((p) => p.id === S.preset);
   $('study-sub').textContent = `· ${pn.name.replace('·', '')}${isEdited(S.preset) ? ' (edited)' : ''} — ${cup.name} + ${enc.name} + ${base.name}`;
-  $('pill-txt').textContent = `Concept ${pn.name.slice(0, 2)} of 05 · ${pins().length} reference${pins().length === 1 ? '' : 's'}`;
+  const nit = SECTIONS.reduce((a, s) => a + C[S.preset].iters[s].length, 0);
+  $('pill-txt').textContent = `Concept ${pn.name.slice(0, 2)} of 05 · ${nit} iteration${nit === 1 ? '' : 's'}`;
   $('dims-readout').textContent = `Overall ${ftin(top)} · footprint ${base.footprint[0]}″ × ${base.footprint[1]}″ · freezer 23.6 × 32.0 × 24.6″`;
 }
 
@@ -720,7 +617,7 @@ function specs() {
 // its applied design, its prompt and its iteration history.
 const SECTIONS = ['base', 'enc', 'cup'];
 const MODS = {
-  cup: { n: '03', label: 'Cup', long: 'Cup · bowl, rim, finish, bottles + ice', list: D.CUPS, key: 'cup', ref: 'refCup', skin: 'skinCup', P: 'cupP', fin: 'cupFinish' },
+  cup: { n: '03', label: 'Cup', long: 'Cup · bowl, rim, finish, bottles + ice', list: D.CUPS.filter((c) => c.id !== 'custom'), key: 'cup', ref: 'refCup', skin: 'skinCup', P: 'cupP', fin: 'cupFinish' },
   enc: { n: '02', label: 'Enclosure', long: 'Enclosure · freezer sleeve + branding', list: D.ENCLOSURES, key: 'enc', ref: 'refEnc', skin: 'skin', P: 'encP', fin: 'encFinish' },
   base: { n: '01', label: 'Sliding base', long: 'Sliding base · UHMW rink sled', list: D.BASES, key: 'base', ref: 'refBase', skin: 'skinBase', P: 'baseP', fin: 'baseFinish' },
 };
@@ -743,16 +640,15 @@ function effState() { if (!S.previewIter) return S; const [, it] = findIter(S.pr
 function toast(msg) { const t = $('toast'); t.textContent = msg; t.classList.add('show'); clearTimeout(toast.t); toast.t = setTimeout(() => t.classList.remove('show'), 2600); }
 function markCustom() { /* edits belong to the active concept (see C) */ }
 async function switchConcept(id) {
-  commitLook(); S.preset = id; S.previewIter = S.compareIter = null; Object.assign(S, pickLook(C[id])); build(); renderThumbs(); saveSoon();
-  if (await ensurePinsLoaded(id)) build();
+  commitLook(); S.preset = id; S.previewIter = S.compareIter = null; Object.assign(S, pickLook(C[id])); build(); saveSoon();
 }
 function renderPresets() {
   $('presets').innerHTML = D.PRESETS.map((p) => {
-    const c = C[p.id], n = c.pins.length, cm = c.metal === 'gold' ? '#d9b45b' : '#dfe4ea', it = SECTIONS.reduce((a, s) => a + c.iters[s].length, 0);
-    return `<div class="layer ${S.preset === p.id ? 'selected' : ''}"><button class="select" data-id="${p.id}"><span class="sw" style="background:linear-gradient(135deg,${c.primary} 0 45%,${c.accent} 45% 72%,${cm} 72%)"></span>${p.name.replace(' · ', ' ')}${isEdited(p.id) ? '<i class="edot" title="Edited"></i>' : ''}<small>${n || it ? `<span class="rc">${n} ref${n === 1 ? '' : 's'} · ${it} it.</span>` : D.byId(D.CUPS, c.cup).name}</small></button></div>`;
+    const c = C[p.id], cm = c.metal === 'gold' ? '#d9b45b' : '#dfe4ea', it = SECTIONS.reduce((a, s) => a + c.iters[s].length, 0);
+    return `<div class="layer ${S.preset === p.id ? 'selected' : ''}"><button class="select" data-id="${p.id}"><span class="sw" style="background:linear-gradient(135deg,${c.primary} 0 45%,${c.accent} 45% 72%,${cm} 72%)"></span>${p.name.replace(' · ', ' ')}${isEdited(p.id) ? '<i class="edot" title="Edited"></i>' : ''}<small>${it ? `<span class="rc">${it} iteration${it === 1 ? '' : 's'}</span>` : D.byId(D.CUPS, c.cup).name}</small></button></div>`;
   }).join('');
 }
-$('presets').onclick = (e) => { const b = e.target.closest('[data-id]'); if (!b || b.dataset.id === S.preset) return; switchConcept(b.dataset.id); toast(`${conceptName(b.dataset.id)} restored · references + iterations`); };
+$('presets').onclick = (e) => { const b = e.target.closest('[data-id]'); if (!b || b.dataset.id === S.preset) return; switchConcept(b.dataset.id); toast(`${conceptName(b.dataset.id)} restored · sections + iterations`); };
 
 // ---------- scene objects ----------
 function renderLayers() {
@@ -766,49 +662,12 @@ function renderLayers() {
   $('isolate').textContent = S.isolate ? 'Show all objects' : 'Isolate selected';
   $('isolate').classList.toggle('active', S.isolate);
 }
-function selectSection(sec, scroll) { if (S.sel === sec) { if (scroll) $('workshop').scrollIntoView({ behavior: 'smooth', block: 'start' }); return; } S.sel = sec; S.compareIter = null; if (parts.compare) build(); else { applyView(); renderLayers(); renderWorkshop(); syncSkin(); renderChips(); renderThumbs(); } if (scroll) $('workshop').scrollIntoView({ behavior: 'smooth', block: 'start' }); }
+function selectSection(sec, scroll) { setTimeout(flashSection, 30); if (S.sel === sec) { if (scroll) $('workshop').scrollIntoView({ behavior: 'smooth', block: 'start' }); return; } S.sel = sec; S.compareIter = null; if (parts.compare) build(); else { applyView(); renderLayers(); renderWorkshop(); syncSkin(); renderChips(); } if (scroll) $('workshop').scrollIntoView({ behavior: 'smooth', block: 'start' }); }
 $('layers').onclick = (e) => {
   const eye = e.target.closest('[data-eye]'); if (eye) { const k = eye.dataset.eye; S.vis[k] = !S.vis[k]; if (k === 'contents') S.contents = S.vis.contents; applyView(); renderLayers(); syncToggles(); return; }
   const s = e.target.closest('[data-sel]'); if (s) selectSection(s.dataset.sel, true);
 };
 $('isolate').onclick = () => { S.isolate = !S.isolate; applyView(); renderLayers(); renderChips(); };
-
-// ---------- references per section ----------
-const EL_OPTS = {
-  cup: [['shape', 'Shape the cup from its silhouette', (r) => !!r.profile], ['skin', 'Wrap it on the cup as a skin']],
-  enc: [['skin', 'Wrap it on the enclosure as a skin'], ['palette', 'Use its colors for glass + LEDs']],
-  base: [['skin', 'Wrap it on the base as a skin']],
-  beer: [['label', 'Use it as the bottle label art'], ['shape', 'Bottle shape from its silhouette', (r) => !!r.beerProfile]],
-};
-function optOn(el, k, id) {
-  if (k === 'skin') return S[MODS[el].skin] === id;
-  if (k === 'palette') return S.paletteRef === id;
-  if (k === 'shape') return el === 'cup' ? S.cup === 'custom' && S.profileSrc === id : S.beerType === 'custom' && S.refBeer === id;
-  if (k === 'label') return S.beerLabel && S.refBeer === id;
-}
-function setOpt(el, k, id, on) {
-  const r = REFS.find((x) => x.id === id), dflt = lookDefaults(D.byId(D.PRESETS, S.preset));
-  if (!r && on) return;
-  if (k === 'skin') S[MODS[el].skin] = on ? id : 'default';
-  if (k === 'palette') { if (on) { S.palette = r.palette; S.paletteSrc = 'Ref · ' + refLabel(r); S.paletteRef = id; } else if (S.paletteRef === id) { S.palette = null; S.paletteSrc = null; S.paletteRef = null; } }
-  if (k === 'shape' && el === 'cup') { if (on && r.profile) { S.cup = 'custom'; S.cupProfile = r.profile.pts; S.profileSrc = id; if (!S.facets && r.facets) S.facets = r.facets; } else if (S.profileSrc === id) { S.cup = dflt.cup === 'custom' ? 'champion' : dflt.cup; S.cupProfile = null; S.profileSrc = null; } }
-  if (k === 'shape' && el === 'beer') { if (on && r.beerProfile) { S.beerType = 'custom'; S.beerProfile = r.beerProfile; } else { if (S.beerType === 'custom') S.beerType = 'longneck'; S.beerProfile = null; } }
-  if (k === 'label') S.beerLabel = on;
-}
-function assignRef(el, id) { // set the section's primary reference (drives skin / shape / palette)
-  const key = MODS[el].ref, prev = S[key];
-  if (prev) for (const [k] of EL_OPTS[el]) if (optOn(el, k, prev)) setOpt(el, k, prev, false);
-  S[key] = id || null;   // effects (shape / skin / palette) are opt-in toggles, so assigning never redesigns a section
-}
-function assignToSection(sec, id) {
-  const list = secRefs(sec); if (!list.includes(id)) list.push(id);
-  pinRef(id); if (!S[MODS[sec].ref]) assignRef(sec, id);
-}
-function removeFromSection(sec, id) {
-  const c = C[S.preset]; c.secRefs[sec] = c.secRefs[sec].filter((x) => x !== id);
-  if (S[MODS[sec].ref] === id) assignRef(sec, c.secRefs[sec][0] || null);
-  if (sec === 'cup' && S.refBeer === id) { S.refBeer = null; S.beerLabel = false; if (S.beerType === 'custom') { S.beerType = 'longneck'; S.beerProfile = null; } }
-}
 
 // ---------- workshop ----------
 function renderWorkshop() {
@@ -818,14 +677,6 @@ function renderWorkshop() {
   $('ws-title').textContent = `${md.n} · ${md.label}`;
   $('ws-sub').textContent = `${md.long} — ${v.name}`;
   $('ws-isolate').classList.toggle('active', S.isolate);
-  // references
-  const refs = secRefs(sec).map((id) => REFS.find((r) => r.id === id)).filter(Boolean), prim = S[md.ref];
-  $('ws-refcount').textContent = refs.length ? `${refs.length} assigned` : 'none';
-  $('ws-refs').innerHTML = refs.map((r) => `<button class="${prim === r.id ? 'on' : ''}" data-ref="${r.id}" title="${refLabel(r)}${prim === r.id ? ' · primary' : ' · click to make primary'}"><img src="${r.thumb}" alt="">${prim === r.id ? '<span class="star">★</span>' : ''}<span class="rm" data-rm="${r.id}" title="Remove from this section">×</span></button>`).join('')
-    + (secRefs(sec).length > refs.length ? `<p class="muted">Loading ${secRefs(sec).length - refs.length}…</p>` : '');
-  const pr = prim && REFS.find((r) => r.id === prim);
-  $('ws-refopts').innerHTML = pr ? EL_OPTS[sec].filter(([, , ok]) => !ok || ok(pr)).map(([k, label]) => `<label class="toggle-row"><input type="checkbox" data-opt="${k}" ${optOn(sec, k, prim) ? 'checked' : ''}>${label}</label>`).join('') : '';
-  $('ws-refhint').textContent = refs.length ? 'The primary reference drives the options above; all of this section’s references are sent to a vision model when enabled.' : `No references yet. Choose slides from the treatment (or import images) for the ${md.label.toLowerCase()} of ${conceptName()}.`;
   // prompt + engine
   if (document.activeElement !== $('ws-prompt')) $('ws-prompt').value = C[S.preset].prompts[sec] || '';
   $('ws-prompt').placeholder = { cup: 'e.g. Taller bowl with a flared rim, gold finish, bottles in a bouquet, more ice heaped above the rim', enc: 'e.g. Wider sleeve with finer stained-glass tiles and the LEDs off', base: 'e.g. Bigger round puck footprint with a glowing underside' }[sec];
@@ -864,23 +715,12 @@ $('ws-params').onchange = (e) => {
   if (t.dataset.led !== undefined) { S[md.P].led = t.checked; build(); }
 };
 function renderBottles() {
-  $('beer-type').innerHTML = D.BEERS.map((b) => `<option value="${b.id}" ${S.beerType === b.id ? 'selected' : ''}>${b.name}</option>`).join('');
-  const refs = secRefs('cup').map((id) => REFS.find((r) => r.id === id)).filter(Boolean);
-  $('beer-label').innerHTML = `<option value="">Brand label (logo / label text)</option>` + refs.map((r) => `<option value="${r.id}" ${S.beerLabel && S.refBeer === r.id ? 'selected' : ''}>Ref · ${refLabel(r)}</option>`).join('');
-  const lr = S.beerLabel && S.refBeer && REFS.find((r) => r.id === S.refBeer);
-  $('beer-shape-row').style.display = lr && lr.beerProfile ? '' : 'none'; $('beer-shape').checked = S.beerType === 'custom';
+  $('beer-type').innerHTML = D.BEERS.filter((b) => b.id !== 'custom').map((b) => `<option value="${b.id}" ${S.beerType === b.id ? 'selected' : ''}>${b.name}</option>`).join('');
 }
 $('beer-type').onchange = (e) => { S.beerType = e.target.value; build(); };
-$('beer-label').onchange = (e) => { const id = e.target.value; if (!id) { S.beerLabel = false; if (S.beerType === 'custom') { S.beerType = 'longneck'; S.beerProfile = null; } } else { S.refBeer = id; S.beerLabel = true; } build(); };
-$('beer-shape').onchange = (e) => { setOpt('beer', 'shape', S.refBeer, e.target.checked); build(); };
 $('ws-tabs').onclick = (e) => { const b = e.target.closest('[data-sec]'); if (b) selectSection(b.dataset.sec); };
 $('ws-isolate').onclick = () => { S.isolate = !S.isolate; applyView(); renderLayers(); renderWorkshop(); renderChips(); goCam(S.isolate ? S.sel === 'cup' ? 'bottles' : 'hero' : 'hero'); if (S.isolate) setTimeout(() => $('fit').click(), 60); };
 $('ws-assembled').onclick = () => { S.isolate = false; S.previewIter = null; S.compareIter = null; build(); goCam('hero'); };
-$('ws-refs').onclick = (e) => {
-  const rm = e.target.closest('[data-rm]'); if (rm) { e.stopPropagation(); removeFromSection(S.sel, rm.dataset.rm); build(); return; }
-  const b = e.target.closest('[data-ref]'); if (b && S[MODS[S.sel].ref] !== b.dataset.ref) { assignRef(S.sel, b.dataset.ref); build(); }
-};
-$('ws-refopts').onchange = (e) => { const c = e.target.closest('[data-opt]'); if (!c) return; setOpt(S.sel, c.dataset.opt, S[MODS[S.sel].ref], c.checked); build(); };
 $('ws-prompt').oninput = (e) => { C[S.preset].prompts[S.sel] = e.target.value; saveSoon(); };
 $('variants').onclick = (e) => { const b = e.target.closest('[data-v]'); if (!b) return; S[MODS[S.sel].key] = b.dataset.v; if (S.sel === 'cup' && b.dataset.v !== 'custom') { S.profileSrc = null; } build(); };
 
@@ -955,7 +795,7 @@ function isLocalURL(u) {
 function genState(msg, bad) { $('gen-state').innerHTML = msg; $('gen-state').style.color = bad ? '#ffb4b4' : ''; }
 function renderGen() {
   $('gen-engine').value = GEN.engine; $('gen-llm').style.display = GEN.engine === 'procedural' ? 'none' : '';
-  if (document.activeElement !== $('gen-url')) $('gen-url').value = GEN.url; $('gen-vision').checked = GEN.vision;
+  if (document.activeElement !== $('gen-url')) $('gen-url').value = GEN.url;
   $('gen-model').innerHTML = (GEN.models.length ? GEN.models : GEN.model ? [GEN.model] : []).map((m) => `<option ${m === GEN.model ? 'selected' : ''}>${m}</option>`).join('') || '<option value="">— test connection —</option>';
   if (GEN.engine === 'procedural') genState('Runs entirely in this page: it interprets your prompt with design rules and explores variations around the current section. No model, no network.');
   else if (GEN.ok === null) genState(`Not tested yet. Start ${GEN.engine === 'ollama' ? 'Ollama' : 'your local server'} and press <b>Test connection</b>.`);
@@ -964,7 +804,6 @@ function renderGen() {
 $('gen-engine').onchange = (e) => { GEN.engine = e.target.value; if (GEN.engine === 'openai' && /11434/.test(GEN.url)) GEN.url = 'http://localhost:1234'; if (GEN.engine === 'ollama' && !/11434/.test(GEN.url)) GEN.url = 'http://localhost:11434'; GEN.ok = null; GEN.models = []; saveGen(); renderGen(); };
 $('gen-url').onchange = (e) => { GEN.url = e.target.value.trim().replace(/\/+$/, ''); GEN.ok = null; saveGen(); renderGen(); };
 $('gen-model').onchange = (e) => { GEN.model = e.target.value; saveGen(); renderGen(); };
-$('gen-vision').onchange = (e) => { GEN.vision = e.target.checked; saveGen(); };
 async function testGen() {
   if (!isLocalURL(GEN.url)) { GEN.ok = false; genState('Only local addresses are allowed (localhost, 127.0.0.1, or your private network). Cloud endpoints are blocked by design.', true); return false; }
   genState('Connecting…');
@@ -992,7 +831,6 @@ function proceduralGen(sec, prompt, cur) {
   const strong = has('much', 'very', 'way', 'dramatic', 'extreme') ? 1.8 : has('slightly', 'a bit', 'subtle', 'little') ? 0.5 : 1;
   const finishWord = () => { for (const [f, ws] of Object.entries({ gold: ['gold', 'brass', 'warm metal'], chrome: ['chrome', 'mirror', 'silver'], satin: ['satin', 'brushed', 'matte metal'], white: ['white', 'porcelain'], iridescent: ['iridescent', 'pearl', 'holographic', 'opal'], lacquer: ['lacquer', 'navy', 'painted', 'colored'] })) if (has(...ws)) return f; return null; };
   const f = finishWord(); if (f) { n[MODS[sec].fin] = f; notes.push(FIN_LABELS[f].toLowerCase() + ' finish'); }
-  const ref = S[MODS[sec].ref] && REFS.find((r) => r.id === S[MODS[sec].ref]), wantsRef = has('reference', 'like the image', 'like the slide', 'silhouette', 'from the ref');
   if (sec === 'cup') {
     if (has('taller', 'tall ', 'deeper', 'elongat')) bump('height', 0.12 * strong, 'taller bowl');
     if (has('shorter', 'squat', 'shallow', 'lower')) bump('height', -0.1 * strong, 'shorter bowl');
@@ -1012,7 +850,6 @@ function proceduralGen(sec, prompt, cur) {
     if (has('smooth', 'soft', 'organic')) { n.facets = 0; if (n.cup === 'chalice') n.cup = 'champion'; notes.push('smooth surfaces'); }
     for (const [id, ws] of Object.entries({ champion: ['champion', 'handles', 'classic trophy', 'loving cup'], hex: ['hex', 'hexagon'], puckstack: ['puck'], torch: ['torch', 'cone', 'flame'], chalice: ['chalice', 'goblet'] })) if (has(...ws)) { n.cup = id; notes.push(D.byId(D.CUPS, id).name); }
     if (has('can')) { n.beerType = 'can'; notes.push('cans'); } if (has('aluminum', 'aluminium')) { n.beerType = 'alubottle'; notes.push('aluminum bottles'); }
-    if ((wantsRef || has('shape')) && ref && ref.profile) { n.cup = 'custom'; n.cupProfile = ref.profile.pts; n.profileSrc = ref.id; notes.push('shape from reference'); }
   }
   if (sec === 'enc') {
     if (has('wider', 'wide', 'broad', 'bigger', 'larger', 'chunky')) bump('width', 0.08 * strong, 'wider sleeve');
@@ -1022,15 +859,12 @@ function proceduralGen(sec, prompt, cur) {
     if (has('finer', 'smaller tiles', 'detailed', 'intricate', 'mosaic')) bump('tile', -0.25 * strong, 'finer mosaic');
     if (has('no led', 'leds off', 'lights off', 'no lights', 'no glow')) { n.encP.led = false; notes.push('LEDs off'); } else if (has('led', 'glow', 'light', 'neon')) { n.encP.led = true; notes.push('LED accents'); }
     for (const [id, ws] of Object.entries({ halo: ['round', 'cylinder', 'column', 'halo'], prism: ['octagon', 'prism', 'tapered'], pucktower: ['stripe', 'jersey', 'hockey'], monolith: ['minimal', 'clean', 'monolith', 'box'], cathedral: ['stained', 'cathedral', 'church'] })) if (has(...ws)) { n.enc = id; notes.push(D.byId(D.ENCLOSURES, id).name); }
-    if ((wantsRef || has('skin', 'wrap', 'pattern')) && ref) { n.skin = ref.id; notes.push('reference skin'); }
-    if (has('reference colors', 'ref colors', 'palette') && ref) { n.palette = ref.palette; n.paletteSrc = 'Ref · ' + refLabel(ref); n.paletteRef = ref.id; notes.push('reference palette'); }
   }
   if (sec === 'base') {
     if (has('bigger', 'larger', 'wider', 'stable', 'broad')) bump('footprint', 0.1 * strong, 'larger footprint');
     if (has('compact', 'smaller', 'tight')) bump('footprint', -0.1, 'compact footprint');
     if (has('no led', 'lights off', 'no glow')) { n.baseP.led = false; notes.push('no underglow'); } else if (has('glow', 'led', 'light', 'hover', 'float')) { n.baseP.led = true; notes.push('LED glow'); }
     for (const [id, ws] of Object.entries({ puck: ['puck', 'round', 'disc'], ski: ['ski', 'runner'], octa: ['octagon', 'octa'], float: ['float', 'hover', 'levitat'], rink: ['sled', 'rink', 'plate'] })) if (has(...ws)) { n.base = id; notes.push(D.byId(D.BASES, id).name); }
-    if ((wantsRef || has('skin', 'wrap', 'pattern')) && ref) { n.skinBase = ref.id; notes.push('reference skin'); }
   }
   if (!notes.length) { for (const k of Object.keys(D.SECTION_PARAMS[sec])) jit(k, 0.12); notes.push('exploratory variation around the current design'); }
   const words = prompt.replace(/[^\w\s'-]/g, ' ').trim().split(/\s+/).filter((w) => w.length > 2).slice(0, 4);
@@ -1040,22 +874,21 @@ function proceduralGen(sec, prompt, cur) {
 // local LLM engine (Ollama / OpenAI-compatible): prompt → JSON section parameters
 function llmSchema(sec) {
   const md = MODS[sec], ranges = Object.entries(D.SECTION_PARAMS[sec]).map(([k, [lo, hi]]) => `"${k}": number ${lo}..${hi}`).join(', ');
-  const extra = sec === 'cup' ? `, "arrangement": "ring"|"double"|"bouquet", "bottleType": ${D.BEERS.filter((b) => b.id !== 'custom').map((b) => `"${b.id}"`).join('|')}, "facets": integer 0..16 (0 = smooth; only used by variant "custom"), "useReferenceShape": boolean` : sec === 'enc' ? `, "led": boolean, "useReferenceSkin": boolean, "useReferencePalette": boolean` : `, "led": boolean, "useReferenceSkin": boolean`;
+  const extra = sec === 'cup' ? `, "arrangement": "ring"|"double"|"bouquet", "bottleType": ${D.BEERS.filter((b) => b.id !== 'custom').map((b) => `"${b.id}"`).join('|')}, "facets": integer 0..16 (0 = smooth; only used by variant "custom")` : sec === 'enc' ? `, "led": boolean` : `, "led": boolean`;
   return `{"name": short iteration name (max 4 words), "variant": one of ${md.list.map((v) => `"${v.id}"`).join('|')}, "finish": one of ${D.FINISHES.map((f) => `"${f}"`).join('|')}, "params": {${ranges}}${extra}, "notes": one short sentence describing the change}`;
 }
 async function llmGen(sec, prompt, cur) {
   if (!isLocalURL(GEN.url)) throw new Error('Only local endpoints are allowed.');
   if (!GEN.model && !(await testGen())) throw new Error('No local model available.');
-  const md = MODS[sec], refs = secRefs(sec).map((id) => REFS.find((r) => r.id === id)).filter(Boolean);
+  const md = MODS[sec], refs = [];
   const curDesc = { variant: cur[md.key], finish: cur[md.fin], params: cur[md.P], ...(sec === 'cup' ? { bottleType: cur.beerType, facets: cur.facets } : {}) };
-  const refDesc = refs.map((r, i) => `#${i + 1} ${refLabel(r)}${r.source === 'slides' && GS.slides.find((s) => s.id === r.slideId)?.title ? ` (“${GS.slides.find((s) => s.id === r.slideId).title}”)` : ''}: palette ${r.palette.slice(0, 4).join(' ')}, ${r.crisp ? 'crisp faceted' : 'soft smooth'}, ${r.metal} tones${r.profile ? ', has a usable silhouette' : ''}`).join('\n') || 'none';
   const sys = `You are a parametric product-design assistant for an oversize trophy-shaped beer cooler used on an NHL rink. It has three sections stacked vertically: sliding base (UHMW rink sled, deck 3in high), enclosure (36in tall sleeve that houses a fixed Meling DW-XL90 freezer 23.6x32.0x24.6in), and cup (bowl on top holding exactly 12 bottles in ice).
 You edit ONLY the ${md.label.toUpperCase()} section. Never change other sections. Keep everything the request doesn't mention close to the current design.
 Constraints: the freezer size is fixed; the cup must still hold 12 bottles plus ice; the base touches the ice only through UHMW.
 Variants: ${md.list.map((v) => `${v.id} = ${v.name}: ${v.blurb}`).join(' | ')}
 Reply with JSON only, matching: ${llmSchema(sec)}`;
-  const user = `Current ${md.label} design: ${JSON.stringify(curDesc)}\nReferences for this section:\n${refDesc}\n\nDesign request: ${prompt}`;
-  const imgs = GEN.vision ? refs.slice(0, 3).map((r) => r.thumb.split(',')[1]) : [];
+  const user = `Current ${md.label} design: ${JSON.stringify(curDesc)}\n\nDesign request: ${prompt}`;
+  const imgs = [];
   let text;
   if (GEN.engine === 'ollama') {
     const r = await fetch(GEN.url + '/api/chat', { method: 'POST', headers: { 'Content-Type': 'application/json' }, signal: AbortSignal.timeout(180000),
@@ -1071,19 +904,15 @@ Reply with JSON only, matching: ${llmSchema(sec)}`;
   }
   const m = String(text || '').match(/\{[\s\S]*\}/); if (!m) throw new Error('The model did not return JSON.');
   const j = JSON.parse(m[0]), n = clone(cur), P = n[md.P];
-  if (md.list.some((v) => v.id === j.variant) && !(sec === 'cup' && j.variant === 'custom' && !(refs[0] && refs[0].profile))) n[md.key] = j.variant;
+  if (md.list.some((v) => v.id === j.variant)) n[md.key] = j.variant;
   if (D.FINISHES.includes(j.finish)) n[md.fin] = j.finish;
   for (const k of Object.keys(D.SECTION_PARAMS[sec])) if (typeof j.params?.[k] === 'number') P[k] = j.params[k];
   if (typeof j.led === 'boolean' && sec !== 'cup') P.led = j.led;
-  const prim = S[md.ref] && REFS.find((r) => r.id === S[md.ref]);
   if (sec === 'cup') {
     if (D.ARRANGEMENTS.includes(j.arrangement)) P.arrangement = j.arrangement;
     if (D.BEERS.some((b) => b.id === j.bottleType && b.id !== 'custom')) n.beerType = j.bottleType;
     if (Number.isInteger(j.facets)) n.facets = j.facets;
-    if (j.useReferenceShape && prim && prim.profile) { n.cup = 'custom'; n.cupProfile = prim.profile.pts; n.profileSrc = prim.id; }
   }
-  if (sec === 'enc' && prim) { if (j.useReferenceSkin) n.skin = prim.id; if (j.useReferencePalette) { n.palette = prim.palette; n.paletteSrc = 'Ref · ' + refLabel(prim); n.paletteRef = prim.id; } }
-  if (sec === 'base' && prim && j.useReferenceSkin) n.skinBase = prim.id;
   return { patch: n, name: String(j.name || 'Iteration').slice(0, 40), notes: String(j.notes || '').slice(0, 160) };
 }
 function clampSection(sec, n) { // enforce ranges + fit constraints before anything is shown
@@ -1113,120 +942,6 @@ $('ws-generate').onclick = async () => {
   } finally { btn.classList.remove('busy'); btn.textContent = label; }
 };
 
-// ---------- crops: a reference can be a region of a slide ----------
-const parseRef = (id) => { const [base, c] = String(id).split('#'); return { base, slideId: base.startsWith('gs:') ? base.slice(3) : null, crop: c ? c.split(',').map(Number) : null }; };
-const cropKey = (base, r) => `${base}#${r.map((v) => v.toFixed(4)).join(',')}`;
-async function cropToDataURL(src, crop) {
-  const im = await loadImg(src), W = im.naturalWidth, H = im.naturalHeight, [x, y, w, h] = crop;
-  const c = mk(Math.max(8, Math.round(w * W)), Math.max(8, Math.round(h * H))); c.getContext('2d').drawImage(im, x * W, y * H, w * W, h * H, 0, 0, c.width, c.height);
-  return c.toDataURL('image/jpeg', 0.9);
-}
-async function loadSlideRef(id) { // whole slide or a crop of it, always fetched live by slide ID
-  const { slideId, crop } = parseRef(id), src = slideURL(slideId);
-  return addRef(crop ? await cropToDataURL(src, crop) : src, 'slide', false, { id, source: 'slides', slideId, crop });
-}
-
-// ---------- reference picker (Google Slides treatment · imported images / PDF) ----------
-const PK = { sec: 'cup', tab: 'slides', sel: new Set(), imports: [], cropThumbs: {}, crop: null };
-function openPicker(sec = S.sel) {
-  PK.sec = sec; PK.sel.clear(); $('picker').hidden = false;
-  $('pk-title').textContent = `${MODS[sec].n} · ${MODS[sec].label} — ${conceptName()}`;
-  $('pk-url').value = GS.url || $('deck-url').value || '';
-  setPkTab(GS.deck || !PK.imports.length ? 'slides' : 'import'); renderPicker();
-}
-function closePicker() { $('picker').hidden = true; $('pk-crop').hidden = true; PK.crop = null; }
-function setPkTab(t) { PK.tab = t; PK.sel.clear(); document.querySelectorAll('#pk-tabs button').forEach((b) => b.classList.toggle('active', b.dataset.tab === t)); $('pk-slides').hidden = t !== 'slides'; $('pk-import').hidden = t !== 'import'; renderPicker(); }
-function assignedBadges(refId) { return SECTIONS.filter((s) => secRefs(s).includes(refId)).map((s) => `<i>${EL_NAMES[s]}</i>`).join(''); }
-function renderPicker() {
-  if ($('picker').hidden) return;
-  if (PK.tab === 'slides') {
-    $('pk-grid').innerHTML = GS.deck ? GS.slides.map((s) => { const rid = 'gs:' + s.id, inSec = secRefs(PK.sec).includes(rid);
-      const crops = SECTIONS.reduce((a, sec) => a + secRefs(sec).filter((x) => x.startsWith(rid + '#')).length, 0);
-      return `<button class="pk-card ${PK.sel.has(rid) ? 'on' : ''}" data-k="${rid}" title="Slide ID ${s.id}"><img loading="lazy" src="${slideURL(s.id)}" alt="Slide ${s.n}"><span class="asg">${assignedBadges(rid)}${crops ? `<i>${crops} crop${crops > 1 ? 's' : ''}</i>` : ''}</span><span class="cropbtn" data-crop="${rid}" title="Select part of this slide">✂ Crop</span><div class="cap"><b>p.${s.n}</b><span>${(s.title || 'Untitled slide').replace(/</g, '&lt;')}${inSec ? ' · <em style="color:#8fb2ff;font-style:normal">in this section</em>' : ''}</span></div></button>`; }).join('') : '';
-    if (GS.deck) $('pk-status').textContent = `${GS.title || 'Treatment'} · ${GS.slides.length} slides. Select one or more, then assign them to the ${MODS[PK.sec].label.toLowerCase()}.`;
-  } else {
-    $('pk-imp-grid').innerHTML = PK.imports.map((m) => `<button class="pk-card ${PK.sel.has(m.k) ? 'on' : ''}" data-k="${m.k}"><img src="${m.src}" alt=""><span class="cropbtn" data-crop="${m.k}" title="Select part of this image">✂ Crop</span><div class="cap"><b>${m.page ? 'p.' + m.page : 'img'}</b><span>${m.name.replace(/</g, '&lt;')}</span></div></button>`).join('');
-  }
-  const crops = [...PK.sel].filter((k) => k.includes('#'));
-  $('pk-crops').innerHTML = crops.length ? `<span>Crops</span>` + crops.map((k) => `<button class="pk-cthumb" data-uncrop="${k}" title="Remove this crop"><img src="${PK.cropThumbs[k] || ''}" alt=""><i>×</i></button>`).join('') : '';
-  const n = PK.sel.size; $('pk-count').textContent = `${n} selected${crops.length ? ` · ${crops.length} crop${crops.length > 1 ? 's' : ''}` : ''}`; $('pk-assign').disabled = !n; $('pk-assign').textContent = `Assign${n ? ' ' + n : ''} to ${MODS[PK.sec].label}`;
-}
-$('ws-choose').onclick = () => openPicker();
-// crop editor: drag a rectangle over the slide / image, add it as its own reference
-function openCrop(base) {
-  const src = base.startsWith('gs:') ? slideURL(base.slice(3)) : PK.imports.find((m) => m.k === base).src;
-  const label = base.startsWith('gs:') ? `Slide p.${slidePos(base.slice(3)) || '?'}${GS.slides.find((s) => 'gs:' + s.id === base)?.title ? ' · ' + GS.slides.find((s) => 'gs:' + s.id === base).title : ''}` : PK.imports.find((m) => m.k === base).name;
-  PK.crop = { base, src, rect: null }; $('pk-crop').hidden = false; $('pk-crop-label').textContent = label;
-  const img = $('pk-crop-img'); img.crossOrigin = 'anonymous'; img.src = src; drawCrop(); $('pk-crop-add').disabled = true;
-}
-function drawCrop() {
-  const r = PK.crop && PK.crop.rect, box = $('pk-crop-rect');
-  if (!r || r[2] < 0.005 || r[3] < 0.005) { box.style.display = 'none'; return; }
-  Object.assign(box.style, { display: 'block', left: r[0] * 100 + '%', top: r[1] * 100 + '%', width: r[2] * 100 + '%', height: r[3] * 100 + '%' });
-}
-{ const stage = $('pk-crop-stage'); let start = null;
-  const pt = (e) => { const b = $('pk-crop-img').getBoundingClientRect(); return [Math.min(1, Math.max(0, (e.clientX - b.left) / b.width)), Math.min(1, Math.max(0, (e.clientY - b.top) / b.height))]; };
-  stage.addEventListener('pointerdown', (e) => { if (!PK.crop) return; e.preventDefault(); stage.setPointerCapture(e.pointerId); start = pt(e); PK.crop.rect = [...start, 0, 0]; drawCrop(); });
-  stage.addEventListener('pointermove', (e) => { if (!start) return; const p = pt(e); PK.crop.rect = [Math.min(start[0], p[0]), Math.min(start[1], p[1]), Math.abs(p[0] - start[0]), Math.abs(p[1] - start[1])]; drawCrop(); });
-  stage.addEventListener('pointerup', () => { if (!start) return; start = null; const r = PK.crop.rect; $('pk-crop-add').disabled = !(r && r[2] > 0.02 && r[3] > 0.02); });
-}
-$('pk-crop-back').onclick = () => { $('pk-crop').hidden = true; PK.crop = null; };
-$('pk-crop-add').onclick = async () => {
-  const { base, src, rect } = PK.crop, k = cropKey(base, rect);
-  try { PK.cropThumbs[k] = await cropToDataURL(src, rect); } catch { PK.cropThumbs[k] = ''; }
-  PK.sel.add(k); PK.crop.rect = null; drawCrop(); $('pk-crop-add').disabled = true; renderPicker();
-  $('pk-crop-hint').textContent = 'Crop added to the selection. Drag again to add another, or go back to the slides.';
-};
-$('pk-crops').onclick = (e) => { const b = e.target.closest('[data-uncrop]'); if (b) { PK.sel.delete(b.dataset.uncrop); renderPicker(); } };
-$('pk-close').onclick = closePicker; $('pk-cancel').onclick = closePicker;
-$('picker').onclick = (e) => { if (e.target === $('picker')) closePicker(); };
-document.addEventListener('keydown', (e) => { if (e.key === 'Escape' && !$('picker').hidden) { if (!$('pk-crop').hidden) $('pk-crop-back').click(); else closePicker(); } });
-$('pk-tabs').onclick = (e) => { const b = e.target.closest('[data-tab]'); if (b) setPkTab(b.dataset.tab); };
-for (const g of ['pk-grid', 'pk-imp-grid']) $(g).onclick = (e) => { const cb = e.target.closest('[data-crop]'); if (cb) { e.stopPropagation(); openCrop(cb.dataset.crop); return; } const b = e.target.closest('[data-k]'); if (!b) return; const k = b.dataset.k; PK.sel.has(k) ? PK.sel.delete(k) : PK.sel.add(k); renderPicker(); };
-$('pk-connect').onclick = async () => { $('pk-status').textContent = 'Reading the treatment…'; await connectDeck($('pk-url').value); renderPicker(); if (!GS.deck) $('pk-status').textContent = $('deck-status').textContent + ' You can also import slide images or a PDF in the other tab.'; };
-$('pk-refresh').onclick = async () => { await connectDeck(GS.url || $('pk-url').value); renderPicker(); };
-$('pk-url').onkeydown = (e) => { if (e.key === 'Enter') $('pk-connect').click(); };
-$('pk-assign').onclick = async () => {
-  const sec = PK.sec, keys = [...PK.sel], btn = $('pk-assign'); btn.disabled = true; btn.textContent = 'Assigning…';
-  let ok = 0;
-  for (const k of keys) {
-    try {
-      if (k.startsWith('gs:')) { if (!REFS.some((r) => r.id === k)) await loadSlideRef(k); assignToSection(sec, k); }
-      else { const { base, crop } = parseRef(k), m = PK.imports.find((x) => x.k === base); const nm = (m.page ? `${m.name} p.${m.page}` : m.name) + (crop ? ' (crop)' : '');
-        const r = await addRef(crop ? await cropToDataURL(m.src, crop) : m.src, nm); assignToSection(sec, r.id); }
-      ok++;
-    } catch {}
-  }
-  closePicker(); build(); renderThumbs(); toast(`${ok} reference${ok === 1 ? '' : 's'} assigned to the ${MODS[sec].label.toLowerCase()} of ${conceptName()}`);
-};
-// fallback: images, screenshots (paste) and PDF exports of the deck
-const PDFJS = window.__PDFJS_BASE || 'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174';
-const pdfGlobal = () => window.pdfjsLib || window['pdfjs-dist/build/pdf'];
-function loadPdfJs() { return pdfGlobal() ? Promise.resolve(pdfGlobal()) : new Promise((ok, no) => { const s = document.createElement('script'); s.src = PDFJS + '/pdf.min.js'; s.onload = () => { const lib = pdfGlobal(); if (!lib) return no(new Error('PDF reader did not initialise')); lib.GlobalWorkerOptions.workerSrc = PDFJS + '/pdf.worker.min.js'; ok(lib); }; s.onerror = () => no(new Error('PDF reader could not load')); document.head.appendChild(s); }); }
-let impSeq = 0;
-async function importFiles(files) {
-  const st = $('pk-imp-status');
-  for (const f of files) {
-    try {
-      if (f.type === 'application/pdf' || /\.pdf$/i.test(f.name)) {
-        st.textContent = `Reading ${f.name}…`; const lib = await loadPdfJs(), pdf = await lib.getDocument({ data: new Uint8Array(await f.arrayBuffer()) }).promise;
-        for (let i = 1; i <= Math.min(pdf.numPages, 80); i++) {
-          const page = await pdf.getPage(i), vp0 = page.getViewport({ scale: 1 }), vp = page.getViewport({ scale: 900 / vp0.width }), c = mk(Math.round(vp.width), Math.round(vp.height));
-          await page.render({ canvasContext: c.getContext('2d'), viewport: vp }).promise;
-          PK.imports.push({ k: 'imp' + (++impSeq), name: f.name.replace(/\.pdf$/i, ''), page: i, src: c.toDataURL('image/jpeg', 0.85) }); st.textContent = `${f.name}: page ${i} of ${pdf.numPages}`; renderPicker();
-        }
-        st.textContent = `${f.name}: ${pdf.numPages} pages imported. Select the slides you want.`;
-      } else if (f.type.startsWith('image/')) { PK.imports.push({ k: 'imp' + (++impSeq), name: f.name || 'Screenshot', src: await readURL(f) }); st.textContent = `${PK.imports.length} image${PK.imports.length > 1 ? 's' : ''} ready to assign.`; }
-    } catch (err) { st.textContent = `Couldn’t read ${f.name}: ${err.message || err}`; }
-    renderPicker();
-  }
-}
-$('pk-file').onchange = (e) => { importFiles([...e.target.files]); e.target.value = ''; };
-$('pk-drop').addEventListener('dragover', (e) => { e.preventDefault(); $('pk-drop').classList.add('over'); });
-$('pk-drop').addEventListener('dragleave', () => $('pk-drop').classList.remove('over'));
-$('pk-drop').addEventListener('drop', (e) => { e.preventDefault(); $('pk-drop').classList.remove('over'); importFiles([...e.dataTransfer.files]); });
-document.addEventListener('paste', (e) => { if ($('picker').hidden) return; const fs = [...(e.clipboardData?.items || [])].filter((i) => i.type.startsWith('image/')).map((i) => i.getAsFile()).filter(Boolean); if (fs.length) { if (PK.tab !== 'import') setPkTab('import'); importFiles(fs.map((f, i) => new File([f], `Pasted screenshot ${impSeq + i + 1}.png`, { type: f.type }))); } });
-
 // ---------- remaining controls ----------
 $('metal').onclick = (e) => { const b = e.target.closest('button'); if (!b) return; S.metal = b.dataset.v; build(); };
 let colorT; for (const k of ['primary', 'accent']) $(k).oninput = (e) => { S[k] = e.target.value; $(k + '-v').textContent = S[k]; clearTimeout(colorT); colorT = setTimeout(build, 120); };
@@ -1238,20 +953,19 @@ $('explode').oninput = (e) => { S.explode = +e.target.value; $('explode-v').text
 $('reset').onclick = () => { const p = D.byId(D.PRESETS, S.preset); Object.assign(S, lookDefaults(p), { door: 0, explode: 0, xray: false, isolate: false, previewIter: null, compareIter: null, vis: { cup: true, contents: true, enc: true, fridge: true, base: true }, contents: true }); build(); toast('Concept look reset · references + iterations kept'); };
 $('copy').onclick = async () => {
   commitLook();
-  const refOut = (id) => { const r = REFS.find((x) => x.id === id); const pr = parseRef(id); return pr.slideId ? { slideId: pr.slideId, page: slidePos(pr.slideId), crop: pr.crop } : { local: r ? r.name : id }; };
   const cfg = { activeConcept: S.preset, brand: { labelText: S.brand, logo: !!B.logo, colors: B.colors, appliesTo: 'all concepts' },
-    referenceDeck: GS.deck ? `https://docs.google.com/presentation/d/${GS.deck}/edit` : null,
     concepts: Object.fromEntries(D.PRESETS.map((p) => { const c = C[p.id]; return [p.id, { name: p.name, edited: isEdited(p.id),
-      sections: Object.fromEntries(SECTIONS.map((sec) => [sec, { design: snapSection(sec, c), references: c.secRefs[sec].map(refOut), primaryReference: c[MODS[sec].ref], iterations: c.iters[sec].map(({ name, prompt, engine, created, notes, snap }) => ({ name, prompt, engine, created: new Date(created).toISOString(), notes, design: snap })) }])) }]; })) };
+      sections: Object.fromEntries(SECTIONS.map((sec) => [sec, { design: snapSection(sec, c), iterations: c.iters[sec].map(({ name, prompt, engine, created, notes, snap }) => ({ name, prompt, engine, created: new Date(created).toISOString(), notes, design: snap })) }])) }]; })) };
   try { await navigator.clipboard.writeText(JSON.stringify(cfg, null, 2)); toast('Config copied to clipboard'); }
   catch { $('copied').style.display = ''; $('copied').textContent = JSON.stringify(cfg); }
 };
+$('hq').onchange = (e) => { HQ = e.target.checked; try { localStorage.setItem('trophy-cooler-hq', HQ ? '1' : '0'); } catch {} };
 $('mobileToggle').onclick = () => { const o = $('panel').classList.toggle('open'); $('mobileToggle').setAttribute('aria-expanded', o); };
-function syncToggles() { $('xray').checked = S.xray; $('contents').checked = S.contents; $('rink').checked = S.rink; $('spin').checked = S.spin; }
+function syncToggles() { $('hq').checked = HQ; $('xray').checked = S.xray; $('contents').checked = S.contents; $('rink').checked = S.rink; $('spin').checked = S.spin; }
 function syncSkin() {
   const md = MODS[S.sel], skKey = md.skin;
-  $('skin').innerHTML = [['default', 'Section default'], ...(B.logo ? [['logo', 'Logo monogram (brand)']] : []), ...secRefs(S.sel).map((id) => REFS.find((r) => r.id === id)).filter(Boolean).map((r) => [r.id, 'Ref · ' + refLabel(r)])].map(([v, l]) => `<option value="${v}">${l}</option>`).join('');
-  if (![...$('skin').options].some((o) => o.value === S[skKey])) $('skin').insertAdjacentHTML('beforeend', `<option value="${S[skKey]}">Reference (loading…)</option>`);
+  $('skin').innerHTML = [['default', 'Section default'], ...(B.logo ? [['logo', 'Logo monogram (brand)']] : [])].map(([v, l]) => `<option value="${v}">${l}</option>`).join('');
+  if (![...$('skin').options].some((o) => o.value === S[skKey])) S[skKey] = 'default';
   $('skin').value = S[skKey];
 }
 function syncUI() {
@@ -1262,11 +976,10 @@ function syncUI() {
   if (document.activeElement !== $('wordmark')) $('wordmark').value = S.wordmark; $('wordmark-out').textContent = S.wordmark || ' ';
   $('door').value = S.door; $('door-v').textContent = S.door < 0.02 ? 'Closed' : Math.round(S.door * 100) + '%';
   $('explode').value = S.explode; $('explode-v').textContent = Math.round(S.explode * 100) + '%';
-  $('facets').value = S.facets; $('facets-v').textContent = S.facets || 'Smooth';
   $('skin-scale').value = S.skinScale; $('skin-scale-v').textContent = S.skinScale.toFixed(1) + '×';
   $('pal-src').textContent = S.palette ? S.paletteSrc : 'Auto from accent'; $('pal-reset').style.display = S.palette ? '' : 'none';
   document.querySelectorAll('#logo-mode button').forEach((b) => b.classList.toggle('active', b.dataset.v === B.mode));
-  renderBrand(); renderRefs();
+  renderBrand();
 }
 
 // =====================================================================
@@ -1379,12 +1092,27 @@ function makeSkin(src) {
 }
 
 // bottle label from a reference: crop the object's label band (or the image centre) into a panel
-function makeBeerLabel(r, type) {
-  if (!r) return null;
-  const src = r.canvas, ob = r.bbox || { x: 0, y: 0, w: src.width, h: src.height };
-  const band = { longneck: [0.47, 0.74], alubottle: [0.42, 0.93], can: [0.08, 0.92], custom: [0.44, 0.72] }[type] || [0.47, 0.74];
-  const sy = r.bbox ? ob.y + ob.h * band[0] : src.height * 0.25, sh = r.bbox ? ob.h * (band[1] - band[0]) : src.height * 0.5;
-  const c = mk(1024, Math.max(64, Math.round(1024 * sh / ob.w))); c.getContext('2d').drawImage(src, ob.x, sy, ob.w, sh, 0, 0, c.width, c.height);
+// Michelob ULTRA bottle wrap: white label, blue rules, MICHELOB over a large ULTRA (or the uploaded logo, in blue).
+// The texture is applied front + back (repeat 2), so this canvas is one face of the label.
+function makeBottleLabel(type) {
+  const W = 1024, H = type === 'can' ? 1060 : type === 'alubottle' ? 860 : 620, c = mk(W, H), x = c.getContext('2d'), blue = '#0b2d82';
+  const g = x.createLinearGradient(0, 0, W, 0); g.addColorStop(0, '#e9edf3'); g.addColorStop(0.5, '#ffffff'); g.addColorStop(1, '#e9edf3');
+  x.fillStyle = g; x.fillRect(0, 0, W, H);
+  x.fillStyle = blue; x.fillRect(0, H * 0.06, W, H * 0.035); x.fillRect(0, H * 0.905, W, H * 0.035);
+  x.fillStyle = '#9aa7bd'; x.fillRect(0, H * 0.11, W, H * 0.008); x.fillRect(0, H * 0.882, W, H * 0.008);
+  const logo = B.logo && B.use ? logoVariant(blue) : null;
+  if (logo) { let h = H * 0.62, w = h * logo.width / logo.height; if (w > W * 0.8) { w = W * 0.8; h = w * logo.height / logo.width; } x.drawImage(logo, (W - w) / 2, (H - h) / 2, w, h); }
+  else {
+    const fam = B.font ? `"${B.font}", "Barlow Condensed"` : '"Barlow Condensed"';
+    x.fillStyle = blue; x.textAlign = 'center'; x.textBaseline = 'alphabetic';
+    let f1 = H * 0.13; x.font = `600 ${f1}px ${fam}, sans-serif`; try { x.letterSpacing = f1 * 0.35 + 'px'; } catch {}
+    x.fillText('MICHELOB', W / 2 + f1 * 0.17, H * 0.33);
+    let f2 = H * 0.4; x.font = `700 ${f2}px ${fam}, sans-serif`; try { x.letterSpacing = f2 * 0.06 + 'px'; } catch {}
+    const tw = x.measureText('ULTRA').width; if (tw > W * 0.84) { f2 *= W * 0.84 / tw; x.font = `700 ${f2}px ${fam}, sans-serif`; }
+    x.fillText('ULTRA', W / 2 + f2 * 0.03, H * 0.33 + f2 * 0.95);
+    let f3 = H * 0.06; x.font = `600 ${f3}px ${fam}, sans-serif`; try { x.letterSpacing = f3 * 0.3 + 'px'; } catch {}
+    x.fillStyle = '#5b6b86'; x.fillText('SUPERIOR LIGHT BEER', W / 2 + f3 * 0.15, H * 0.84);
+  }
   const t = new THREE.CanvasTexture(c); t.colorSpace = THREE.SRGBColorSpace; t.anisotropy = 8; return t;
 }
 
@@ -1419,73 +1147,9 @@ $('f-font').onchange = async (e) => {
   catch { $('font-name').textContent = 'Unreadable font'; }
 };
 
-// ---------- reference UI ----------
-let refSeq = 0;
-async function addRef(src, name, save = true, extra = {}) {
-  const im = await loadImg(src), canvas = toCanvas(im, 900);
-  const r = { id: extra.id || 'ref' + (++refSeq), source: extra.source || 'local', slideId: extra.slideId, crop: extra.crop || null, name: name.replace(/\.[a-z0-9]+$/i, '').slice(0, 40), canvas, thumb: canvas.toDataURL('image/jpeg', 0.8), palette: extractPalette(canvas, 6), ...analyze(canvas), profile: extractProfile(canvas) };
-  { const bp = extractProfile(canvas, { trim: false }); if (bp) { const Hb = Math.min(10, Math.max(4.5, bp.aspect * 2.5)), mx = Math.max(...bp.pts.map((q) => q[0]));
-      r.beerProfile = bp.pts.map(([q, y]) => [Math.max(0.35, q / mx * 1.25), +(y / bp.height * Hb).toFixed(3)]); r.bbox = bp.bbox; } }
-  const old = REFS.findIndex((x) => x.id === r.id); if (old >= 0) REFS.splice(old, 1, r); else REFS.push(r); if (save) saveSoon(); return r;
-}
-const pinnedRefs = () => pins().map((id) => REFS.find((r) => r.id === id)).filter(Boolean);
-const refLabel = (r) => (r.source === 'slides' ? (slidePos(r.slideId) ? 'Slide p.' + slidePos(r.slideId) : 'Slide (removed)') + (r.crop ? ' · crop' : '') : r.name);
-function unpinRef(id) {
-  const c = activeC(); c.pins = c.pins.filter((p) => p !== id);
-  for (const el of SECTIONS) removeFromSection(el, id);
-  for (const k of ['skin', 'skinCup', 'skinBase']) if (S[k] === id) S[k] = 'default'; if (S.profileSrc === id) S.profileSrc = null; if (S.paletteRef === id) { S.palette = null; S.paletteSrc = null; S.paletteRef = null; }
-  const r = REFS.find((x) => x.id === id);   // drop local images nobody pins any more
-  if (r && r.source !== 'slides' && !Object.values(C).some((cc) => cc.pins.includes(id))) REFS.splice(REFS.indexOf(r), 1);
-}
-function pinRef(id) { if (!pins().includes(id)) pins().push(id); }
-async function ensurePinsLoaded(cid) {
-  let changed = false;
-  for (const id of C[cid].pins) {
-    if (!id.startsWith('gs:') || REFS.some((r) => r.id === id) || !GS.deck || !slidePos(parseRef(id).slideId)) continue;
-    try { await loadSlideRef(id); changed = true; } catch {}
-  }
-  return changed;
-}
-function renderRefs() {
-  const pn = D.byId(D.PRESETS, S.preset).name.replace(' · ', ' ');
-  $('refs-for').textContent = pn;
-  $('refs').innerHTML = (pins().length && !pinnedRefs().length ? `<p class="muted">Loading ${pins().length} pinned reference${pins().length > 1 ? 's' : ''}…</p>` : '') + pinnedRefs().map((r) => {
-    const pOn = S.paletteRef === r.id, as = SECTIONS.filter((sec) => secRefs(sec).includes(r.id)), sOn = as.length > 0, cOn = false;
-    const gs = r.source === 'slides', pos = gs ? slidePos(r.slideId) : null;
-    const nm = gs ? `<span class="src">SLIDES</span>${pos ? 'p.' + pos : 'Removed from deck'}${GS.title ? ' · ' + GS.title : ''}` : r.name;
-    return `<div class="ref ${pOn || sOn || cOn ? 'on' : ''} ${gs && !pos && GS.slides.length ? 'missing' : ''}" data-id="${r.id}" title="${gs ? 'Slide ID ' + r.slideId : ''}">
-      <img src="${r.thumb}" alt=""><div><div class="nm">${nm}${as.length ? `<span class="as">${as.map((k) => `<i>${EL_NAMES[k]}</i>`).join('')}</span>` : ''}</div>
-      <div class="pal">${r.palette.map((c) => `<i style="background:${c}"></i>`).join('')}</div>
-      <div class="meta">${r.crisp ? 'Crisp, faceted edges' : 'Soft, smooth surfaces'} · ${r.metal === 'gold' ? 'warm → gold' : 'cool → chrome'}${r.profile ? ` · silhouette ${r.profile.height.toFixed(0)}″ tall${r.profile.trimmed ? ' (top trimmed)' : ''}` : ' · no clear silhouette'}</div></div>
-      ${r.profile ? '<canvas class="prof" width="68" height="88"></canvas>' : ''}
-      <span class="rm" data-act="rm" title="Remove">×</span>
-      <div class="acts">
-        ${['base', 'enc', 'cup'].map((k) => `<button data-act="as-${k}" class="${as.includes(k) ? 'on' : ''}" title="Use for the ${EL_NAMES[k].toLowerCase()}">→ ${EL_NAMES[k]}</button>`).join('')}
-        <button data-act="pal" class="${pOn ? 'on' : ''}">Palette → glass</button>
-        <button data-act="finish" title="Apply suggested metal + facet count">Finish: ${r.metal}${r.facets ? ' · ' + r.facets + ' facets' : ' · smooth'}</button>
-        <button data-act="pa">Colors → P/A</button>
-      </div></div>`;
-  }).join('');
-  const n = pinnedRefs().length; $('pin-count').textContent = n ? n + (n === 1 ? ' reference' : ' references') : 'none yet — pick thumbnails above';
-  $('refs').querySelectorAll('.ref').forEach((el) => { const r = REFS.find((x) => x.id === el.dataset.id), cv = el.querySelector('canvas.prof'); if (cv && r.profile) drawProfile(cv, r.profile.pts, S.accent); });
-}
-$('refs').onclick = (e) => {
-  const b = e.target.closest('[data-act]'), el = e.target.closest('.ref'); if (!b || !el) return; const r = REFS.find((x) => x.id === el.dataset.id), act = b.dataset.act;
-  if (act === 'rm') { unpinRef(r.id); renderThumbs(); }
-  if (act === 'pal') { if (S.paletteRef === r.id) { S.palette = null; S.paletteSrc = null; S.paletteRef = null; } else { S.palette = r.palette; S.paletteSrc = 'Ref · ' + refLabel(r); S.paletteRef = r.id; } }
-  if (act.startsWith('as-')) { const el = act.slice(3); if (secRefs(el).includes(r.id)) removeFromSection(el, r.id); else assignToSection(el, r.id); S.sel = el; }
-  if (act === 'finish') { S.metal = r.metal; S.facets = r.facets; if (S.cup !== 'custom' && r.profile) { S.cup = 'custom'; S.cupProfile = r.profile.pts; S.profileSrc = r.id; } markCustom(); }
-  if (act === 'pa') { const sorted = [...r.palette]; const lum = (h) => { const c = new THREE.Color(h); return c.r * 0.3 + c.g * 0.59 + c.b * 0.11; };
-    const dark = sorted.filter((c) => lum(c) < 0.45).sort((a, b) => lum(a) - lum(b))[0] || sorted[0];
-    const vivid = sorted.map((c) => { const hsl = {}; new THREE.Color(c).getHSL(hsl); return [c, hsl.s * (1 - Math.abs(hsl.l - 0.55))]; }).sort((a, b) => b[1] - a[1])[0][0];
-    S.primary = dark; S.accent = vivid; markCustom(); }
-  build();
-};
-$('facets').oninput = (e) => { S.facets = +e.target.value; $('facets-v').textContent = S.facets || 'Smooth'; clearTimeout(colorT); colorT = setTimeout(build, 80); };
+// ---------- surface skin + logo upload ----------
 $('skin').onchange = (e) => { S[MODS[S.sel].skin || 'skin'] = e.target.value; build(); };
 $('skin-scale').oninput = (e) => { S.skinScale = +e.target.value; $('skin-scale-v').textContent = S.skinScale.toFixed(1) + '×'; for (const [t, k] of [[skinTex, S.skin], [skinTexCup, S.skinCup], [skinTexBase, S.skinBase]]) if (t) { const m = k === 'logo' ? 3 : 1; t.repeat.set(m * S.skinScale, m * S.skinScale); } saveSoon(); };
-
-// drag & drop + file pickers
 function wireDrop(zone, input, onFiles) {
   input.onchange = (e) => { onFiles([...e.target.files]); input.value = ''; };
   zone.addEventListener('dragover', (e) => { e.preventDefault(); zone.classList.add('over'); });
@@ -1493,78 +1157,18 @@ function wireDrop(zone, input, onFiles) {
   zone.addEventListener('drop', (e) => { e.preventDefault(); zone.classList.remove('over'); onFiles([...e.dataTransfer.files].filter((f) => f.type.startsWith('image/'))); });
 }
 wireDrop($('drop-logo'), $('f-logo'), async (fs) => { if (fs[0]) await setLogo(await readURL(fs[0])); });
-wireDrop($('drop-ref'), $('f-ref'), async (fs) => { for (const f of fs.slice(0, 12)) { try { const r = await addRef(await readURL(f), f.name); pinRef(r.id); } catch {} } build(); });
-// also: drop images anywhere on the 3D view → references
-view.addEventListener('dragover', (e) => e.preventDefault());
-view.addEventListener('drop', async (e) => { e.preventDefault(); for (const f of [...e.dataTransfer.files].filter((f) => f.type.startsWith('image/')).slice(0, 12)) { try { const r = await addRef(await readURL(f), f.name); pinRef(r.id); } catch {} } build(); });
-
-// ---------- Google Slides references (live, pinned by slide ID) ----------
-// Pass-through API: same origin when served from Vercel; absolute URL when opened as a file.
-const API_BASES = [...new Set([location.protocol.startsWith('http') ? '' : null, 'https://trophy-cooler-studio.vercel.app'].filter((x) => x !== null))];
-const GS = { url: '', deck: null, title: '', slides: [], pins: [], base: null };
-const slidePos = (id) => (GS.slides.find((s) => s.id === id) || {}).n || null;
-const slideURL = (id) => `${GS.base}/api/slides?deck=${encodeURIComponent(GS.deck)}&page=${encodeURIComponent(id)}`;
-async function slidesAPI(query) {
-  let err = null;
-  for (const b of API_BASES) {
-    try { const r = await fetch(`${b}/api/slides?${query}`); if ((r.headers.get('content-type') || '').includes('json')) return { r, base: b, j: await r.json() }; }
-    catch (e) { err = e; }
-  }
-  throw err || new Error('unreachable');
-}
-function deckStatus(msg, bad) { $('deck-status').textContent = msg; $('deck-status').style.color = bad ? '#ffb4b4' : ''; }
-async function connectDeck(url, quiet) {
-  url = (url || '').trim(); if (!url) { deckStatus('Paste a Google Slides link first.', true); return; }
-  deckStatus('Reading the deck…');
-  let res; try { res = await slidesAPI('deck=' + encodeURIComponent(url)); }
-  catch { deckStatus('Couldn’t reach the slides service from here. Google Slides references work on the live site (trophy-cooler-studio.vercel.app) and in the standalone file.', true); return; }
-  if (!res.r.ok) { deckStatus(res.j.message || 'Couldn’t read that deck.', true); return; }
-  Object.assign(GS, { url, deck: res.j.deck, title: res.j.title, slides: res.j.slides, base: res.base });
-  $('deck-url').value = url; $('deck-head').style.display = 'flex'; $('deck-title').textContent = GS.title || 'Untitled deck';
-  $('deck-open').href = `https://docs.google.com/presentation/d/${GS.deck}/edit`; $('pin-hint').style.display = '';
-  deckStatus(deckSummary());
-  renderThumbs(); saveSoon(); if (typeof renderPicker === 'function') renderPicker();
-  // load pinned slides that aren't loaded yet (fresh from Google every session)
-  const changed = await ensurePinsLoaded(S.preset);
-  if (changed || !quiet) build();
-}
-function deckSummary() {
-  const mine = pins().filter((id) => id.startsWith('gs:')), gone = mine.filter((id) => !slidePos(parseRef(id).slideId)).length;
-  return `${GS.slides.length} slides · ${mine.length} used by ${conceptName()} · click a slide to assign it to the ${EL_NAMES[S.sel].toLowerCase()}${gone ? ` · ${gone} no longer in the deck` : ''}`;
-}
-function renderThumbs() {
-  $('thumbs').innerHTML = GS.deck ? GS.slides.map((s) => {
-    const rid = 'gs:' + s.id, mine = SECTIONS.filter((sec) => secRefs(sec).some((x) => parseRef(x).base === rid)).map((sec) => `<i>${EL_NAMES[sec].slice(0, 3)}</i>`).join('');
-    const others = mine + D.PRESETS.filter((p) => p.id !== S.preset && C[p.id].pins.includes(rid)).map((p) => `<i>${p.name.slice(0, 2)}</i>`).join('');
-    return `<button class="thumb ${secRefs(S.sel).includes(rid) ? 'on' : ''}" data-id="${s.id}" title="Slide ${s.n}${s.title ? ' · ' + s.title.replace(/"/g, '') : ''} · click to ${secRefs(S.sel).includes(rid) ? 'remove from' : 'assign to'} the ${EL_NAMES[S.sel].toLowerCase()}"><img loading="lazy" alt="Slide ${s.n}" src="${slideURL(s.id)}"><span class="pn">p.${s.n}</span>${others ? `<span class="cb" title="Also pinned by other concepts">${others}</span>` : ''}</button>`;
-  }).join('') : '';
-  if (GS.deck) deckStatus(deckSummary());
-}
-$('thumbs').onclick = async (e) => {
-  const b = e.target.closest('.thumb'); if (!b) return; const id = b.dataset.id;
-  const rid = 'gs:' + id;
-  if (secRefs(S.sel).includes(rid)) { removeFromSection(S.sel, rid); renderThumbs(); build(); return; }
-  b.classList.add('on'); deckStatus('Analyzing slide…');
-  try { if (!REFS.some((r) => r.id === rid)) await addRef(slideURL(id), 'slide', false, { id: rid, source: 'slides', slideId: id }); assignToSection(S.sel, rid); }
-  catch { deckStatus('Couldn’t load that slide image.', true); }
-  renderThumbs(); build();
-};
-$('deck-connect').onclick = () => connectDeck($('deck-url').value);
-$('deck-refresh').onclick = () => connectDeck(GS.url || $('deck-url').value);
-$('deck-url').onkeydown = (e) => { if (e.key === 'Enter') connectDeck($('deck-url').value); };
 
 // ---------- persistence (this browser only) ----------
 const KEY = 'trophy-cooler-studio-v2'; let saveT;   // v3 payload: per-concept looks + pins
 function saveSoon() { clearTimeout(saveT); saveT = setTimeout(() => {
   commitLook();
-  const data = { v: 3, active: S.preset, concepts: C, globals: { brand: S.brand, wordmark: S.wordmark }, B: { logo: B.logoSrc, mode: B.mode, use: B.use, colors: B.colors }, gs: { url: GS.url }, refs: REFS.filter((r) => r.source !== 'slides').map((r) => ({ id: r.id, name: r.name, src: r.canvas.width > 640 ? toCanvas(r.canvas, 640).toDataURL('image/jpeg', 0.82) : r.thumb })) };
+  const data = { v: 3, blue: 1, active: S.preset, concepts: C, globals: { brand: S.brand, wordmark: S.wordmark }, B: { logo: B.logoSrc, mode: B.mode, use: B.use, colors: B.colors }, refs: [].map((r) => ({ id: r.id, name: r.name, src: r.canvas.width > 640 ? toCanvas(r.canvas, 640).toDataURL('image/jpeg', 0.82) : r.thumb })) };
   try { localStorage.setItem(KEY, JSON.stringify(data)); } catch { try { data.refs = data.refs.slice(0, 3); localStorage.setItem(KEY, JSON.stringify(data)); } catch {} }
 }, 600); }
 async function restore() {
   let data; try { data = JSON.parse(localStorage.getItem(KEY) || 'null'); } catch { data = null; } if (!data) return;
   try {
     Object.assign(B, { mode: data.B?.mode || 'tint', use: data.B?.use !== false, colors: data.B?.colors || [] });
-    if (data.gs) GS.url = data.gs.url || '';
     if (data.v === 3) {
       for (const [id, c] of Object.entries(data.concepts || {})) if (C[id]) {
         const d = newConcept(D.byId(D.PRESETS, id)); Object.assign(C[id], c);
@@ -1580,8 +1184,14 @@ async function restore() {
     }
     Object.assign(S, pickLook(C[S.preset]));
     if (data.B?.logo) { const im = await loadImg(data.B.logo); B.logo = toCanvas(im, 1024); B.logoSrc = data.B.logo; }
-    for (const r of data.refs || []) { await addRef(r.src, r.name, false, { id: r.id }); const k = +String(r.id).replace(/\D/g, ''); if (k > refSeq) refSeq = k; }
-    if (data.v !== 3) for (const r of data.refs || []) pinRef(r.id);
+    // references were removed: drop any saved reference effects
+    for (const c of Object.values(C)) {
+      Object.assign(c, { pins: [], secRefs: { cup: [], enc: [], base: [] }, refCup: null, refEnc: null, refBase: null, refBeer: null, beerLabel: false, beerProfile: null, paletteRef: null });
+      for (const k of ['skin', 'skinCup', 'skinBase']) if (c[k] !== 'logo') c[k] = 'default';
+      if (c.cup === 'custom') { c.cup = 'champion'; c.cupProfile = null; c.profileSrc = null; } if (c.beerType === 'custom') c.beerType = 'longneck';
+      if (c.paletteSrc && c.paletteSrc.startsWith('Ref')) { c.palette = null; c.paletteSrc = null; }
+    }
+    if (!data.blue) for (const [id, c] of Object.entries(C)) { const p = D.byId(D.PRESETS, id); Object.assign(c, { primary: p.primary, accent: p.accent, metal: p.metal }); } // Michelob blue for every concept
   } catch {}
 }
 
@@ -1627,7 +1237,7 @@ $('glb').onclick = async () => {
 // ---------- header actions ----------
 $('export').onclick = () => { $('glb-what').value = 'all'; $('glb').click(); };
 $('capture').onclick = async () => {
-  controls.update(); renderer.render(scene, camera);
+  controls.update(); renderFrame();
   const blob = await new Promise((r) => renderer.domElement.toBlob(r, 'image/png')), name = `trophy-cooler_${S.preset}_${S.view}.png`;
   if (hostDL) { try { await hostDL.save({ filename: name, data: blob }); toast('View captured'); } catch (e) { toast(e && e.code === 'declined' ? 'Capture cancelled' : 'Capture unavailable here'); } }
   else { const u = URL.createObjectURL(blob), a = document.createElement('a'); a.href = u; a.download = name; document.body.appendChild(a); a.click(); a.remove(); setTimeout(() => URL.revokeObjectURL(u), 4000); toast('View captured'); }
@@ -1650,18 +1260,17 @@ $('fit').onclick = () => { // frame whatever is visible
   tween = { t0: performance.now(), fromP: camera.position.clone(), fromT: controls.target.clone(), toP: c.clone().add(dir.multiplyScalar(dist)), toT: c };
 };
 
-function resize() { const w = view.clientWidth, h = view.clientHeight; renderer.setSize(w, h); camera.aspect = w / h; camera.updateProjectionMatrix(); }
+function resize() { const w = view.clientWidth, h = view.clientHeight; renderer.setSize(w, h); composer.setSize(w, h); gtao.setSize(w * renderer.getPixelRatio(), h * renderer.getPixelRatio()); camera.aspect = w / h; camera.updateProjectionMatrix(); if (scene.background) scene.background.dispose(); scene.background = stageBackdrop(w, h); }
 addEventListener('resize', resize);
 
 function loop(now) {
   if (tween) { const k = Math.min(1, (now - tween.t0) / 900), e = 1 - Math.pow(1 - k, 3); camera.position.lerpVectors(tween.fromP, tween.toP, e); controls.target.lerpVectors(tween.fromT, tween.toT, e); if (k === 1) tween = null; }
-  controls.update(); renderer.render(scene, camera); requestAnimationFrame(loop);
+  controls.update(); renderFrame(); requestAnimationFrame(loop);
 }
 
 try { await Promise.race([document.fonts.load('700 64px "Barlow Condensed"'), new Promise((r) => setTimeout(r, 2500))]); } catch {}
 await restore();
-resize(); goCam('hero', true); build();
-if (GS.url) connectDeck(GS.url, true); $('loading').remove(); requestAnimationFrame(loop);
+resize(); goCam('hero', true); build(); $('loading').remove(); requestAnimationFrame(loop);
 window.__studio = { S, build, applyView, goCam };
 </script>
 </body>
