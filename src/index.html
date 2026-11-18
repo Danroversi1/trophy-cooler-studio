@@ -115,6 +115,21 @@ select{background:var(--field);border:1px solid #34363e;border-radius:7px;color:
 .ref .rm{position:absolute;top:6px;right:9px;color:#8f95a1;cursor:pointer;font-size:13px}
 .ref canvas.prof{position:absolute;right:9px;top:28px;width:26px;height:34px;opacity:.9}
 .chipsrc{display:inline-flex;align-items:center;gap:6px;font-size:10.5px;color:#8f95a1}
+/* google slides thumbnails */
+.thumbs{display:grid;grid-template-columns:repeat(3,1fr);gap:6px;margin-top:10px;max-height:330px;overflow:auto;scrollbar-width:thin;scrollbar-color:#353941 transparent}
+.thumb{position:relative;padding:0;border:1px solid #34363e;background:#0b0c10;border-radius:6px;overflow:hidden;aspect-ratio:4/3}
+.thumb img{width:100%;height:100%;object-fit:cover;display:block;opacity:.88;transition:opacity .15s}
+.thumb:hover{border-color:#4d6db0}.thumb:hover img{opacity:1}
+.thumb .pn{position:absolute;left:4px;bottom:4px;font-size:9px;background:#000b;color:#cfd6e4;border-radius:4px;padding:1px 5px}
+.thumb.on{border-color:#5d7ab5;box-shadow:0 0 0 2px #2c57b8 inset}
+.thumb.on::after{content:"✓";position:absolute;right:4px;top:4px;width:16px;height:16px;border-radius:50%;background:#2a5bc4;color:#fff;font-size:10px;display:grid;place-items:center}
+.deck-head{display:flex;align-items:center;gap:8px;margin-top:10px;font-size:11px;color:#c6cbd4}
+.deck-head b{font-weight:500;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;flex:1}
+.deck-head a{color:#a8bce6;font-size:10px}
+.ref .src{display:inline-block;font-size:8.5px;letter-spacing:.4px;color:#b8ceff;background:#092368;border-radius:3px;padding:2px 4px;margin-right:5px;vertical-align:1px}
+.ref.missing{opacity:.6}
+details.localref{border:0;padding:8px 0 0}
+details.localref summary{font-size:10.5px;color:#a8bce6}
 /* specs */
 .stat{display:grid;grid-template-columns:1fr 1fr;gap:6px}
 .stat div{background:#191c24;border:1px solid #2a3348;border-radius:8px;padding:9px 10px}
@@ -233,10 +248,19 @@ details b{color:#d6dbe4;font-weight:600}
     <div class="swatches" id="brand-sw"></div>
     <div id="brand-pal-row" style="display:none"><p class="muted">Swatch → <b>P</b> primary · <b>A</b> accent</p><button class="wide" id="brand-pal">Use brand colors as glass palette</button></div>
 
-    <div class="subhead" style="margin-top:20px">02 · Design references <small>moodboard → form + finish</small></div>
-    <label class="drop" id="drop-ref"><input type="file" id="f-ref" accept="image/*" multiple><b>Drop reference images</b>Trophies, vases, sculpture, stained glass, materials — or drop onto the stage</label>
+    <div class="subhead" style="margin-top:20px">02 · Design references <small>live from Google Slides</small></div>
+    <div class="input-wrap" style="width:100%"><input type="text" id="deck-url" placeholder="Paste a Google Slides link…" spellcheck="false"></div>
+    <div class="seg blue" style="margin-top:8px"><button id="deck-connect">Connect deck</button><button id="deck-refresh" class="ghost">Refresh</button></div>
+    <div class="deck-head" id="deck-head" style="display:none"><b id="deck-title"></b><a id="deck-open" href="#" target="_blank" rel="noopener">Open ↗</a></div>
+    <p class="muted" id="deck-status">Share the deck as “Anyone with the link can view”. Slides stream live from Google — nothing is copied or stored.</p>
+    <div class="thumbs" id="thumbs"></div>
+    <p class="muted" id="pin-hint" style="display:none">Click thumbnails to pin them. Pins follow each slide's permanent ID, so they stay put when you reorder, insert or edit slides — the “p.” number just shows where it sits now.</p>
+    <div class="subhead" style="margin-top:14px">Pinned references <small id="pin-count">0</small></div>
     <div class="refs" id="refs"></div>
-    <p class="muted">Each reference is read for <b style="color:#c6cbd4">palette</b> → glass + LEDs, <b style="color:#c6cbd4">finish</b> → metal + facets, and <b style="color:#c6cbd4">silhouette</b> → a lathed ★ cup. <b style="color:#c6cbd4">Skin</b> wraps it onto the enclosure. Uploads stay in this browser.</p>
+    <p class="muted">Each pin is read for <b style="color:#c6cbd4">palette</b> → glass + LEDs, <b style="color:#c6cbd4">finish</b> → metal + facets, and <b style="color:#c6cbd4">silhouette</b> → a lathed ★ cup. <b style="color:#c6cbd4">Skin</b> wraps it onto the enclosure.</p>
+    <details class="localref"><summary>Add a local image instead (this browser only)</summary>
+      <label class="drop" id="drop-ref" style="margin-top:8px"><input type="file" id="f-ref" accept="image/*" multiple><b>Drop images</b>Kept only in this browser, never uploaded</label>
+    </details>
   </section>
 
   <section class="section"><h2>View settings</h2>
@@ -518,7 +542,7 @@ $('door').oninput = (e) => { S.door = +e.target.value; $('door-v').textContent =
 $('explode').oninput = (e) => { S.explode = +e.target.value; $('explode-v').textContent = Math.round(S.explode * 100) + '%'; applyView(); };
 $('reset').onclick = () => { const p = D.PRESETS.find((p) => p.id === S.preset) || D.PRESETS[0]; Object.assign(S, fresh(p), { preset: p.id, door: 0, explode: 0, xray: false, isolate: false, vis: { cup: true, contents: true, enc: true, fridge: true, base: true }, contents: true }); build(); toast('Concept reset'); };
 $('copy').onclick = async () => {
-  const cfg = { preset: S.preset, base: S.base, enclosure: S.enc, cup: S.cup, metal: S.metal, primary: S.primary, accent: S.accent, brand: S.brand, facets: S.facets, cupProfile: S.cupProfile };
+  const cfg = { preset: S.preset, base: S.base, enclosure: S.enc, cup: S.cup, metal: S.metal, primary: S.primary, accent: S.accent, brand: S.brand, facets: S.facets, cupProfile: S.cupProfile, references: GS.deck ? { deck: GS.deck, deckUrl: `https://docs.google.com/presentation/d/${GS.deck}/edit`, pinnedSlideIds: GS.pins } : null };
   try { await navigator.clipboard.writeText(JSON.stringify(cfg, null, 2)); toast('Config copied to clipboard'); }
   catch { $('copied').style.display = ''; $('copied').textContent = JSON.stringify(cfg); }
 };
@@ -535,7 +559,7 @@ function syncUI() {
   $('facets').value = S.facets; $('facets-v').textContent = S.facets || 'Smooth';
   $('skin-scale').value = S.skinScale; $('skin-scale-v').textContent = S.skinScale.toFixed(1) + '×';
   $('skin').innerHTML = [['default', 'Concept default'], ...(B.logo ? [['logo', 'Logo monogram']] : []), ...REFS.map((r) => [r.id, 'Ref · ' + r.name])].map(([v, l]) => `<option value="${v}">${l}</option>`).join('');
-  if (![...$('skin').options].some((o) => o.value === S.skin)) S.skin = 'default';
+  if (![...$('skin').options].some((o) => o.value === S.skin)) $('skin').insertAdjacentHTML('beforeend', `<option value="${S.skin}">Loading reference…</option>`);
   $('skin').value = S.skin;
   $('pal-src').textContent = S.palette ? S.paletteSrc : 'Auto from accent'; $('pal-reset').style.display = S.palette ? '' : 'none';
   document.querySelectorAll('#logo-mode button').forEach((b) => b.classList.toggle('active', b.dataset.v === B.mode));
@@ -547,7 +571,7 @@ function syncUI() {
 // =====================================================================
 const mk = (w, h) => { const c = document.createElement('canvas'); c.width = w; c.height = h; return c; };
 const hex = (r, g, b) => '#' + [r, g, b].map((v) => Math.round(v).toString(16).padStart(2, '0')).join('');
-const loadImg = (src) => new Promise((res, rej) => { const im = new Image(); im.onload = () => res(im); im.onerror = rej; im.src = src; });
+const loadImg = (src) => new Promise((res, rej) => { const im = new Image(); if (/^https?:|^\//.test(src)) im.crossOrigin = 'anonymous'; im.onload = () => res(im); im.onerror = rej; im.src = src; });
 const readURL = (file) => new Promise((res) => { const r = new FileReader(); r.onload = () => res(r.result); r.readAsDataURL(file); });
 function toCanvas(im, max = 1024) {
   let w = im.naturalWidth || im.width || 1024, h = im.naturalHeight || im.height || 1024;
@@ -680,16 +704,18 @@ $('f-font').onchange = async (e) => {
 
 // ---------- reference UI ----------
 let refSeq = 0;
-async function addRef(src, name, save = true) {
+async function addRef(src, name, save = true, extra = {}) {
   const im = await loadImg(src), canvas = toCanvas(im, 900);
-  const r = { id: 'ref' + (++refSeq), name: name.replace(/\.[a-z0-9]+$/i, '').slice(0, 40), canvas, thumb: canvas.toDataURL('image/jpeg', 0.8), palette: extractPalette(canvas, 6), ...analyze(canvas), profile: extractProfile(canvas) };
-  REFS.push(r); if (save) saveSoon(); return r;
+  const r = { id: extra.id || 'ref' + (++refSeq), source: extra.source || 'local', slideId: extra.slideId, name: name.replace(/\.[a-z0-9]+$/i, '').slice(0, 40), canvas, thumb: canvas.toDataURL('image/jpeg', 0.8), palette: extractPalette(canvas, 6), ...analyze(canvas), profile: extractProfile(canvas) };
+  const old = REFS.findIndex((x) => x.id === r.id); if (old >= 0) REFS.splice(old, 1, r); else REFS.push(r); if (save) saveSoon(); return r;
 }
 function renderRefs() {
   $('refs').innerHTML = REFS.map((r) => {
     const pOn = S.paletteSrc === 'Ref · ' + r.name, sOn = S.skin === r.id, cOn = S.profileSrc === r.id && S.cup === 'custom';
-    return `<div class="ref ${pOn || sOn || cOn ? 'on' : ''}" data-id="${r.id}">
-      <img src="${r.thumb}" alt=""><div><div class="nm">${r.name}</div>
+    const gs = r.source === 'slides', pos = gs ? slidePos(r.slideId) : null;
+    const nm = gs ? `<span class="src">SLIDES</span>${pos ? 'p.' + pos : 'Removed from deck'}${GS.title ? ' · ' + GS.title : ''}` : r.name;
+    return `<div class="ref ${pOn || sOn || cOn ? 'on' : ''} ${gs && !pos && GS.slides.length ? 'missing' : ''}" data-id="${r.id}" title="${gs ? 'Slide ID ' + r.slideId : ''}">
+      <img src="${r.thumb}" alt=""><div><div class="nm">${nm}</div>
       <div class="pal">${r.palette.map((c) => `<i style="background:${c}"></i>`).join('')}</div>
       <div class="meta">${r.crisp ? 'Crisp, faceted edges' : 'Soft, smooth surfaces'} · ${r.metal === 'gold' ? 'warm → gold' : 'cool → chrome'}${r.profile ? ` · silhouette ${r.profile.height.toFixed(0)}″ tall${r.profile.trimmed ? ' (top trimmed)' : ''}` : ' · no clear silhouette'}</div></div>
       ${r.profile ? '<canvas class="prof" width="68" height="88"></canvas>' : ''}
@@ -702,10 +728,12 @@ function renderRefs() {
         <button data-act="pa">Colors → P/A</button>
       </div></div>`;
   }).join('');
+  $('pin-count').textContent = REFS.length ? REFS.length + (REFS.length === 1 ? ' reference' : ' references') : 'none yet';
   $('refs').querySelectorAll('.ref').forEach((el) => { const r = REFS.find((x) => x.id === el.dataset.id), cv = el.querySelector('canvas.prof'); if (cv && r.profile) drawProfile(cv, r.profile.pts, S.accent); });
 }
 $('refs').onclick = (e) => {
   const b = e.target.closest('[data-act]'), el = e.target.closest('.ref'); if (!b || !el) return; const r = REFS.find((x) => x.id === el.dataset.id), act = b.dataset.act;
+  if (act === 'rm' && r.source === 'slides') { GS.pins = GS.pins.filter((p) => p !== r.slideId); renderThumbs(); }
   if (act === 'rm') { REFS.splice(REFS.indexOf(r), 1); if (S.skin === r.id) S.skin = 'default'; if (S.profileSrc === r.id) { S.profileSrc = null; S.cupProfile = null; } if (S.paletteSrc === 'Ref · ' + r.name) { S.palette = null; S.paletteSrc = null; } }
   if (act === 'pal') { if (S.paletteSrc === 'Ref · ' + r.name) { S.palette = null; S.paletteSrc = null; } else { S.palette = r.palette; S.paletteSrc = 'Ref · ' + r.name; } }
   if (act === 'skin') S.skin = S.skin === r.id ? 'default' : r.id;
@@ -734,19 +762,74 @@ wireDrop($('drop-ref'), $('f-ref'), async (fs) => { for (const f of fs.slice(0, 
 view.addEventListener('dragover', (e) => e.preventDefault());
 view.addEventListener('drop', async (e) => { e.preventDefault(); for (const f of [...e.dataTransfer.files].filter((f) => f.type.startsWith('image/')).slice(0, 12)) { try { await addRef(await readURL(f), f.name); } catch {} } build(); });
 
+// ---------- Google Slides references (live, pinned by slide ID) ----------
+// Pass-through API: same origin when served from Vercel; absolute URL when opened as a file.
+const API_BASES = [...new Set([location.protocol.startsWith('http') ? '' : null, 'https://trophy-cooler-studio.vercel.app'].filter((x) => x !== null))];
+const GS = { url: '', deck: null, title: '', slides: [], pins: [], base: null };
+const slidePos = (id) => (GS.slides.find((s) => s.id === id) || {}).n || null;
+const slideURL = (id) => `${GS.base}/api/slides?deck=${encodeURIComponent(GS.deck)}&page=${encodeURIComponent(id)}`;
+async function slidesAPI(query) {
+  let err = null;
+  for (const b of API_BASES) {
+    try { const r = await fetch(`${b}/api/slides?${query}`); if ((r.headers.get('content-type') || '').includes('json')) return { r, base: b, j: await r.json() }; }
+    catch (e) { err = e; }
+  }
+  throw err || new Error('unreachable');
+}
+function deckStatus(msg, bad) { $('deck-status').textContent = msg; $('deck-status').style.color = bad ? '#ffb4b4' : ''; }
+async function connectDeck(url, quiet) {
+  url = (url || '').trim(); if (!url) { deckStatus('Paste a Google Slides link first.', true); return; }
+  deckStatus('Reading the deck…');
+  let res; try { res = await slidesAPI('deck=' + encodeURIComponent(url)); }
+  catch { deckStatus('Couldn’t reach the slides service from here. Google Slides references work on the live site (trophy-cooler-studio.vercel.app) and in the standalone file.', true); return; }
+  if (!res.r.ok) { deckStatus(res.j.message || 'Couldn’t read that deck.', true); return; }
+  Object.assign(GS, { url, deck: res.j.deck, title: res.j.title, slides: res.j.slides, base: res.base });
+  $('deck-url').value = url; $('deck-head').style.display = 'flex'; $('deck-title').textContent = GS.title || 'Untitled deck';
+  $('deck-open').href = `https://docs.google.com/presentation/d/${GS.deck}/edit`; $('pin-hint').style.display = '';
+  const gone = GS.pins.filter((id) => !slidePos(id)).length;
+  deckStatus(`${GS.slides.length} slides · ${GS.pins.length} pinned${gone ? ` · ${gone} pinned slide${gone > 1 ? 's' : ''} no longer in the deck` : ''}`);
+  renderThumbs(); saveSoon();
+  // load pinned slides that aren't loaded yet (fresh from Google every session)
+  let changed = false;
+  for (const id of GS.pins) {
+    if (REFS.some((r) => r.id === 'gs:' + id) || !slidePos(id)) continue;
+    try { await addRef(slideURL(id), 'slide', false, { id: 'gs:' + id, source: 'slides', slideId: id }); changed = true; } catch {}
+  }
+  if (changed || !quiet) build();
+}
+function renderThumbs() {
+  $('thumbs').innerHTML = GS.deck ? GS.slides.map((s) => `<button class="thumb ${GS.pins.includes(s.id) ? 'on' : ''}" data-id="${s.id}" title="Slide ${s.n} · ID ${s.id}"><img loading="lazy" alt="Slide ${s.n}" src="${slideURL(s.id)}"><span class="pn">p.${s.n}</span></button>`).join('') : '';
+}
+$('thumbs').onclick = async (e) => {
+  const b = e.target.closest('.thumb'); if (!b) return; const id = b.dataset.id;
+  if (GS.pins.includes(id)) {
+    GS.pins = GS.pins.filter((p) => p !== id); const i = REFS.findIndex((r) => r.id === 'gs:' + id);
+    if (i >= 0) { const r = REFS[i]; REFS.splice(i, 1); if (S.skin === r.id) S.skin = 'default'; if (S.paletteSrc === 'Ref · ' + r.name) { S.palette = null; S.paletteSrc = null; } }
+    renderThumbs(); build(); return;
+  }
+  GS.pins.push(id); b.classList.add('on'); deckStatus('Analyzing slide…');
+  try { await addRef(slideURL(id), 'slide', false, { id: 'gs:' + id, source: 'slides', slideId: id }); deckStatus(`${GS.slides.length} slides · ${GS.pins.length} pinned`); }
+  catch { deckStatus('Couldn’t load that slide image.', true); }
+  build();
+};
+$('deck-connect').onclick = () => connectDeck($('deck-url').value);
+$('deck-refresh').onclick = () => connectDeck(GS.url || $('deck-url').value);
+$('deck-url').onkeydown = (e) => { if (e.key === 'Enter') connectDeck($('deck-url').value); };
+
 // ---------- persistence (this browser only) ----------
 const KEY = 'trophy-cooler-studio-v2'; let saveT;
 function saveSoon() { clearTimeout(saveT); saveT = setTimeout(() => {
   const keepS = (({ preset, base, enc, cup, metal, primary, accent, brand, skin, skinScale, palette, paletteSrc, cupProfile, profileSrc, facets, wordmark }) => ({ preset, base, enc, cup, metal, primary, accent, brand, skin, skinScale, palette, paletteSrc, cupProfile, profileSrc, facets, wordmark }))(S);
-  const data = { S: keepS, B: { logo: B.logoSrc, mode: B.mode, use: B.use, colors: B.colors }, refs: REFS.map((r) => ({ id: r.id, name: r.name, src: r.canvas.width > 640 ? toCanvas(r.canvas, 640).toDataURL('image/jpeg', 0.82) : r.thumb })) };
+  const data = { S: keepS, B: { logo: B.logoSrc, mode: B.mode, use: B.use, colors: B.colors }, gs: { url: GS.url, pins: GS.pins }, refs: REFS.filter((r) => r.source !== 'slides').map((r) => ({ id: r.id, name: r.name, src: r.canvas.width > 640 ? toCanvas(r.canvas, 640).toDataURL('image/jpeg', 0.82) : r.thumb })) };
   try { localStorage.setItem(KEY, JSON.stringify(data)); } catch { try { data.refs = data.refs.slice(0, 3); localStorage.setItem(KEY, JSON.stringify(data)); } catch {} }
 }, 600); }
 async function restore() {
   let data; try { data = JSON.parse(localStorage.getItem(KEY) || 'null'); } catch { data = null; } if (!data) return;
   try {
     Object.assign(S, data.S || {}); Object.assign(B, { mode: data.B?.mode || 'tint', use: data.B?.use !== false, colors: data.B?.colors || [] });
+    if (data.gs) { GS.url = data.gs.url || ''; GS.pins = data.gs.pins || []; }
     if (data.B?.logo) { const im = await loadImg(data.B.logo); B.logo = toCanvas(im, 1024); B.logoSrc = data.B.logo; }
-    for (const r of data.refs || []) { const nr = await addRef(r.src, r.name, false); if (S.skin === r.id) S.skin = nr.id; if (S.profileSrc === r.id) S.profileSrc = nr.id; }
+    for (const r of data.refs || []) { if (r.source === 'slides') continue; const nr = await addRef(r.src, r.name, false); if (S.skin === r.id) S.skin = nr.id; if (S.profileSrc === r.id) S.profileSrc = nr.id; }
   } catch {}
 }
 
@@ -825,7 +908,8 @@ function loop(now) {
 
 try { await Promise.race([document.fonts.load('700 64px "Barlow Condensed"'), new Promise((r) => setTimeout(r, 2500))]); } catch {}
 await restore();
-resize(); goCam('hero', true); build(); $('loading').remove(); requestAnimationFrame(loop);
+resize(); goCam('hero', true); build();
+if (GS.url) connectDeck(GS.url, true); $('loading').remove(); requestAnimationFrame(loop);
 window.__studio = { S, build, applyView, goCam };
 </script>
 </body>
