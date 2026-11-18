@@ -69,9 +69,17 @@ export function makeMaterials(o) {
   });
   // "skin" = surface graphic from a design reference or the brand logo pattern
   const skinMat = (tex, name, metal = 0.05) => tex ? new THREE.MeshPhysicalMaterial({ name, map: tex, roughness: 0.3, clearcoat: 1, clearcoatRoughness: 0.08, metalness: metal, side: THREE.DoubleSide }) : null;
-  M.skin = skinMat(o.skinTexture, 'skin-enclosure');
-  M.skinCup = skinMat(o.skinTextureCup, 'skin-cup', 0.35);
-  M.skinBase = skinMat(o.skinTextureBase, 'skin-base');
+  const fin = (f) => ({
+    chrome: () => new THREE.MeshPhysicalMaterial({ name: 'finish-chrome', color: 0xf3f5f8, metalness: 1, roughness: 0.05 }),
+    gold: () => new THREE.MeshPhysicalMaterial({ name: 'finish-gold', color: 0xd9b45b, metalness: 1, roughness: 0.14 }),
+    lacquer: () => M.primary,
+    white: () => M.white,
+    iridescent: () => M.iridescent,
+    satin: () => new THREE.MeshPhysicalMaterial({ name: 'finish-satin-metal', color: 0xc9ced6, metalness: 1, roughness: 0.38 }),
+  }[f] || (() => null))();
+  M.skin = skinMat(o.skinTexture, 'skin-enclosure') || fin(o.encFinish);
+  M.skinCup = skinMat(o.skinTextureCup, 'skin-cup', 0.35) || fin(o.cupFinish);
+  M.skinBase = skinMat(o.skinTextureBase, 'skin-base') || fin(o.baseFinish);
   M.alu = new THREE.MeshPhysicalMaterial({ name: 'aluminum', color: 0xdfe6ee, metalness: 1, roughness: 0.22 });
   return M;
 }
@@ -89,14 +97,14 @@ function labelBand(o, R, h, y, ts, tl, opt) {
 }
 
 // Stained-glass mosaic panel in the XY plane facing +Z (tiles merged per material)
-function mosaic(M, w, h, seed, glow = true) {
+function mosaic(M, w, h, seed, glow = true, tileK = 1) {
   const g = new THREE.Group(), r = rng(seed), buckets = M.glass.map(() => []);
   let y = -h / 2;
   while (y < h / 2 - 0.01) {
-    let rh = 2.2 + r() * 3.2; if (h / 2 - (y + rh) < 1.8) rh = h / 2 - y;
+    let rh = (2.2 + r() * 3.2) * tileK; if (h / 2 - (y + rh) < 1.8) rh = h / 2 - y;
     let x = -w / 2;
     while (x < w / 2 - 0.01) {
-      let cw = 2 + r() * 4.5; if (w / 2 - (x + cw) < 1.6) cw = w / 2 - x;
+      let cw = (2 + r() * 4.5) * tileK; if (w / 2 - (x + cw) < 1.6) cw = w / 2 - x;
       const tile = new THREE.BoxGeometry(cw - 0.32, rh - 0.32, 0.22);
       tile.translate(x + cw / 2, y + rh / 2, 0.12);
       buckets[Math.floor(r() * M.glass.length)].push(tile);
@@ -189,7 +197,7 @@ function encCathedral(M, o) {
   sides.forEach(([ry, x, z, w], i) => {
     const s = new THREE.Group(); s.position.set(x, 0, z); s.rotation.y = ry; g.add(s);
     if (M.skin) { s.add(mesh(new THREE.PlaneGeometry(w, ph), M.skin, 0, pyc, 0.2)); s.add(box(w, ph, 0.12, M.gunmetal, 0, pyc, -0.02)); }
-    else { const mo = mosaic(M, w, ph, 11 + i * 7); mo.position.y = pyc; s.add(mo); }
+    else { const mo = mosaic(M, w, ph, 11 + i * 7, true, (o.encP && o.encP.tile) || 1); mo.position.y = pyc; s.add(mo); }
     s.add(box(w, 2, 0.6, M.metal, 0, y0 + 1, 0));
     s.add(box(w, 3.5, 0.5, M.primary, 0, y0 + 30.9 + 1.75, 0));
     const l = labelPlane(o, w - 2, 2.8, { fg: '#ffffff' }); if (l) { l.position.set(0, y0 + 32.65, 0.27); s.add(l); }
@@ -376,7 +384,7 @@ export const BEERS = [
     profile: [[0, 0], [1.05, 0], [1.3, 0.35], [1.3, 4.45], [1.08, 4.75], [1.1, 4.83], [0, 4.83]], cap: null },
   { id: 'custom', name: '★ From reference', lbEach: 1.2, glass: true, label: null, blurb: 'Lathed from a bottle silhouette in your references (default long-neck until you pick one).', profile: null, cap: null },
 ];
-export function buildContents(M, bowl, { instanced = true, seed = 5, beer = {}, o = {} } = {}) {
+export function buildContents(M, bowl, { instanced = true, seed = 5, beer = {}, o = {}, arrangement = 'ring', tilt: tiltIn = 0.2, heap = 1.0 } = {}) {
   const g = named(new THREE.Group(), 'contents-12-beers-ice');
   const T = BEERS.find((b) => b.id === beer.type) || BEERS[0];
   const prof = T.id === 'custom' ? (beer.profile && beer.profile.length > 3 ? beer.profile : BEERS[0].profile) : T.profile;
@@ -395,31 +403,40 @@ export function buildContents(M, bowl, { instanced = true, seed = 5, beer = {}, 
   parts.push([labelGeo, lmat]);
   if (T.cap) { const [cr, cy, ch] = T.cap, cg = new THREE.CylinderGeometry(cr, cr, ch, 24); cg.translate(0, cy + ch / 2 - (T.id === 'longneck' ? ch / 2 : 0), 0); parts.push([cg, M.foil]); }
   // placement: label bottom ~ at the rim, ring as close to the wall as the bowl allows
-  const tilt = 0.2, baseY = Math.max(bowl.floor + 0.05, bowl.rim - (l0 + (l1 - l0) * 0.25));
+  const tilt = tiltIn, baseY = Math.max(bowl.floor + 0.05, bowl.rim - (l0 + (l1 - l0) * 0.25));
   // ring radius: as close to the wall as the bowl allows at every height the bottle is inside it
   let ringR = 9;
   for (let h = 0; baseY + h <= bowl.rim && h <= H; h += 0.25) ringR = Math.min(ringR, bowl.rAt(baseY + h) - 0.35 - rP(h) - h * Math.tan(tilt));
   ringR = Math.max(5.3, ringR); const rimR = bowl.rAt(bowl.rim);
-  const mats = [];
-  for (let i = 0; i < BEER.count; i++) {
-    const a = (i / BEER.count) * Math.PI * 2, o3 = new THREE.Object3D();
-    o3.position.set(ringR * Math.cos(a), baseY, ringR * Math.sin(a));
-    o3.rotation.set(0, -a, 0); o3.rotateZ(-tilt); o3.updateMatrix(); mats.push(o3.matrix.clone());
+  // arrangement of the 12: one ring, 8 + 4 double ring (inner raised), or a staggered bouquet
+  const slots = [];
+  if (arrangement === 'double' && ringR > 6.2) {
+    for (let i = 0; i < 8; i++) slots.push([ringR, (i / 8) * Math.PI * 2, 0, tilt]);
+    for (let i = 0; i < 4; i++) slots.push([Math.max(1.6, ringR - 3.4), (i / 4) * Math.PI * 2 + Math.PI / 4, 1.6, tilt * 0.4]);
+  } else for (let i = 0; i < BEER.count; i++) {
+    const bq = arrangement === 'bouquet', odd = i % 2;
+    slots.push([ringR - (bq && odd ? 0.4 : 0), (i / BEER.count) * Math.PI * 2, bq ? (odd ? 1.4 : -0.3) : 0, bq ? (odd ? tilt * 0.6 : tilt * 1.35) : tilt]);
+  }
+  const mats = [], axes = [];
+  for (const [rr0, a, dy, t] of slots) {
+    const o3 = new THREE.Object3D(); o3.position.set(rr0 * Math.cos(a), baseY + dy, rr0 * Math.sin(a));
+    o3.rotation.set(0, -a, 0); o3.rotateZ(-t); o3.updateMatrix(); mats.push(o3.matrix.clone()); axes.push([rr0, a, baseY + dy, t]);
   }
   for (const [geo, mat] of parts) {
     if (instanced) { const im = new THREE.InstancedMesh(geo, mat, mats.length); mats.forEach((m, i) => im.setMatrixAt(i, m)); im.castShadow = true; g.add(im); }
     else mats.forEach((m) => { const me = mesh(geo, mat); me.applyMatrix4(m); g.add(me); });
   }
   // heaped ice: fills the bowl to the rim and mounds above it
-  const r = rng(seed), yTop = bowl.rim + 1.0, cubes = [], cell = new Map(), key = (x, y, z) => `${Math.floor(x / 1.1)},${Math.floor(y / 1.1)},${Math.floor(z / 1.1)}`;
+  const r = rng(seed), yTop = bowl.rim + heap, cubes = [], cell = new Map(), key = (x, y, z) => `${Math.floor(x / 1.1)},${Math.floor(y / 1.1)},${Math.floor(z / 1.1)}`;
   const near = (v) => { const [cx, cy, cz] = key(v.x, v.y, v.z).split(',').map(Number); for (let i = -1; i <= 1; i++) for (let j = -1; j <= 1; j++) for (let k = -1; k <= 1; k++) for (const c of cell.get(`${cx + i},${cy + j},${cz + k}`) || []) if (c.distanceTo(v) < 1.02) return true; return false; };
-  for (let t = 0; t < 30000 && cubes.length < 720; t++) {
+  for (let t = 0; t < 34000 && cubes.length < 520 + heap * 260; t++) {
     const y = bowl.floor + 0.6 + r() * (yTop - bowl.floor - 0.6);
-    const rmax = y <= bowl.rim ? bowl.rAt(y) - 0.7 : (rimR - 0.9) * (1 - (y - bowl.rim) / 1.6);
+    const rmax = y <= bowl.rim ? bowl.rAt(y) - 0.7 : (rimR - 0.9) * (1 - (y - bowl.rim) / (heap * 1.6 + 0.01));
     if (rmax <= 0.3) continue;
     const rr = Math.sqrt(r()) * rmax, a = r() * Math.PI * 2, v = new THREE.Vector3(rr * Math.cos(a), y, rr * Math.sin(a));
-    if (y > baseY) { const h = y - baseY, axR = ringR + h * Math.tan(tilt), br = rP(Math.min(H, h)) + 0.55; let hit = false;
-      for (let i = 0; i < BEER.count && !hit; i++) { const b = (i / BEER.count) * Math.PI * 2; if (Math.hypot(v.x - axR * Math.cos(b), v.z - axR * Math.sin(b)) < br) hit = true; } if (hit) continue; }
+    { let hit = false;
+      for (const [rr0, b, by, t] of axes) { const h = y - by; if (h < 0 || hit) continue; const axR = rr0 + h * Math.tan(t); if (Math.hypot(v.x - axR * Math.cos(b), v.z - axR * Math.sin(b)) < rP(Math.min(H, h)) + 0.55) hit = true; }
+      if (hit) continue; }
     if (near(v)) continue;
     cubes.push(v); const k2 = key(v.x, v.y, v.z); (cell.get(k2) || cell.set(k2, []).get(k2)).push(v);
   }
@@ -428,7 +445,7 @@ export function buildContents(M, bowl, { instanced = true, seed = 5, beer = {}, 
   for (const c of cubes) { dummy.position.copy(c); dummy.rotation.set(r() * 3, r() * 3, r() * 3); dummy.scale.setScalar(0.85 + r() * 0.4); dummy.updateMatrix(); cm.push(dummy.matrix.clone()); }
   if (instanced) { const im = new THREE.InstancedMesh(cubeGeo, M.ice, cm.length); cm.forEach((m, i) => im.setMatrixAt(i, m)); im.receiveShadow = true; g.add(im); }
   else { const geos = cm.map((m) => cubeGeo.clone().applyMatrix4(m)); g.add(mesh(mergeGeometries(geos), M.ice)); }
-  g.userData.top = baseY + H * Math.cos(tilt); g.userData.lbEach = T.lbEach;
+  g.userData.top = Math.max(...axes.map(([, , by, t]) => by + H * Math.cos(t))); g.userData.lbEach = T.lbEach; g.userData.ringR = ringR; g.userData.baseY = baseY;
   return g;
 }
 
@@ -447,6 +464,44 @@ export function buildFridge(M) {
 }
 
 // ======================================================================
+// Section parameters — each section is edited without touching the others.
+// The cup mounts at CUP_Y, the enclosure is always 36" tall and the sled deck is always 3",
+// so a change to one section never moves the rest of the assembly.
+export const SECTION_PARAMS = {
+  cup: { width: [0.8, 1.3, 1], height: [0.8, 1.35, 1], flare: [-0.15, 0.35, 0], neck: [0.6, 1.6, 1], tilt: [0.05, 0.35, 0.2], heap: [0, 2.5, 1] },
+  enc: { width: [1, 1.25, 1], depth: [1, 1.25, 1], tile: [0.6, 1.8, 1] },
+  base: { footprint: [1, 1.4, 1] },
+};
+export const FINISHES = ['concept', 'chrome', 'gold', 'satin', 'lacquer', 'white', 'iridescent'];
+export const ARRANGEMENTS = ['ring', 'double', 'bouquet'];
+// Deform a built cup (group-local space): neck stretch, width, height, rim flare. Updates the bowl data too.
+export function shapeCup(g, P = {}) {
+  const w = P.width ?? 1, h = P.height ?? 1, flare = P.flare ?? 0, neck = P.neck ?? 1, b = g.userData.bowl;
+  if (w === 1 && h === 1 && !flare && neck === 1) return g;
+  const yb = b.floor - 1.0, top = b.rim;
+  const mapY = (y) => (y < yb ? y * neck : yb * neck + (y - yb)) * h;
+  const fy = (y) => { const t = Math.min(1, Math.max(0, (y - b.floor) / (top - b.floor))); return 1 + flare * t * t; };
+  g.updateMatrixWorld(true); const inv = new THREE.Matrix4().copy(g.matrixWorld).invert(), v = new THREE.Vector3();
+  g.traverse((m) => {
+    if (!m.isMesh) return; const toG = new THREE.Matrix4().multiplyMatrices(inv, m.matrixWorld), back = toG.clone().invert();
+    m.geometry = m.geometry.clone(); const pos = m.geometry.attributes.position;
+    for (let i = 0; i < pos.count; i++) { v.fromBufferAttribute(pos, i).applyMatrix4(toG); const k = w * fy(v.y); v.set(v.x * k, mapY(v.y), v.z * k).applyMatrix4(back); pos.setXYZ(i, v.x, v.y, v.z); }
+    pos.needsUpdate = true; m.geometry.computeVertexNormals(); m.geometry.computeBoundingSphere();
+  });
+  const rAt0 = b.rAt, floor = mapY(b.floor), rim = mapY(b.rim), inv1 = (y) => { const y0 = y / h; return y0 < yb * neck ? y0 / neck : y0 - yb * neck + yb; };
+  g.userData.bowl = { ...b, floor, rim, rAt: (y) => rAt0(inv1(y)) * w * fy(inv1(y)), ringR: b.ringR * w };
+  return g;
+}
+export function setLeds(g, on) { g.traverse((m) => { if (m.isMesh && m.material && m.material.name === 'LED') m.visible = on; }); }
+// Capacity / fit check for the cup: 12 bottles plus ice must fit inside the bowl.
+export function checkCup(bowl, contents) {
+  const out = []; const innerAtBase = bowl.rAt(contents.userData.baseY);
+  if (innerAtBase < contents.userData.ringR + 1.3) out.push('Bowl is tight for 12 bottles at this width — widen the bowl or reduce flare inward.');
+  if (bowl.rAt(bowl.rim) * 2 > 40) out.push('Rim is over 40″ across — wider than any base; check stability.');
+  return out;
+}
+
+// ======================================================================
 // Catalog
 // ======================================================================
 export const BASES = [
@@ -457,11 +512,11 @@ export const BASES = [
   { id: 'float', name: 'Floating Plinth', build: baseFloat, lb: 34, footprint: [36, 36], blurb: 'Recessed UHMW pad + LED underglow so the trophy appears to hover on the ice.' },
 ];
 export const ENCLOSURES = [
-  { id: 'cathedral', name: 'Cathedral', build: encCathedral, lb: 44, clear: { side: 1.8, back: 1.0, front: 1.9, top: 2.4 }, blurb: 'Backlit faux stained-glass side walls (resin on acrylic) in a chrome frame.' },
-  { id: 'halo', name: 'Halo', build: encHalo, lb: 30, clear: { side: 6.6, back: 6.1, front: 5.4, top: 2.4 }, blurb: 'Round gloss column with chrome rings, a wrap-around brand band and a curved door.' },
-  { id: 'prism', name: 'Prism', build: encPrism, lb: 36, clear: { side: 6.4, back: 5.9, front: 5.9, top: 2.4 }, blurb: 'Tapered octagon of frosted iridescent acrylic; faceted front shell lifts off.' },
-  { id: 'pucktower', name: 'Hat-Trick Tower', build: encPuckTower, lb: 34, clear: { side: 0.9, back: 1.0, front: 1.8, top: 1.5 }, blurb: 'Soft-cornered sleeve with jersey stripes and big side brand panels.' },
-  { id: 'monolith', name: 'Monolith', build: encMonolith, lb: 30, clear: { side: 1.4, back: 1.0, front: 2.0, top: 2.5 }, blurb: 'Crisp ACM box, chrome fins, mirror door, full-height brand panels.' },
+  { id: 'cathedral', outer: [29.2, 30.2], name: 'Cathedral', build: encCathedral, lb: 44, clear: { side: 1.8, back: 1.0, front: 1.9, top: 2.4 }, blurb: 'Backlit faux stained-glass side walls (resin on acrylic) in a chrome frame.' },
+  { id: 'halo', outer: [39.2, 39.2], name: 'Halo', build: encHalo, lb: 30, clear: { side: 6.6, back: 6.1, front: 5.4, top: 2.4 }, blurb: 'Round gloss column with chrome rings, a wrap-around brand band and a curved door.' },
+  { id: 'prism', outer: [43.4, 43.4], name: 'Prism', build: encPrism, lb: 36, clear: { side: 6.4, back: 5.9, front: 5.9, top: 2.4 }, blurb: 'Tapered octagon of frosted iridescent acrylic; faceted front shell lifts off.' },
+  { id: 'pucktower', outer: [29, 30], name: 'Hat-Trick Tower', build: encPuckTower, lb: 34, clear: { side: 0.9, back: 1.0, front: 1.8, top: 1.5 }, blurb: 'Soft-cornered sleeve with jersey stripes and big side brand panels.' },
+  { id: 'monolith', outer: [28.4, 29.4], name: 'Monolith', build: encMonolith, lb: 30, clear: { side: 1.4, back: 1.0, front: 2.0, top: 2.5 }, blurb: 'Crisp ACM box, chrome fins, mirror door, full-height brand panels.' },
 ];
 export const CUPS = [
   { id: 'chalice', name: 'Faceted Chalice', build: cupChalice, lb: 18, blurb: '10-facet spun-aluminum chalice with a stained-glass band.' },

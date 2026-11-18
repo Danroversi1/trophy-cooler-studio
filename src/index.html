@@ -142,6 +142,65 @@ select{background:var(--field);border:1px solid #34363e;border-radius:7px;color:
 .rc{color:#b8ceff;background:#092368;border-radius:4px;padding:2px 6px;font-size:9.5px}
 details.localref{border:0;padding:8px 0 0}
 details.localref summary{font-size:10.5px;color:#a8bce6}
+/* workshop */
+.seg3{display:grid;grid-template-columns:repeat(3,1fr);gap:5px}
+.seg3 button{font-size:11px;padding:9px 4px;background:#1d1f25;border-color:#34363e;color:#a9b0bf}
+.seg3 button.active{background:linear-gradient(180deg,#244da6,#08277d);border-color:#5d7ab5;color:#fff}
+textarea{width:100%;margin-top:10px;background:var(--field);border:1px solid #34363e;border-radius:7px;color:#eef2fb;padding:9px 10px;font:12px/1.5 Arial,Helvetica,sans-serif;resize:vertical;outline:none}
+textarea:focus{border-color:#5377ba}
+.gen-row{display:grid;grid-template-columns:1fr auto;gap:7px;margin-top:8px}
+.gen-row button{font-size:11.5px}
+#ws-generate.busy{opacity:.7;pointer-events:none}
+.mthumbs .rm{position:absolute;right:2px;bottom:2px;width:16px;height:16px;border-radius:50%;background:#000c;color:#fff;font-size:10px;display:none;place-items:center;line-height:1}
+.mthumbs button:hover .rm{display:grid}
+.mthumbs .star{position:absolute;left:3px;top:3px;font-size:8px;background:#2a5bc4;color:#fff;border-radius:3px;padding:1px 4px}
+.iter{display:grid;grid-template-columns:72px 1fr;gap:9px;padding:9px 0;border-top:1px solid #ffffff0d}
+.iter:first-child{border-top:0}
+.iter img{width:72px;height:48px;object-fit:cover;border-radius:5px;background:#0b0c10;border:1px solid #2a3348}
+.iter.applied img{border-color:#5d7ab5}
+.iter input{width:100%;background:transparent;border:1px solid transparent;border-radius:5px;color:#eef2fb;font-size:11.5px;padding:3px 4px;margin:-3px 0 0 -4px}
+.iter input:hover,.iter input:focus{border-color:#34363e;background:#202126;outline:none}
+.iter .im{font-size:9.5px;color:#8f95a1;line-height:1.45}
+.iter .ip{font-size:10px;color:#b5bccb;line-height:1.45;margin-top:2px;max-height:2.9em;overflow:hidden}
+.iter .ia{grid-column:1/-1;display:flex;gap:4px;flex-wrap:wrap}
+.iter .ia button{background:#1d1f25;border:1px solid #34363e;color:#c6cbd4;border-radius:6px;padding:5px 8px;font-size:10px}
+.iter .ia button:hover{border-color:#4d6db0;color:#fff}
+.iter .ia button.on{background:linear-gradient(180deg,#244da6,#08277d);border-color:#5d7ab5;color:#fff}
+.iter .tag{font-size:8px;letter-spacing:.4px;text-transform:uppercase;color:#b8ceff;background:#092368;border-radius:3px;padding:2px 4px;margin-left:4px}
+.pslider .slider-head{margin:12px 0 6px}
+code{font-size:10px;background:#0b0c10;border:1px solid #2a3348;border-radius:4px;padding:1px 4px;color:#cfd6e4}
+/* viewport chips */
+.vchips{position:absolute;left:50%;top:76px;transform:translateX(-50%);z-index:3;display:flex;flex-direction:column;align-items:center;gap:6px;pointer-events:none}
+.vchip{pointer-events:auto;display:flex;align-items:center;gap:8px;background:#0a0b0ee6;border:1px solid #345496;border-radius:9px;padding:6px 6px 6px 12px;font-size:11px;color:#dfe6f5;backdrop-filter:blur(12px);white-space:nowrap}
+.vchip b{font-weight:500;color:#fff}
+.vchip .dotb{width:7px;height:7px;border-radius:50%;background:#4d7dff;box-shadow:0 0 0 3px #4d7dff33}
+.vchip button{padding:6px 10px;font-size:10.5px}
+.vchip.pv{border-color:#b08a2e}.vchip.pv .dotb{background:#e0b24a;box-shadow:0 0 0 3px #e0b24a33}
+/* modal */
+.modal{position:fixed;inset:0;z-index:50;background:#05060acc;backdrop-filter:blur(6px);display:grid;place-items:center;padding:20px}
+.modal[hidden]{display:none}
+.modal-box{width:min(980px,100%);max-height:min(860px,100%);display:flex;flex-direction:column;background:#141519;border:1px solid #2a3348;border-radius:14px;box-shadow:0 30px 80px #000a}
+.modal-head{display:flex;justify-content:space-between;align-items:flex-start;padding:18px 20px 12px}
+.modal-head h3{margin:4px 0 0;font-size:16px;font-weight:500}
+.pk-eyebrow{font-size:10px;letter-spacing:1.4px;text-transform:uppercase;color:#9297a2}
+.pk-tabs{margin:0 20px;max-width:420px}
+#pk-slides,#pk-import{padding:12px 20px 0;overflow:auto;flex:1;min-height:200px}
+.pk-deck{display:flex;gap:7px}
+.pk-deck button{font-size:11px}
+.pk-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(170px,1fr));gap:10px;margin:12px 0 16px}
+.pk-card{position:relative;text-align:left;padding:0;background:#0f1014;border:1px solid #2a2d36;border-radius:9px;overflow:hidden;color:#e8ebf2}
+.pk-card:hover{border-color:#4d6db0;background:#0f1014}
+.pk-card img{display:block;width:100%;aspect-ratio:4/3;object-fit:cover;background:#0b0c10}
+.pk-card .cap{padding:7px 9px 8px;font-size:10.5px;line-height:1.4}
+.pk-card .cap b{font-weight:500;color:#b8ceff;margin-right:5px}
+.pk-card .cap span{color:#c6cbd4;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden}
+.pk-card.on{border-color:#5d7ab5;box-shadow:0 0 0 2px #2c57b8 inset}
+.pk-card.on::after{content:"✓";position:absolute;right:7px;top:7px;width:20px;height:20px;border-radius:50%;background:#2a5bc4;color:#fff;font-size:12px;display:grid;place-items:center}
+.pk-card .asg{position:absolute;left:7px;top:7px;display:flex;gap:3px}
+.pk-card .asg i{font-style:normal;font-size:9px;background:#0c2254ee;color:#b8ceff;border:1px solid #345496;border-radius:4px;padding:1px 5px}
+.modal-foot{display:flex;align-items:center;gap:8px;padding:12px 20px;border-top:1px solid #ffffff10;font-size:11px;color:#9aa1ad}
+.modal-foot button{font-size:11.5px;padding:9px 16px}
+.modal-foot button:disabled{opacity:.45;cursor:default}
 /* specs */
 .stat{display:grid;grid-template-columns:1fr 1fr;gap:6px}
 .stat div{background:#191c24;border:1px solid #2a3348;border-radius:8px;padding:9px 10px}
@@ -175,7 +234,7 @@ details b{color:#d6dbe4;font-weight:600}
 .viewbar button:hover{background:#0c245c;color:#fff}
 .viewbar button.active{background:linear-gradient(180deg,#224796,#08277d);border-color:#355994;color:#fff}
 .focusbtn{position:absolute;right:20px;top:20px;min-height:36px;font-size:11px;z-index:2}
-.legend{position:absolute;left:25px;top:78px;font-size:10px;line-height:1.6;color:#929aaa;pointer-events:none;max-width:280px}
+.legend{position:absolute;left:25px;top:78px;display:none;font-size:10px;line-height:1.6;color:#929aaa;pointer-events:none;max-width:280px}
 .scene-label{position:absolute;bottom:52px;left:20px;font-size:9px;letter-spacing:1.2px;color:#8f97a5;text-transform:uppercase;pointer-events:none;background:#0a0b0ecc;backdrop-filter:blur(10px);border:1px solid #ffffff0c;border-radius:7px;padding:5px 10px}
 .hint{position:absolute;bottom:18px;left:20px;font-size:10px;line-height:1.4;color:#a1a8b7;pointer-events:none;background:#0a0b0ecc;backdrop-filter:blur(10px);border:1px solid #ffffff0c;border-radius:7px;padding:5px 10px}
 .hint span{display:inline-block;margin:0 10px;color:#5f6570}
@@ -219,33 +278,59 @@ details b{color:#d6dbe4;font-weight:600}
     <p class="muted" id="dims-readout"></p>
   </section>
 
-  <section class="section"><h2>Module</h2>
-    <div class="selected-title" id="mod-title">03 · Cup</div>
-    <div id="variants"></div>
-    <p class="muted" id="v-blurb"></p>
-    <div class="box" id="mod-ref" style="margin-top:12px">
-      <div class="box-head"><span>Reference for this element</span><span class="badge" id="mref-badge">none</span></div>
-      <div class="mthumbs" id="mref-thumbs"></div>
-      <div id="mref-opts"></div>
-      <p class="muted" id="mref-hint" style="margin-top:8px"></p>
+  <section class="section" id="workshop"><h2>Section workshop <small id="ws-concept"></small></h2>
+    <div class="seg3" id="ws-tabs"><button data-sec="base">01 Base</button><button data-sec="enc">02 Enclosure</button><button data-sec="cup">03 Cup</button></div>
+    <div class="selected-title" id="ws-title" style="margin:14px 0 2px">03 · Cup</div>
+    <p class="muted" id="ws-sub" style="margin:0 0 12px"></p>
+    <div class="seg"><button id="ws-isolate">Isolate section</button><button id="ws-assembled" class="ghost">Assembled trophy</button></div>
+
+    <div class="box" style="margin-top:14px">
+      <div class="box-head"><span>References for this section</span><span class="badge" id="ws-refcount">0</span></div>
+      <div class="mthumbs" id="ws-refs"></div>
+      <button class="wide" id="ws-choose">Choose reference…</button>
+      <div id="ws-refopts"></div>
+      <p class="muted" id="ws-refhint"></p>
     </div>
-    <div id="mod-skin">
-      <div class="input-row"><label>Surface skin</label><select id="skin"></select></div>
-      <div class="slider-head"><label for="skin-scale">Skin scale <span style="color:#6b717d">· all skins</span></label><output id="skin-scale-v">1.0×</output></div>
-      <input class="range" id="skin-scale" type="range" min="0.5" max="4" step="0.1" value="1">
+
+    <div class="box">
+      <div class="box-head"><span>Design prompt</span><span class="badge" id="ws-engine-badge">procedural</span></div>
+      <textarea id="ws-prompt" rows="3" placeholder="e.g. Taller bowl with a flared rim, gold finish, more ice heaped above the rim"></textarea>
+      <div class="gen-row"><button id="ws-generate">Generate iteration</button><button class="ghost" id="ws-save">Save current</button></div>
+      <p class="muted" id="gen-status"></p>
     </div>
-    <div id="mod-beer"><p class="muted">Bottles stand high in a heaped ice bed so the label clears the rim. With no bottle reference, labels carry your brand logo (or label text).</p></div>
-    <div id="mod-cup">
-      <div class="slider-head"><label for="facets">Cup facets <span style="color:#6b717d">· ★ cup, 0 = smooth</span></label><output id="facets-v">0</output></div>
-      <input class="range" id="facets" type="range" min="0" max="16" step="1" value="0">
-      <div class="warnbox" id="cup-warn"></div>
+
+    <div class="box">
+      <div class="box-head"><span>Iterations</span><span class="badge" id="ws-itcount">0</span></div>
+      <div id="ws-iters"></div>
     </div>
-    <div id="mod-enc">
-      <div class="slider-head"><label for="door">Service door</label><output id="door-v">Closed</output></div>
-      <input class="range" id="door" type="range" min="0" max="1" step="0.01" value="0">
-      <label class="toggle-row"><input type="checkbox" id="xray">X-ray sleeve · show the freezer</label>
+
+    <div class="box">
+      <div class="box-head"><span>Design parameters</span><span class="badge">manual · no generation</span></div>
+      <div id="variants" style="margin-top:8px"></div>
+      <p class="muted" id="v-blurb"></p>
+      <div id="ws-params"></div>
+      <div id="mod-skin">
+        <div class="input-row"><label>Surface skin</label><select id="skin"></select></div>
+        <div class="slider-head"><label for="skin-scale">Skin scale <span style="color:#6b717d">· all skins</span></label><output id="skin-scale-v">1.0×</output></div>
+        <input class="range" id="skin-scale" type="range" min="0.5" max="4" step="0.1" value="1">
+      </div>
+      <div id="mod-cup">
+        <div class="slider-head"><label for="facets">Cup facets <span style="color:#6b717d">· ★ cup, 0 = smooth</span></label><output id="facets-v">0</output></div>
+        <input class="range" id="facets" type="range" min="0" max="16" step="1" value="0">
+        <div class="subhead" style="margin-top:16px">Bottles + ice <small>always 12 bottles</small></div>
+        <div class="input-row"><label>Bottle</label><select id="beer-type"></select></div>
+        <div class="input-row"><label>Label art</label><select id="beer-label"></select></div>
+        <label class="toggle-row" id="beer-shape-row"><input type="checkbox" id="beer-shape">Bottle shape from the label reference</label>
+        <div class="warnbox" id="cup-warn"></div>
+      </div>
+      <div id="mod-enc">
+        <div class="slider-head"><label for="door">Service door</label><output id="door-v">Closed</output></div>
+        <input class="range" id="door" type="range" min="0" max="1" step="0.01" value="0">
+        <label class="toggle-row"><input type="checkbox" id="xray">X-ray sleeve · show the freezer</label>
+        <p class="muted">The freezer (23.6 × 32.0 × 24.6″) is fixed: the sleeve can grow, never shrink below it, and stays 36″ tall so the cup and base don't move.</p>
+      </div>
+      <div id="mod-base"><p class="muted" id="base-note">Ice contact is always UHMW-PE. The deck stays at 3″, and the footprint grows automatically if the enclosure needs it.</p></div>
     </div>
-    <div id="mod-base"><p class="muted">All bases share a 3″ deck height and the same enclosure pin pattern, so any sleeve drops onto any sled.</p></div>
   </section>
 
   <section class="section"><h2>Finish</h2>
@@ -282,6 +367,24 @@ details b{color:#d6dbe4;font-weight:600}
     <details class="localref"><summary>Add a local image instead (this browser only)</summary>
       <label class="drop" id="drop-ref" style="margin-top:8px"><input type="file" id="f-ref" accept="image/*" multiple><b>Drop images</b>Kept only in this browser, never uploaded</label>
     </details>
+  </section>
+
+  <section class="section" id="gen"><h2>Local generator <small>your computer only</small></h2>
+    <div class="input-row"><label>Engine</label><select id="gen-engine" style="width:170px"><option value="procedural">Built-in procedural (no model)</option><option value="ollama">Ollama · local LLM</option><option value="openai">LM Studio / llama.cpp</option></select></div>
+    <div id="gen-llm">
+      <div class="input-row"><label>Endpoint</label><div class="input-wrap" style="width:170px"><input type="text" id="gen-url" spellcheck="false"></div></div>
+      <div class="input-row"><label>Model</label><select id="gen-model" style="width:170px"><option value="">— test connection —</option></select></div>
+      <label class="toggle-row"><input type="checkbox" id="gen-vision">Send section references to the model (vision models only)</label>
+      <button class="wide" id="gen-test">Test connection</button>
+    </div>
+    <p class="muted" id="gen-state"></p>
+    <details><summary>How local generation works</summary>
+      <ul>
+        <li>Each iteration is <b>editable parameters</b> for one section (shape, proportions, finish, bottle arrangement), checked against the freezer fit and the 12-bottle capacity before it's shown.</li>
+        <li><b>Ollama:</b> install from ollama.com, run <code>ollama pull qwen2.5:7b</code> (or <code>llama3.2-vision</code> to send reference images), then start it allowing this site: <code>OLLAMA_ORIGINS="https://trophy-cooler-studio.vercel.app" ollama serve</code>. For the standalone file use <code>OLLAMA_ORIGINS="*"</code>.</li>
+        <li><b>LM Studio:</b> load a model, open Developer → Local Server, enable CORS and start it (default <code>http://localhost:1234</code>). llama.cpp's <code>llama-server --port 8080</code> also works.</li>
+        <li>Only <b>localhost / private-network</b> addresses are accepted, and nothing ever falls back to a cloud API. The built-in procedural engine runs in this page with no model at all.</li>
+      </ul></details>
   </section>
 
   <section class="section"><h2>View settings</h2>
@@ -337,6 +440,7 @@ details b{color:#d6dbe4;font-weight:600}
 
 <main id="stage" aria-label="Interactive trophy cooler 3D viewer">
   <div class="viewbar" id="viewbar"><button data-view="hero" class="active">3D</button><button data-view="front">Front</button><button data-view="back">Back</button><button data-view="top">Top</button><button data-view="side">Side</button><button data-view="bottles">Bottles</button><button data-view="rink">Rink</button></div>
+  <div class="vchips" id="vchips"></div>
   <button class="focusbtn" id="fit">Fit view</button>
   <div class="legend" id="legend">Drag the background to explore the model.</div>
   <div class="scene-label" id="scene-label">03 modules · freezer enclosed · 12 beers on ice</div>
@@ -346,6 +450,23 @@ details b{color:#d6dbe4;font-weight:600}
 </main>
 </div>
 <footer class="wordmark-footer"><span id="wordmark-out">Trophy Cooler</span></footer>
+<div class="modal" id="picker" hidden>
+  <div class="modal-box" role="dialog" aria-modal="true" aria-labelledby="pk-title">
+    <div class="modal-head"><div><div class="pk-eyebrow">Choose reference</div><h3 id="pk-title">03 · Cup</h3></div><button class="ghost" id="pk-close" aria-label="Close">✕</button></div>
+    <div class="seg pk-tabs" id="pk-tabs"><button data-tab="slides">Google Slides treatment</button><button data-tab="import">Import images / PDF</button></div>
+    <div id="pk-slides">
+      <div class="pk-deck"><div class="input-wrap" style="flex:1;width:auto"><input type="text" id="pk-url" placeholder="Paste a Google Slides link…" spellcheck="false"></div><button id="pk-connect">Connect</button><button class="ghost" id="pk-refresh">Refresh</button></div>
+      <p class="muted" id="pk-status">Share the treatment as “Anyone with the link can view”. Slides stream live from Google, and pins follow each slide's permanent ID.</p>
+      <div class="pk-grid" id="pk-grid"></div>
+    </div>
+    <div id="pk-import" hidden>
+      <label class="drop" id="pk-drop"><input type="file" id="pk-file" accept="image/*,application/pdf" multiple><b>Drop slide images, screenshots or a PDF of the treatment</b>…or paste a screenshot (⌘/Ctrl + V). From Google Slides: File → Download → PDF document.</label>
+      <p class="muted" id="pk-imp-status"></p>
+      <div class="pk-grid" id="pk-imp-grid"></div>
+    </div>
+    <div class="modal-foot"><span id="pk-count">0 selected</span><span style="flex:1"></span><button class="ghost" id="pk-cancel">Cancel</button><button id="pk-assign" disabled>Assign</button></div>
+  </div>
+</div>
 <script type="module">
 import * as THREE from 'three';
 import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
@@ -358,13 +479,18 @@ const S = { preset: D.PRESETS[0].id, ...fresh(D.PRESETS[0]), brand: 'MICHELOB UL
   skin: 'default', skinScale: 1, palette: null, paletteSrc: null, cupProfile: null, profileSrc: null, facets: 0, wordmark: 'Trophy Cooler',
   sel: 'cup', isolate: false, view: 'hero', vis: { cup: true, contents: true, enc: true, fridge: true, base: true } };
 // Each concept keeps its own look + its own reference pins; brand assets (B) are shared by all.
-const LOOK = ['base', 'enc', 'cup', 'metal', 'primary', 'accent', 'skin', 'skinCup', 'skinBase', 'skinScale', 'palette', 'paletteSrc', 'paletteRef', 'cupProfile', 'profileSrc', 'facets', 'refCup', 'refEnc', 'refBase', 'refBeer', 'beerType', 'beerLabel', 'beerProfile'];
-const lookDefaults = (p) => ({ ...fresh(p), skin: 'default', skinCup: 'default', skinBase: 'default', skinScale: 1, palette: null, paletteSrc: null, paletteRef: null, cupProfile: null, profileSrc: null, facets: 0, refCup: null, refEnc: null, refBase: null, refBeer: null, beerType: 'longneck', beerLabel: false, beerProfile: null });
-const pickLook = (o) => Object.fromEntries(LOOK.map((k) => [k, o[k]]));
-const C = Object.fromEntries(D.PRESETS.map((p) => [p.id, { ...lookDefaults(p), pins: [] }]));   // pins: ref ids ('gs:<slideId>' or local 'refN')
+const LOOK = ['base', 'enc', 'cup', 'metal', 'primary', 'accent', 'skin', 'skinCup', 'skinBase', 'skinScale', 'palette', 'paletteSrc', 'paletteRef', 'cupProfile', 'profileSrc', 'facets', 'refCup', 'refEnc', 'refBase', 'refBeer', 'beerType', 'beerLabel', 'beerProfile', 'cupP', 'encP', 'baseP', 'cupFinish', 'encFinish', 'baseFinish'];
+const lookDefaults = (p) => ({ ...fresh(p), skin: 'default', skinCup: 'default', skinBase: 'default', skinScale: 1, palette: null, paletteSrc: null, paletteRef: null, cupProfile: null, profileSrc: null, facets: 0, refCup: null, refEnc: null, refBase: null, refBeer: null, beerType: 'longneck', beerLabel: false, beerProfile: null,
+  cupP: { ...Object.fromEntries(Object.entries(D.SECTION_PARAMS.cup).map(([k, v]) => [k, v[2]])), arrangement: 'ring' },
+  encP: { ...Object.fromEntries(Object.entries(D.SECTION_PARAMS.enc).map(([k, v]) => [k, v[2]])), led: true },
+  baseP: { ...Object.fromEntries(Object.entries(D.SECTION_PARAMS.base).map(([k, v]) => [k, v[2]])), led: true },
+  cupFinish: 'concept', encFinish: 'concept', baseFinish: 'concept' });
+const pickLook = (o) => JSON.parse(JSON.stringify(Object.fromEntries(LOOK.map((k) => [k, o[k] ?? null]))));
+const newConcept = (p) => ({ ...lookDefaults(p), pins: [], secRefs: { cup: [], enc: [], base: [] }, iters: { cup: [], enc: [], base: [] }, prompts: { cup: '', enc: '', base: '' } });
+const C = Object.fromEntries(D.PRESETS.map((p) => [p.id, newConcept(p)]));   // pins: ref ids ('gs:<slideId>' or local 'refN')
 const activeC = () => C[S.preset];
 const pins = () => activeC().pins;
-const commitLook = () => { Object.assign(activeC(), pickLook(S)); };
+const commitLook = () => { Object.assign(activeC(), pickLook(S)); };   // deep copy: S and C never share objects
 Object.assign(S, pickLook(C[S.preset]));
 const isEdited = (id) => { const d = lookDefaults(D.byId(D.PRESETS, id)), c = C[id]; return LOOK.some((k) => JSON.stringify(c[k]) !== JSON.stringify(d[k])); };
 const B = { logo: null, logoSrc: null, mode: 'tint', use: true, font: null, colors: [], tints: {} };   // brand assets
@@ -458,53 +584,90 @@ const ghostEdge = new THREE.LineBasicMaterial({ color: 0x9cc4ff, transparent: tr
 
 function dispose(o) { o.traverse((m) => { if (m.geometry) m.geometry.dispose(); const ms = m.userData.orig ? [m.userData.orig] : [m.material]; ms.flat().forEach((mt) => { if (mt && mt !== ghost && mt !== ghostEdge) { mt.map && mt.map.dispose(); mt.dispose(); } }); }); }
 
+function makeTex(E) {
+  return { enc: makeSkin(E.skin), cup: makeSkin(E.skinCup), base: makeSkin(E.skinBase), beer: E.refBeer && E.beerLabel ? makeBeerLabel(REFS.find((r) => r.id === E.refBeer), E.beerType) : null };
+}
+function baseScale(E) { // the sled grows (never shrinks below its design) to carry the enclosure on ice
+  const b = D.byId(D.BASES, E.base), e = D.byId(D.ENCLOSURES, E.enc);
+  const need = Math.max((e.outer[0] * E.encP.width + 1) / b.footprint[0], (e.outer[1] * E.encP.depth + 1) / b.footprint[1]);
+  return { s: Math.min(1.6, Math.max(E.baseP.footprint, need)), auto: need > E.baseP.footprint + 1e-6 };
+}
+function makeSectionParts(E, tex) {
+  const o = { ...E, makeLabel, skinTexture: tex.enc, skinTextureCup: tex.cup, skinTextureBase: tex.base }, M = D.makeMaterials(o), out = {};
+  const bs = baseScale(E); out.baseAuto = bs;
+  out.base = D.byId(D.BASES, E.base).build(M, o); out.base.scale.set(bs.s, 1, bs.s); D.setLeds(out.base, E.baseP.led !== false);
+  out.enc = D.byId(D.ENCLOSURES, E.enc).build(M, o); out.enc.scale.set(E.encP.width, 1, E.encP.depth); D.setLeds(out.enc, E.encP.led !== false);
+  out.fridge = D.buildFridge(M);
+  out.cupGroup = new THREE.Group(); out.cup = D.byId(D.CUPS, E.cup).build(M, o); D.shapeCup(out.cup, E.cupP); out.cupGroup.add(out.cup);
+  out.contents = D.buildContents(M, out.cup.userData.bowl, { o, beer: { type: E.beerType, profile: E.beerProfile, labelTexture: tex.beer }, arrangement: E.cupP.arrangement, tilt: E.cupP.tilt, heap: E.cupP.heap });
+  out.cupGroup.add(out.contents);
+  return out;
+}
+let texList = [];
+const sectionObj = (sec, p = parts) => (sec === 'cup' ? p.cupGroup : sec === 'enc' ? p.enc : p.base);
 function build() {
   commitLook();
   if (root) { scene.remove(root); dispose(root); }
+  for (const t of texList) if (t) t.dispose(); texList = [];
   root = new THREE.Group(); scene.add(root);
-  for (const t of [skinTex, skinTexCup, skinTexBase, beerTex]) if (t) t.dispose();
-  skinTex = makeSkin(S.skin); skinTexCup = makeSkin(S.skinCup); skinTexBase = makeSkin(S.skinBase); beerTex = S.refBeer && S.beerLabel ? makeBeerLabel(REFS.find((r) => r.id === S.refBeer), S.beerType) : null;
-  const o = { ...S, makeLabel, skinTexture: skinTex, skinTextureCup: skinTexCup, skinTextureBase: skinTexBase };
-  const M = D.makeMaterials(o);
-  const base = D.byId(D.BASES, S.base), enc = D.byId(D.ENCLOSURES, S.enc), cup = D.byId(D.CUPS, S.cup);
-  parts.base = base.build(M, o); parts.enc = enc.build(M, o); parts.fridge = D.buildFridge(M);
-  parts.cupGroup = new THREE.Group(); parts.cup = cup.build(M, o); parts.cupGroup.add(parts.cup);
-  parts.contents = D.buildContents(M, parts.cup.userData.bowl, { o, beer: { type: S.beerType, profile: S.beerProfile, labelTexture: beerTex } }); parts.cupGroup.add(parts.contents);
+  if (S.previewIter && !findIter(S.previewIter)[1]) S.previewIter = null;
+  const E = effState(), tex = makeTex(E); texList.push(...Object.values(tex));
+  Object.assign(parts, makeSectionParts(E, tex)); parts.E = E;
   root.add(parts.base, parts.fridge, parts.enc, parts.cupGroup);
-  parts.enc.traverse((m) => { if (m.isMesh) { m.userData.orig = m.material; } });
-  parts.meta = { base, enc, cup };
+  parts.enc.traverse((m) => { if (m.isMesh) m.userData.orig = m.material; });
+  parts.meta = { base: D.byId(D.BASES, E.base), enc: D.byId(D.ENCLOSURES, E.enc), cup: D.byId(D.CUPS, E.cup) };
+  parts.compare = null;
+  if (S.compareIter) { // side-by-side: the applied section on the left, the iteration on the right
+    const [sec, it] = findIter(S.compareIter);
+    if (it && sec === S.sel) {
+      const E2 = { ...S, ...clone(it.snap) }, t2 = makeTex(E2); texList.push(...Object.values(t2));
+      const p2 = makeSectionParts(E2, t2), g = new THREE.Group();
+      if (sec === 'cup') { p2.cupGroup.position.y = D.CUP_Y; g.add(p2.cupGroup); } else if (sec === 'enc') g.add(p2.enc, p2.fridge); else g.add(p2.base);
+      for (const k of ['base', 'enc', 'fridge', 'cupGroup']) if (!g.children.includes(p2[k])) dispose(p2[k]);
+      parts.compare = g; root.add(g);
+    } else S.compareIter = null;
+  }
+  parts.highlight = new THREE.Box3Helper(new THREE.Box3(), 0x4d7dff);
+  Object.assign(parts.highlight.material, { depthTest: false, transparent: true, opacity: 0.7 }); parts.highlight.renderOrder = 10; root.add(parts.highlight);
   applyView(); specs(); syncUI();
-  const w = parts.cup.userData.warn; $('cup-warn').style.display = w ? 'block' : 'none'; $('cup-warn').textContent = w || '';
+  const warns = [parts.cup.userData.warn, ...D.checkCup(parts.cup.userData.bowl, parts.contents)].filter(Boolean);
+  $('cup-warn').style.display = warns.length ? 'block' : 'none'; $('cup-warn').textContent = warns.join(' ');
   saveSoon();
 }
 function applyView() {
   if (!root) return;
   parts.enc.traverse((m) => { if (m.isMesh) { m.material = S.xray ? ghost : m.userData.orig; m.castShadow = !S.xray; } });
   ice.material.map = S.rink ? iceTex.on : iceTex.off;
-  const V = S.vis, only = S.isolate ? S.sel : null;
-  parts.cupGroup.visible = true;
+  const V = S.vis, only = S.isolate || parts.compare ? S.sel : null;
   parts.cup.visible = only ? only === 'cup' : V.cup;
-  parts.contents.visible = (only ? only === 'cup' || only === 'beer' : true) && S.contents && V.contents;
+  parts.contents.visible = (only ? only === 'cup' : true) && S.contents && V.contents;
   parts.enc.visible = only ? only === 'enc' : V.enc;
   parts.fridge.visible = only ? only === 'enc' && V.fridge : V.fridge;
   parts.base.visible = only ? only === 'base' : V.base;
   parts.enc.userData.setDoor && parts.enc.userData.setDoor(S.door);
-  parts.enc.position.y = S.explode * 40;
-  parts.cupGroup.position.y = D.CUP_Y + S.explode * 64;
-  parts.base.position.y = 0;
+  const ex = only ? 0 : S.explode;
+  parts.enc.position.y = ex * 40;
+  parts.cupGroup.position.y = D.CUP_Y + ex * 64;
+  root.updateMatrixWorld(true);
+  const box = new THREE.Box3().setFromObject(sectionObj(S.sel)), size = box.getSize(new THREE.Vector3());
+  if (parts.compare) parts.compare.position.set(size.x + 16, 0, 0);
+  parts.highlight.box.copy(box.expandByScalar(1.2)); parts.highlight.visible = !only;
 }
 
 // ---------- specs ----------
 const ftin = (i) => { const f = Math.floor(i / 12), r = Math.round(i - f * 12); return r === 12 ? `${f + 1}′0″` : `${f}′${r}″`; };
 function specs() {
-  const { base, enc, cup } = parts.meta, bowl = parts.cup.userData.bowl;
+  const E = parts.E, m = parts.meta, bowl = parts.cup.userData.bowl, bs = parts.baseAuto.s;
+  const base = { ...m.base, lb: Math.round(m.base.lb * bs * bs), footprint: m.base.footprint.map((v) => Math.round(v * bs)) };
+  const enc = { ...m.enc, lb: Math.round(m.enc.lb * E.encP.width * E.encP.depth) }, cup = { ...m.cup, lb: Math.round(m.cup.lb * E.cupP.width * E.cupP.width * E.cupP.height) };
   const top = D.CUP_Y + Math.max(bowl.rim, parts.contents.userData.top || 0);
-  const bt = D.BEERS.find((b) => b.id === S.beerType) || D.BEERS[0], beer = D.BEER.count * bt.lbEach, iceLb = bowl.iceLb + 6, fr = D.FRIDGE.weight;
+  const bt = D.BEERS.find((b) => b.id === E.beerType) || D.BEERS[0], beer = D.BEER.count * bt.lbEach, iceLb = Math.round((bowl.iceLb + 6) * E.cupP.width * E.cupP.width * (0.8 + E.cupP.heap * 0.2)), fr = D.FRIDGE.weight;
   const total = base.lb + enc.lb + cup.lb + fr + beer + iceLb;
   $('s-h').textContent = `${ftin(top)}`;
   $('s-f').textContent = `${base.footprint[0]}″ × ${base.footprint[1]}″`;
   $('s-w').textContent = `≈ ${Math.round(total)} lb`;
-  const c = enc.clear; $('s-c').textContent = `${c.side} / ${c.back} / ${c.front} / ${c.top}″`;
+  const c = enc.clear, gx = (m.enc.outer[0] * (E.encP.width - 1)) / 2, gz = (m.enc.outer[1] * (E.encP.depth - 1)) / 2;
+  $('s-c').textContent = `${(c.side + gx).toFixed(1)} / ${(c.back + gz).toFixed(1)} / ${(c.front + gz).toFixed(1)} / ${c.top}″`;
   $('wt').innerHTML = [
     ['01 · ' + base.name + ' (UHMW + frame)', base.lb], ['02 · ' + enc.name + ' sleeve', enc.lb], ['03 · ' + cup.name + ' (empty)', cup.lb],
     ['Meling DW-XL90 (listed gross wt)', fr], ['12 × ' + bt.name.replace('★ ', ''), beer], ['Ice (est.)', iceLb],
@@ -527,54 +690,66 @@ function specs() {
 }
 
 // ---------- UI ----------
-const MODS = { beer: { n: '04', label: 'Bottles · 12 on ice', list: D.BEERS.map((b) => ({ ...b, lb: Math.round(b.lbEach * 12) })), key: 'beerType', ref: 'refBeer' }, cup: { n: '03', label: 'Cup · beer cooler', list: D.CUPS, key: 'cup', ref: 'refCup', skin: 'skinCup' }, enc: { n: '02', label: 'Enclosure · freezer sleeve', list: D.ENCLOSURES, key: 'enc', ref: 'refEnc', skin: 'skin' }, base: { n: '01', label: 'Sliding base · UHMW', list: D.BASES, key: 'base', ref: 'refBase', skin: 'skinBase' } };
+// Three independently designed sections. Each concept keeps, per section: its references,
+// its applied design, its prompt and its iteration history.
+const SECTIONS = ['base', 'enc', 'cup'];
+const MODS = {
+  cup: { n: '03', label: 'Cup', long: 'Cup · bowl, rim, finish, bottles + ice', list: D.CUPS, key: 'cup', ref: 'refCup', skin: 'skinCup', P: 'cupP', fin: 'cupFinish' },
+  enc: { n: '02', label: 'Enclosure', long: 'Enclosure · freezer sleeve + branding', list: D.ENCLOSURES, key: 'enc', ref: 'refEnc', skin: 'skin', P: 'encP', fin: 'encFinish' },
+  base: { n: '01', label: 'Sliding base', long: 'Sliding base · UHMW rink sled', list: D.BASES, key: 'base', ref: 'refBase', skin: 'skinBase', P: 'baseP', fin: 'baseFinish' },
+};
+const SECTION_KEYS = {
+  cup: ['cup', 'cupP', 'cupFinish', 'skinCup', 'cupProfile', 'profileSrc', 'facets', 'refCup', 'beerType', 'beerLabel', 'beerProfile', 'refBeer'],
+  enc: ['enc', 'encP', 'encFinish', 'skin', 'palette', 'paletteSrc', 'paletteRef', 'refEnc'],
+  base: ['base', 'baseP', 'baseFinish', 'skinBase', 'refBase'],
+};
+const PARAM_LABELS = { width: 'Width', height: 'Height', flare: 'Rim flare', neck: 'Stem height', tilt: 'Bottle lean', heap: 'Ice heap above rim', depth: 'Depth', tile: 'Mosaic tile size', footprint: 'Footprint' };
+const FIN_LABELS = { concept: 'Concept default', chrome: 'Mirror chrome', gold: 'Polished gold', satin: 'Satin metal', lacquer: 'Primary lacquer', white: 'Gloss white', iridescent: 'Iridescent' };
+const EL_NAMES = { cup: 'Cup', enc: 'Enclosure', base: 'Base', beer: 'Bottles' };
+const clone = (o) => JSON.parse(JSON.stringify(o ?? null));
+const snapSection = (sec, src = S) => clone(Object.fromEntries(SECTION_KEYS[sec].map((k) => [k, src[k] ?? null])));
+const sameSnap = (a, b) => JSON.stringify(a) === JSON.stringify(b);
+const secRefs = (sec, cid = S.preset) => C[cid].secRefs[sec];
+const iters = (sec = S.sel, cid = S.preset) => C[cid].iters[sec];
+const conceptName = (id = S.preset) => D.byId(D.PRESETS, id).name.replace(' · ', ' ');
+function findIter(id) { for (const sec of SECTIONS) { const it = iters(sec).find((x) => x.id === id); if (it) return [sec, it]; } return [null, null]; }
+function effState() { if (!S.previewIter) return S; const [, it] = findIter(S.previewIter); return it ? { ...S, ...clone(it.snap) } : S; }
 function toast(msg) { const t = $('toast'); t.textContent = msg; t.classList.add('show'); clearTimeout(toast.t); toast.t = setTimeout(() => t.classList.remove('show'), 2600); }
-function markCustom() { /* edits now belong to the active concept (see C) */ }
+function markCustom() { /* edits belong to the active concept (see C) */ }
 async function switchConcept(id) {
-  commitLook(); S.preset = id; Object.assign(S, pickLook(C[id])); build(); renderThumbs(); saveSoon();
+  commitLook(); S.preset = id; S.previewIter = S.compareIter = null; Object.assign(S, pickLook(C[id])); build(); renderThumbs(); saveSoon();
   if (await ensurePinsLoaded(id)) build();
 }
 function renderPresets() {
   $('presets').innerHTML = D.PRESETS.map((p) => {
-    const metal = p.metal === 'gold' ? '#d9b45b' : '#dfe4ea';
-    const c = C[p.id], n = c.pins.length, cm = c.metal === 'gold' ? '#d9b45b' : '#dfe4ea';
-    return `<div class="layer ${S.preset === p.id ? 'selected' : ''}"><button class="select" data-id="${p.id}"><span class="sw" style="background:linear-gradient(135deg,${c.primary} 0 45%,${c.accent} 45% 72%,${cm} 72%)"></span>${p.name.replace(' · ', ' ')}${isEdited(p.id) ? '<i class="edot" title="Edited"></i>' : ''}<small>${n ? `<span class="rc">${n} ref${n > 1 ? 's' : ''}</span>` : D.byId(D.CUPS, c.cup).name}</small></button></div>`;
+    const c = C[p.id], n = c.pins.length, cm = c.metal === 'gold' ? '#d9b45b' : '#dfe4ea', it = SECTIONS.reduce((a, s) => a + c.iters[s].length, 0);
+    return `<div class="layer ${S.preset === p.id ? 'selected' : ''}"><button class="select" data-id="${p.id}"><span class="sw" style="background:linear-gradient(135deg,${c.primary} 0 45%,${c.accent} 45% 72%,${cm} 72%)"></span>${p.name.replace(' · ', ' ')}${isEdited(p.id) ? '<i class="edot" title="Edited"></i>' : ''}<small>${n || it ? `<span class="rc">${n} ref${n === 1 ? '' : 's'} · ${it} it.</span>` : D.byId(D.CUPS, c.cup).name}</small></button></div>`;
   }).join('');
 }
-$('presets').onclick = (e) => { const b = e.target.closest('[data-id]'); if (!b || b.dataset.id === S.preset) return; const p = D.byId(D.PRESETS, b.dataset.id); switchConcept(p.id); toast(`${p.name} · ${C[p.id].pins.length} pinned reference${C[p.id].pins.length === 1 ? '' : 's'}`); };
+$('presets').onclick = (e) => { const b = e.target.closest('[data-id]'); if (!b || b.dataset.id === S.preset) return; switchConcept(b.dataset.id); toast(`${conceptName(b.dataset.id)} restored · references + iterations`); };
+
+// ---------- scene objects ----------
 function renderLayers() {
-  const V = S.vis, row = (id, name, sub, eyeKey, selKey, cls = '') =>
-    `<div class="layer ${cls} ${S.sel === selKey && (!cls || selKey === 'beer') ? 'selected' : ''}"><button class="select" data-sel="${selKey}">${cls ? '↳ ' : `<span class="num">${MODS[selKey].n}</span>`}${name}${sub ? `<small>${sub}</small>` : ''}</button><button class="eye ${V[eyeKey] ? '' : 'off'}" data-eye="${eyeKey}" aria-label="Toggle ${name}">◉</button></div>`;
+  const V = S.vis, row = (name, sub, eyeKey, selKey, cls = '') =>
+    `<div class="layer ${cls} ${S.sel === selKey && !cls ? 'selected' : ''}"><button class="select" data-sel="${selKey}">${cls ? '↳ ' : `<span class="num">${MODS[selKey].n}</span>`}${name}${sub ? `<small>${sub}</small>` : ''}</button><button class="eye ${V[eyeKey] ? '' : 'off'}" data-eye="${eyeKey}" aria-label="Toggle ${name}">◉</button></div>`;
   const m = parts.meta;
   $('layers').innerHTML =
-    row('cup', 'Cup', m.cup.name, 'cup', 'cup') + row('', '12 bottles + ice', D.BEERS.find((b) => b.id === S.beerType).name.replace('★ ', ''), 'contents', 'beer', 'sub') +
-    row('enc', 'Enclosure', m.enc.name, 'enc', 'enc') + row('', 'Freezer · Meling DW-XL90', '', 'fridge', 'enc', 'sub') +
-    row('base', 'Sliding base', m.base.name, 'base', 'base');
+    row('Cup', m.cup.name, 'cup', 'cup') + row('12 bottles + ice', D.BEERS.find((b) => b.id === parts.E.beerType).name.replace('★ ', ''), 'contents', 'cup', 'sub') +
+    row('Enclosure', m.enc.name, 'enc', 'enc') + row('Freezer · Meling DW-XL90', '', 'fridge', 'enc', 'sub') +
+    row('Sliding base', m.base.name, 'base', 'base');
   $('isolate').textContent = S.isolate ? 'Show all objects' : 'Isolate selected';
   $('isolate').classList.toggle('active', S.isolate);
 }
+function selectSection(sec, scroll) { if (S.sel === sec) { if (scroll) $('workshop').scrollIntoView({ behavior: 'smooth', block: 'start' }); return; } S.sel = sec; S.compareIter = null; if (parts.compare) build(); else { applyView(); renderLayers(); renderWorkshop(); syncSkin(); renderChips(); renderThumbs(); } if (scroll) $('workshop').scrollIntoView({ behavior: 'smooth', block: 'start' }); }
 $('layers').onclick = (e) => {
   const eye = e.target.closest('[data-eye]'); if (eye) { const k = eye.dataset.eye; S.vis[k] = !S.vis[k]; if (k === 'contents') S.contents = S.vis.contents; applyView(); renderLayers(); syncToggles(); return; }
-  const s = e.target.closest('[data-sel]'); if (s) { S.sel = s.dataset.sel; applyView(); renderLayers(); renderModule(); }
+  const s = e.target.closest('[data-sel]'); if (s) selectSection(s.dataset.sel, true);
 };
-$('isolate').onclick = () => { S.isolate = !S.isolate; applyView(); renderLayers(); };
-function renderModule() {
-  const md = MODS[S.sel];
-  $('mod-title').textContent = `${md.n} · ${md.label}`;
-  $('variants').innerHTML = md.list.map((v) => `<button class="variant ${S[md.key] === v.id ? 'active' : ''}" data-v="${v.id}">${v.name}<small>≈ ${v.lb} lb</small></button>`).join('');
-  $('v-blurb').textContent = D.byId(md.list, S[md.key]).blurb;
-  renderModRef();
-  $('mod-skin').style.display = md.skin ? '' : 'none';
-  $('mod-beer').style.display = S.sel === 'beer' ? '' : 'none';
-  $('mod-cup').style.display = S.sel === 'cup' ? '' : 'none';
-  $('mod-enc').style.display = S.sel === 'enc' ? '' : 'none';
-  $('mod-base').style.display = S.sel === 'base' ? '' : 'none';
-}
-$('variants').onclick = (e) => { const b = e.target.closest('[data-v]'); if (!b) return; S[MODS[S.sel].key] = b.dataset.v; markCustom(); build(); };
-// ---- per-element reference (cup · enclosure · base · bottles) ----
-const EL_NAMES = { cup: 'Cup', enc: 'Enclosure', base: 'Base', beer: 'Bottles' };
+$('isolate').onclick = () => { S.isolate = !S.isolate; applyView(); renderLayers(); renderChips(); };
+
+// ---------- references per section ----------
 const EL_OPTS = {
-  cup: [['shape', 'Shape from its silhouette', (r) => !!r.profile], ['skin', 'Wrap it on the cup as a skin']],
+  cup: [['shape', 'Shape the cup from its silhouette', (r) => !!r.profile], ['skin', 'Wrap it on the cup as a skin']],
   enc: [['skin', 'Wrap it on the enclosure as a skin'], ['palette', 'Use its colors for glass + LEDs']],
   base: [['skin', 'Wrap it on the base as a skin']],
   beer: [['label', 'Use it as the bottle label art'], ['shape', 'Bottle shape from its silhouette', (r) => !!r.beerProfile]],
@@ -586,53 +761,432 @@ function optOn(el, k, id) {
   if (k === 'label') return S.beerLabel && S.refBeer === id;
 }
 function setOpt(el, k, id, on) {
-  const r = REFS.find((x) => x.id === id), p = D.byId(D.PRESETS, S.preset), dflt = lookDefaults(p);
+  const r = REFS.find((x) => x.id === id), dflt = lookDefaults(D.byId(D.PRESETS, S.preset));
+  if (!r && on) return;
   if (k === 'skin') S[MODS[el].skin] = on ? id : 'default';
   if (k === 'palette') { if (on) { S.palette = r.palette; S.paletteSrc = 'Ref · ' + refLabel(r); S.paletteRef = id; } else if (S.paletteRef === id) { S.palette = null; S.paletteSrc = null; S.paletteRef = null; } }
   if (k === 'shape' && el === 'cup') { if (on && r.profile) { S.cup = 'custom'; S.cupProfile = r.profile.pts; S.profileSrc = id; if (!S.facets && r.facets) S.facets = r.facets; } else if (S.profileSrc === id) { S.cup = dflt.cup === 'custom' ? 'champion' : dflt.cup; S.cupProfile = null; S.profileSrc = null; } }
   if (k === 'shape' && el === 'beer') { if (on && r.beerProfile) { S.beerType = 'custom'; S.beerProfile = r.beerProfile; } else { if (S.beerType === 'custom') S.beerType = 'longneck'; S.beerProfile = null; } }
   if (k === 'label') S.beerLabel = on;
 }
-function assignRef(el, id) { // pick (or clear) the reference for an element, with sensible defaults
+function assignRef(el, id) { // set the section's primary reference (drives skin / shape / palette)
   const key = MODS[el].ref, prev = S[key];
   if (prev) for (const [k] of EL_OPTS[el]) if (optOn(el, k, prev)) setOpt(el, k, prev, false);
-  S[key] = id || null;
-  if (id) { const r = REFS.find((x) => x.id === id);
-    if (el === 'cup') setOpt(el, r.profile ? 'shape' : 'skin', id, true);
-    if (el === 'enc' || el === 'base') setOpt(el, 'skin', id, true);
-    if (el === 'beer') setOpt(el, 'label', id, true); }
+  S[key] = id || null;   // effects (shape / skin / palette) are opt-in toggles, so assigning never redesigns a section
 }
-function renderModRef() {
-  const el = S.sel, md = MODS[el], cur = S[md.ref], refs = pinnedRefs();
-  $('mref-badge').textContent = cur ? refLabel(REFS.find((r) => r.id === cur) || { name: '…' }) : 'none';
-  $('mref-thumbs').innerHTML = `<button class="none ${cur ? '' : 'on'}" data-ref="">None</button>` + refs.map((r) => `<button class="${cur === r.id ? 'on' : ''}" data-ref="${r.id}" title="${refLabel(r)}"><img src="${r.thumb}" alt=""></button>`).join('');
-  const rr = cur && REFS.find((r) => r.id === cur);
-  $('mref-opts').innerHTML = rr ? EL_OPTS[el].filter(([, , ok]) => !ok || ok(rr)).map(([k, label]) => `<label class="toggle-row"><input type="checkbox" data-opt="${k}" ${optOn(el, k, cur) ? 'checked' : ''}>${label}</label>`).join('') : '';
-  $('mref-hint').textContent = refs.length ? (rr ? '' : `Pick one of ${D.byId(D.PRESETS, S.preset).name.replace(' · ', ' ')}'s pinned references to inform the ${EL_NAMES[el].toLowerCase()}.`) : `Pin references for this concept in Inputs → Design references, then pick one here for the ${EL_NAMES[el].toLowerCase()}.`;
+function assignToSection(sec, id) {
+  const list = secRefs(sec); if (!list.includes(id)) list.push(id);
+  pinRef(id); if (!S[MODS[sec].ref]) assignRef(sec, id);
 }
-$('mref-thumbs').onclick = (e) => { const b = e.target.closest('[data-ref]'); if (!b) return; assignRef(S.sel, b.dataset.ref); build(); };
-$('mref-opts').onchange = (e) => { const c = e.target.closest('[data-opt]'); if (!c) return; setOpt(S.sel, c.dataset.opt, S[MODS[S.sel].ref], c.checked); build(); };
-$('metal').onclick = (e) => { const b = e.target.closest('button'); if (!b) return; S.metal = b.dataset.v; markCustom(); build(); };
-let colorT; for (const k of ['primary', 'accent']) $(k).oninput = (e) => { S[k] = e.target.value; $(k + '-v').textContent = S[k]; markCustom(); clearTimeout(colorT); colorT = setTimeout(build, 120); };
+function removeFromSection(sec, id) {
+  const c = C[S.preset]; c.secRefs[sec] = c.secRefs[sec].filter((x) => x !== id);
+  if (S[MODS[sec].ref] === id) assignRef(sec, c.secRefs[sec][0] || null);
+  if (sec === 'cup' && S.refBeer === id) { S.refBeer = null; S.beerLabel = false; if (S.beerType === 'custom') { S.beerType = 'longneck'; S.beerProfile = null; } }
+}
+
+// ---------- workshop ----------
+function renderWorkshop() {
+  const sec = S.sel, md = MODS[sec], v = D.byId(md.list, S[md.key]);
+  document.querySelectorAll('#ws-tabs button').forEach((b) => b.classList.toggle('active', b.dataset.sec === sec));
+  $('ws-concept').textContent = conceptName();
+  $('ws-title').textContent = `${md.n} · ${md.label}`;
+  $('ws-sub').textContent = `${md.long} — ${v.name}`;
+  $('ws-isolate').classList.toggle('active', S.isolate);
+  // references
+  const refs = secRefs(sec).map((id) => REFS.find((r) => r.id === id)).filter(Boolean), prim = S[md.ref];
+  $('ws-refcount').textContent = refs.length ? `${refs.length} assigned` : 'none';
+  $('ws-refs').innerHTML = refs.map((r) => `<button class="${prim === r.id ? 'on' : ''}" data-ref="${r.id}" title="${refLabel(r)}${prim === r.id ? ' · primary' : ' · click to make primary'}"><img src="${r.thumb}" alt="">${prim === r.id ? '<span class="star">★</span>' : ''}<span class="rm" data-rm="${r.id}" title="Remove from this section">×</span></button>`).join('')
+    + (secRefs(sec).length > refs.length ? `<p class="muted">Loading ${secRefs(sec).length - refs.length}…</p>` : '');
+  const pr = prim && REFS.find((r) => r.id === prim);
+  $('ws-refopts').innerHTML = pr ? EL_OPTS[sec].filter(([, , ok]) => !ok || ok(pr)).map(([k, label]) => `<label class="toggle-row"><input type="checkbox" data-opt="${k}" ${optOn(sec, k, prim) ? 'checked' : ''}>${label}</label>`).join('') : '';
+  $('ws-refhint').textContent = refs.length ? 'The primary reference drives the options above; all of this section’s references are sent to a vision model when enabled.' : `No references yet. Choose slides from the treatment (or import images) for the ${md.label.toLowerCase()} of ${conceptName()}.`;
+  // prompt + engine
+  if (document.activeElement !== $('ws-prompt')) $('ws-prompt').value = C[S.preset].prompts[sec] || '';
+  $('ws-prompt').placeholder = { cup: 'e.g. Taller bowl with a flared rim, gold finish, bottles in a bouquet, more ice heaped above the rim', enc: 'e.g. Wider sleeve with finer stained-glass tiles and the LEDs off', base: 'e.g. Bigger round puck footprint with a glowing underside' }[sec];
+  $('ws-engine-badge').textContent = engineLabel(true);
+  $('ws-generate').textContent = `Generate ${md.label.toLowerCase()} iteration`;
+  renderIters(); renderParams();
+  // variants
+  $('variants').innerHTML = md.list.map((x) => `<button class="variant ${S[md.key] === x.id ? 'active' : ''}" data-v="${x.id}">${x.name}<small>≈ ${x.lb} lb</small></button>`).join('');
+  $('v-blurb').textContent = v.blurb;
+  $('mod-cup').style.display = sec === 'cup' ? '' : 'none';
+  $('mod-enc').style.display = sec === 'enc' ? '' : 'none';
+  $('mod-base').style.display = sec === 'base' ? '' : 'none';
+  if (sec === 'cup') renderBottles();
+  if (sec === 'base' && parts.baseAuto) $('base-note').textContent = `Ice contact is always UHMW-PE. The deck stays at 3″.${parts.baseAuto.auto ? ` Footprint auto-enlarged to ×${parts.baseAuto.s.toFixed(2)} to carry this enclosure.` : ''}`;
+}
+function renderParams() {
+  const sec = S.sel, md = MODS[sec], P = S[md.P], ranges = D.SECTION_PARAMS[sec];
+  let h = `<div class="input-row"><label>Finish</label><select data-fin>${D.FINISHES.map((f) => `<option value="${f}" ${S[md.fin] === f ? 'selected' : ''}>${FIN_LABELS[f]}</option>`).join('')}</select></div>`;
+  if (sec === 'cup') h += `<div class="input-row"><label>Bottle arrangement</label><select data-arr>${D.ARRANGEMENTS.map((a) => `<option value="${a}" ${P.arrangement === a ? 'selected' : ''}>${{ ring: 'Single ring of 12', double: 'Double ring · 8 + 4 raised', bouquet: 'Staggered bouquet' }[a]}</option>`).join('')}</select></div>`;
+  if (sec !== 'cup') h += `<label class="toggle-row"><input type="checkbox" data-led ${P.led !== false ? 'checked' : ''}>LED accents on</label>`;
+  for (const [k, [lo, hi]] of Object.entries(ranges)) {
+    const val = P[k], fmt = k === 'tilt' ? Math.round(val * 57.3) + '°' : k === 'heap' ? val.toFixed(1) + '″' : k === 'flare' ? (val >= 0 ? '+' : '') + Math.round(val * 100) + '%' : '×' + val.toFixed(2);
+    h += `<div class="pslider"><div class="slider-head"><label>${PARAM_LABELS[k]}</label><output>${fmt}</output></div><input class="range" type="range" data-p="${k}" min="${lo}" max="${hi}" step="0.01" value="${val}"></div>`;
+  }
+  $('ws-params').innerHTML = h;
+}
+let paramT;
+$('ws-params').oninput = (e) => {
+  const md = MODS[S.sel], t = e.target;
+  if (t.dataset.p) { S[md.P][t.dataset.p] = +t.value; const k = t.dataset.p, v = +t.value; t.previousElementSibling.querySelector('output').textContent = k === 'tilt' ? Math.round(v * 57.3) + '°' : k === 'heap' ? v.toFixed(1) + '″' : k === 'flare' ? (v >= 0 ? '+' : '') + Math.round(v * 100) + '%' : '×' + v.toFixed(2); clearTimeout(paramT); paramT = setTimeout(build, 140); }
+};
+$('ws-params').onchange = (e) => {
+  const md = MODS[S.sel], t = e.target;
+  if (t.dataset.fin !== undefined) { S[md.fin] = t.value; build(); }
+  if (t.dataset.arr !== undefined) { S.cupP.arrangement = t.value; build(); }
+  if (t.dataset.led !== undefined) { S[md.P].led = t.checked; build(); }
+};
+function renderBottles() {
+  $('beer-type').innerHTML = D.BEERS.map((b) => `<option value="${b.id}" ${S.beerType === b.id ? 'selected' : ''}>${b.name}</option>`).join('');
+  const refs = secRefs('cup').map((id) => REFS.find((r) => r.id === id)).filter(Boolean);
+  $('beer-label').innerHTML = `<option value="">Brand label (logo / label text)</option>` + refs.map((r) => `<option value="${r.id}" ${S.beerLabel && S.refBeer === r.id ? 'selected' : ''}>Ref · ${refLabel(r)}</option>`).join('');
+  const lr = S.beerLabel && S.refBeer && REFS.find((r) => r.id === S.refBeer);
+  $('beer-shape-row').style.display = lr && lr.beerProfile ? '' : 'none'; $('beer-shape').checked = S.beerType === 'custom';
+}
+$('beer-type').onchange = (e) => { S.beerType = e.target.value; build(); };
+$('beer-label').onchange = (e) => { const id = e.target.value; if (!id) { S.beerLabel = false; if (S.beerType === 'custom') { S.beerType = 'longneck'; S.beerProfile = null; } } else { S.refBeer = id; S.beerLabel = true; } build(); };
+$('beer-shape').onchange = (e) => { setOpt('beer', 'shape', S.refBeer, e.target.checked); build(); };
+$('ws-tabs').onclick = (e) => { const b = e.target.closest('[data-sec]'); if (b) selectSection(b.dataset.sec); };
+$('ws-isolate').onclick = () => { S.isolate = !S.isolate; applyView(); renderLayers(); renderWorkshop(); renderChips(); goCam(S.isolate ? S.sel === 'cup' ? 'bottles' : 'hero' : 'hero'); if (S.isolate) setTimeout(() => $('fit').click(), 60); };
+$('ws-assembled').onclick = () => { S.isolate = false; S.previewIter = null; S.compareIter = null; build(); goCam('hero'); };
+$('ws-refs').onclick = (e) => {
+  const rm = e.target.closest('[data-rm]'); if (rm) { e.stopPropagation(); removeFromSection(S.sel, rm.dataset.rm); build(); return; }
+  const b = e.target.closest('[data-ref]'); if (b && S[MODS[S.sel].ref] !== b.dataset.ref) { assignRef(S.sel, b.dataset.ref); build(); }
+};
+$('ws-refopts').onchange = (e) => { const c = e.target.closest('[data-opt]'); if (!c) return; setOpt(S.sel, c.dataset.opt, S[MODS[S.sel].ref], c.checked); build(); };
+$('ws-prompt').oninput = (e) => { C[S.preset].prompts[S.sel] = e.target.value; saveSoon(); };
+$('variants').onclick = (e) => { const b = e.target.closest('[data-v]'); if (!b) return; S[MODS[S.sel].key] = b.dataset.v; if (S.sel === 'cup' && b.dataset.v !== 'custom') { S.profileSrc = null; } build(); };
+
+// ---------- iterations: review · name · compare · save · restore · apply ----------
+function renderIters() {
+  const sec = S.sel, list = iters(sec), cur = snapSection(sec);
+  $('ws-itcount').textContent = list.length ? `${list.length} saved` : 'none yet';
+  $('ws-iters').innerHTML = list.length ? list.slice().reverse().map((it) => {
+    const applied = sameSnap(it.snap, cur), pv = S.previewIter === it.id, cmp = S.compareIter === it.id, d = new Date(it.created);
+    return `<div class="iter ${applied ? 'applied' : ''}" data-it="${it.id}">
+      <img src="${it.thumb || ''}" alt="">
+      <div><input value="${(it.name || '').replace(/"/g, '&quot;')}" data-name aria-label="Iteration name">
+        <div class="im">${it.engine}${applied ? '<span class="tag">applied</span>' : ''}${pv ? '<span class="tag">previewing</span>' : ''} · ${d.toLocaleDateString([], { month: 'short', day: 'numeric' })} ${d.toLocaleTimeString([], { hour: 'numeric', minute: '2-digit' })}</div>
+        ${it.prompt ? `<div class="ip">“${it.prompt.replace(/</g, '&lt;')}”</div>` : ''}${it.notes ? `<div class="im" style="margin-top:2px">${it.notes.replace(/</g, '&lt;')}</div>` : ''}</div>
+      <div class="ia"><button data-a="preview" class="${pv ? 'on' : ''}">${pv ? 'Exit preview' : 'Preview'}</button><button data-a="apply">${applied ? 'Applied ✓' : 'Apply to trophy'}</button><button data-a="compare" class="${cmp ? 'on' : ''}">${cmp ? 'Exit compare' : 'Compare'}</button><button data-a="del" title="Delete">Delete</button></div></div>`;
+  }).join('') : `<p class="muted">Generate an iteration from a prompt, or tune the parameters below and press <b>Save current</b>. Each iteration only changes the ${MODS[sec].label.toLowerCase()}.</p>`;
+}
+function addIteration(sec, snap, meta) {
+  const it = { id: 'it' + Date.now().toString(36) + Math.random().toString(36).slice(2, 5), created: Date.now(), snap: clone(snap), thumb: '', ...meta };
+  const list = iters(sec); list.push(it); while (list.length > 20) list.shift();
+  return it;
+}
+function captureThumb(it) { // grab the viewport two frames after the iteration is shown
+  requestAnimationFrame(() => requestAnimationFrame(() => {
+    try { const src = renderer.domElement, c = mk(192, 128), x = c.getContext('2d'), k = Math.max(192 / src.width, 128 / src.height) * 1.35;
+      const w = 192 / k, h = 128 / k; x.fillStyle = '#111315'; x.fillRect(0, 0, 192, 128); x.drawImage(src, (src.width - w) / 2, (src.height - h) / 2, w, h, 0, 0, 192, 128);
+      it.thumb = c.toDataURL('image/jpeg', 0.72); renderIters(); saveSoon(); } catch {}
+  }));
+}
+$('ws-save').onclick = () => {
+  const sec = S.sel, n = iters(sec).length + 1, it = addIteration(sec, snapSection(sec), { name: `Manual edit ${n}`, prompt: '', engine: 'Manual parameters' });
+  renderIters(); captureThumb(it); toast(`Saved “${it.name}” for the ${MODS[sec].label.toLowerCase()}`);
+};
+$('ws-iters').onclick = (e) => {
+  const b = e.target.closest('[data-a]'), row = e.target.closest('[data-it]'); if (!b || !row) return;
+  const sec = S.sel, it = iters(sec).find((x) => x.id === row.dataset.it); if (!it) return;
+  const a = b.dataset.a;
+  if (a === 'preview') { S.previewIter = S.previewIter === it.id ? null : it.id; S.compareIter = null; }
+  if (a === 'apply') { Object.assign(S, clone(it.snap)); S.previewIter = null; S.compareIter = null; $('gen-status').textContent = `“${it.name}” is applied to the ${MODS[sec].label.toLowerCase()}. The other sections are unchanged.`; toast(`Applied “${it.name}” to the ${MODS[sec].label.toLowerCase()}`); }
+  if (a === 'compare') { S.compareIter = S.compareIter === it.id ? null : it.id; S.previewIter = null; }
+  if (a === 'del') { C[S.preset].iters[sec] = iters(sec).filter((x) => x !== it); if (S.previewIter === it.id) S.previewIter = null; if (S.compareIter === it.id) S.compareIter = null; }
+  build(); if (a === 'compare' && S.compareIter) setTimeout(() => $('fit').click(), 60);
+};
+$('ws-iters').onchange = (e) => { const inp = e.target.closest('[data-name]'), row = e.target.closest('[data-it]'); if (!inp || !row) return; const it = iters().find((x) => x.id === row.dataset.it); if (it) { it.name = inp.value.trim() || it.name; saveSoon(); renderChips(); } };
+
+// ---------- viewport chips: which section is being edited, preview + compare ----------
+function renderChips() {
+  const md = MODS[S.sel], [, pit] = S.previewIter ? findIter(S.previewIter) : [], [, cit] = S.compareIter ? findIter(S.compareIter) : [];
+  let h = `<div class="vchip"><span class="dotb"></span>Editing <b>${md.n} · ${md.label}</b> · ${conceptName()}<button class="${S.isolate ? 'active' : 'ghost'}" data-c="iso">${S.isolate ? 'Isolated' : 'Isolate'}</button><button class="ghost" data-c="asm">Assembled</button></div>`;
+  if (pit) h += `<div class="vchip pv"><span class="dotb"></span>Previewing <b>“${pit.name}”</b><button data-c="apply">Apply</button><button class="ghost" data-c="exit">Exit</button></div>`;
+  if (cit) h += `<div class="vchip"><span class="dotb"></span>Left: <b>applied design</b> · Right: <b>“${cit.name}”</b><button class="ghost" data-c="exit">Exit compare</button></div>`;
+  $('vchips').innerHTML = h;
+}
+$('vchips').onclick = (e) => {
+  const b = e.target.closest('[data-c]'); if (!b) return; const c = b.dataset.c;
+  if (c === 'iso') return $('ws-isolate').click();
+  if (c === 'asm') return $('ws-assembled').click();
+  if (c === 'apply') { const [sec, it] = findIter(S.previewIter); if (it) { Object.assign(S, clone(it.snap)); toast(`Applied “${it.name}”`); } }
+  S.previewIter = null; S.compareIter = null; build();
+};
+
+// ---------- local generation ----------
+const GEN = { engine: 'procedural', url: 'http://localhost:11434', model: '', vision: false, ok: null, models: [] };
+try { Object.assign(GEN, JSON.parse(localStorage.getItem('trophy-cooler-gen') || '{}'), { ok: null, models: [] }); } catch {}
+const saveGen = () => { try { const { engine, url, model, vision } = GEN; localStorage.setItem('trophy-cooler-gen', JSON.stringify({ engine, url, model, vision })); } catch {} };
+const ENGINE_NAMES = { procedural: 'Built-in procedural', ollama: 'Ollama', openai: 'Local OpenAI-compatible' };
+function engineLabel(short) { return GEN.engine === 'procedural' ? (short ? 'procedural · no model' : 'Built-in procedural engine (no model)') : `${short ? GEN.engine === 'ollama' ? 'ollama' : 'local llm' : ENGINE_NAMES[GEN.engine]}${GEN.model ? ' · ' + GEN.model : ''}${GEN.ok === false ? ' · offline' : ''}`; }
+function isLocalURL(u) {
+  try { const h = new URL(u).hostname.replace(/^\[|\]$/g, '');
+    return h === 'localhost' || h === '::1' || h === '0.0.0.0' || h.endsWith('.local') || /^127\./.test(h) || /^10\./.test(h) || /^192\.168\./.test(h) || /^172\.(1[6-9]|2\d|3[01])\./.test(h); } catch { return false; }
+}
+function genState(msg, bad) { $('gen-state').innerHTML = msg; $('gen-state').style.color = bad ? '#ffb4b4' : ''; }
+function renderGen() {
+  $('gen-engine').value = GEN.engine; $('gen-llm').style.display = GEN.engine === 'procedural' ? 'none' : '';
+  if (document.activeElement !== $('gen-url')) $('gen-url').value = GEN.url; $('gen-vision').checked = GEN.vision;
+  $('gen-model').innerHTML = (GEN.models.length ? GEN.models : GEN.model ? [GEN.model] : []).map((m) => `<option ${m === GEN.model ? 'selected' : ''}>${m}</option>`).join('') || '<option value="">— test connection —</option>';
+  if (GEN.engine === 'procedural') genState('Runs entirely in this page: it interprets your prompt with design rules and explores variations around the current section. No model, no network.');
+  else if (GEN.ok === null) genState(`Not tested yet. Start ${GEN.engine === 'ollama' ? 'Ollama' : 'your local server'} and press <b>Test connection</b>.`);
+  $('ws-engine-badge') && ($('ws-engine-badge').textContent = engineLabel(true));
+}
+$('gen-engine').onchange = (e) => { GEN.engine = e.target.value; if (GEN.engine === 'openai' && /11434/.test(GEN.url)) GEN.url = 'http://localhost:1234'; if (GEN.engine === 'ollama' && !/11434/.test(GEN.url)) GEN.url = 'http://localhost:11434'; GEN.ok = null; GEN.models = []; saveGen(); renderGen(); };
+$('gen-url').onchange = (e) => { GEN.url = e.target.value.trim().replace(/\/+$/, ''); GEN.ok = null; saveGen(); renderGen(); };
+$('gen-model').onchange = (e) => { GEN.model = e.target.value; saveGen(); renderGen(); };
+$('gen-vision').onchange = (e) => { GEN.vision = e.target.checked; saveGen(); };
+async function testGen() {
+  if (!isLocalURL(GEN.url)) { GEN.ok = false; genState('Only local addresses are allowed (localhost, 127.0.0.1, or your private network). Cloud endpoints are blocked by design.', true); return false; }
+  genState('Connecting…');
+  try {
+    const r = await fetch(GEN.url + (GEN.engine === 'ollama' ? '/api/tags' : '/v1/models'), { signal: AbortSignal.timeout(6000) });
+    if (!r.ok) throw new Error('HTTP ' + r.status);
+    const j = await r.json(); GEN.models = GEN.engine === 'ollama' ? (j.models || []).map((m) => m.name) : (j.data || []).map((m) => m.id);
+    if (!GEN.models.length) { GEN.ok = false; genState(GEN.engine === 'ollama' ? 'Connected, but no models are installed. Run <code>ollama pull qwen2.5:7b</code>.' : 'Connected, but no model is loaded in the local server.', true); renderGen(); return false; }
+    if (!GEN.models.includes(GEN.model)) GEN.model = GEN.models[0];
+    GEN.ok = true; saveGen(); renderGen(); genState(`● Connected to ${ENGINE_NAMES[GEN.engine]} at ${GEN.url} · ${GEN.models.length} model${GEN.models.length > 1 ? 's' : ''}. Generation stays on this computer.`); return true;
+  } catch (err) {
+    GEN.ok = false; renderGen();
+    genState(`Couldn’t reach ${GEN.url}. Is ${GEN.engine === 'ollama' ? 'Ollama' : 'the server'} running${GEN.engine === 'ollama' ? ' with <code>OLLAMA_ORIGINS</code> allowing this page' : ' with CORS enabled'}? (${String(err.message || err).slice(0, 60)})`, true); return false;
+  }
+}
+$('gen-test').onclick = testGen;
+
+// procedural engine: prompt → targeted parameter changes for ONE section (no model)
+function rng(seed) { let s = (seed >>> 0) || 1; return () => { s ^= s << 13; s >>>= 0; s ^= s >>> 17; s ^= s << 5; s >>>= 0; return s / 4294967296; }; }
+function hash(s) { let h = 2166136261; for (const ch of s) h = Math.imul(h ^ ch.charCodeAt(0), 16777619); return h >>> 0; }
+function proceduralGen(sec, prompt, cur) {
+  const p = prompt.toLowerCase(), has = (...w) => w.some((x) => p.includes(x)), notes = [], n = clone(cur), P = n[MODS[sec].P];
+  const rnd = rng(hash(prompt + iters(sec).length)), jit = (k, amt) => { const [lo, hi] = D.SECTION_PARAMS[sec][k]; P[k] = Math.min(hi, Math.max(lo, P[k] + (rnd() * 2 - 1) * amt * (hi - lo))); };
+  const bump = (k, d, label) => { const [lo, hi] = D.SECTION_PARAMS[sec][k]; P[k] = Math.min(hi, Math.max(lo, P[k] + d)); notes.push(label); };
+  const strong = has('much', 'very', 'way', 'dramatic', 'extreme') ? 1.8 : has('slightly', 'a bit', 'subtle', 'little') ? 0.5 : 1;
+  const finishWord = () => { for (const [f, ws] of Object.entries({ gold: ['gold', 'brass', 'warm metal'], chrome: ['chrome', 'mirror', 'silver'], satin: ['satin', 'brushed', 'matte metal'], white: ['white', 'porcelain'], iridescent: ['iridescent', 'pearl', 'holographic', 'opal'], lacquer: ['lacquer', 'navy', 'painted', 'colored'] })) if (has(...ws)) return f; return null; };
+  const f = finishWord(); if (f) { n[MODS[sec].fin] = f; notes.push(FIN_LABELS[f].toLowerCase() + ' finish'); }
+  const ref = S[MODS[sec].ref] && REFS.find((r) => r.id === S[MODS[sec].ref]), wantsRef = has('reference', 'like the image', 'like the slide', 'silhouette', 'from the ref');
+  if (sec === 'cup') {
+    if (has('taller', 'tall ', 'deeper', 'elongat')) bump('height', 0.12 * strong, 'taller bowl');
+    if (has('shorter', 'squat', 'shallow', 'lower')) bump('height', -0.1 * strong, 'shorter bowl');
+    if (has('wider', 'wide', 'broad', 'bigger', 'larger', 'generous')) bump('width', 0.08 * strong, 'wider bowl');
+    if (has('narrow', 'slim', 'slender', 'smaller')) bump('width', -0.07 * strong, 'slimmer bowl');
+    if (has('flare', 'flared', 'trumpet', 'open rim', 'lip')) bump('flare', 0.14 * strong, 'flared rim');
+    if (has('tulip', 'closed', 'inward', 'cinched')) bump('flare', -0.1 * strong, 'inward rim');
+    if (has('long stem', 'taller stem', 'tall stem', 'elevated', 'pedestal')) bump('neck', 0.3 * strong, 'longer stem');
+    if (has('short stem', 'no stem', 'low stem', 'stubby')) bump('neck', -0.25 * strong, 'shorter stem');
+    if (has('crowded', 'packed', 'abundant', 'overflow', 'more ice', 'heaped', 'full')) { bump('heap', 0.8 * strong, 'more ice heaped'); if (!has('ring')) { n.cupP.arrangement = 'double'; notes.push('double ring of bottles'); } }
+    if (has('less ice', 'minimal ice')) bump('heap', -0.7, 'less ice');
+    if (has('bouquet', 'stagger', 'varied', 'playful', 'dynamic')) { n.cupP.arrangement = 'bouquet'; notes.push('staggered bouquet'); }
+    if (has('single ring', 'one ring', 'tidy', 'orderly')) { n.cupP.arrangement = 'ring'; notes.push('single ring'); }
+    if (has('upright', 'straight', 'vertical')) bump('tilt', -0.08, 'bottles more upright');
+    if (has('splay', 'lean', 'fan out', 'spread')) bump('tilt', 0.08, 'bottles fanned out');
+    if (has('facet', 'crystal', 'geometric', 'angular', 'cut')) { if (n.cup !== 'custom' && n.cup !== 'chalice') { n.cup = 'chalice'; } n.facets = n.cup === 'custom' ? 10 : n.facets; notes.push('faceted'); }
+    if (has('smooth', 'soft', 'organic')) { n.facets = 0; if (n.cup === 'chalice') n.cup = 'champion'; notes.push('smooth surfaces'); }
+    for (const [id, ws] of Object.entries({ champion: ['champion', 'handles', 'classic trophy', 'loving cup'], hex: ['hex', 'hexagon'], puckstack: ['puck'], torch: ['torch', 'cone', 'flame'], chalice: ['chalice', 'goblet'] })) if (has(...ws)) { n.cup = id; notes.push(D.byId(D.CUPS, id).name); }
+    if (has('can')) { n.beerType = 'can'; notes.push('cans'); } if (has('aluminum', 'aluminium')) { n.beerType = 'alubottle'; notes.push('aluminum bottles'); }
+    if ((wantsRef || has('shape')) && ref && ref.profile) { n.cup = 'custom'; n.cupProfile = ref.profile.pts; n.profileSrc = ref.id; notes.push('shape from reference'); }
+  }
+  if (sec === 'enc') {
+    if (has('wider', 'wide', 'broad', 'bigger', 'larger', 'chunky')) bump('width', 0.08 * strong, 'wider sleeve');
+    if (has('deeper', 'deep')) bump('depth', 0.08 * strong, 'deeper sleeve');
+    if (has('slim', 'tight', 'compact', 'narrow')) { bump('width', -0.1, 'tighter sleeve'); bump('depth', -0.1, ''); }
+    if (has('bigger tiles', 'coarse', 'bold tiles', 'large tiles', 'chunkier')) bump('tile', 0.35 * strong, 'larger glass tiles');
+    if (has('finer', 'smaller tiles', 'detailed', 'intricate', 'mosaic')) bump('tile', -0.25 * strong, 'finer mosaic');
+    if (has('no led', 'leds off', 'lights off', 'no lights', 'no glow')) { n.encP.led = false; notes.push('LEDs off'); } else if (has('led', 'glow', 'light', 'neon')) { n.encP.led = true; notes.push('LED accents'); }
+    for (const [id, ws] of Object.entries({ halo: ['round', 'cylinder', 'column', 'halo'], prism: ['octagon', 'prism', 'tapered'], pucktower: ['stripe', 'jersey', 'hockey'], monolith: ['minimal', 'clean', 'monolith', 'box'], cathedral: ['stained', 'cathedral', 'church'] })) if (has(...ws)) { n.enc = id; notes.push(D.byId(D.ENCLOSURES, id).name); }
+    if ((wantsRef || has('skin', 'wrap', 'pattern')) && ref) { n.skin = ref.id; notes.push('reference skin'); }
+    if (has('reference colors', 'ref colors', 'palette') && ref) { n.palette = ref.palette; n.paletteSrc = 'Ref · ' + refLabel(ref); n.paletteRef = ref.id; notes.push('reference palette'); }
+  }
+  if (sec === 'base') {
+    if (has('bigger', 'larger', 'wider', 'stable', 'broad')) bump('footprint', 0.1 * strong, 'larger footprint');
+    if (has('compact', 'smaller', 'tight')) bump('footprint', -0.1, 'compact footprint');
+    if (has('no led', 'lights off', 'no glow')) { n.baseP.led = false; notes.push('no underglow'); } else if (has('glow', 'led', 'light', 'hover', 'float')) { n.baseP.led = true; notes.push('LED glow'); }
+    for (const [id, ws] of Object.entries({ puck: ['puck', 'round', 'disc'], ski: ['ski', 'runner'], octa: ['octagon', 'octa'], float: ['float', 'hover', 'levitat'], rink: ['sled', 'rink', 'plate'] })) if (has(...ws)) { n.base = id; notes.push(D.byId(D.BASES, id).name); }
+    if ((wantsRef || has('skin', 'wrap', 'pattern')) && ref) { n.skinBase = ref.id; notes.push('reference skin'); }
+  }
+  if (!notes.length) { for (const k of Object.keys(D.SECTION_PARAMS[sec])) jit(k, 0.12); notes.push('exploratory variation around the current design'); }
+  const words = prompt.replace(/[^\w\s'-]/g, ' ').trim().split(/\s+/).filter((w) => w.length > 2).slice(0, 4);
+  return { patch: n, name: words.length ? words.map((w) => w[0].toUpperCase() + w.slice(1)).join(' ') : 'Variation', notes: notes.filter(Boolean).join(', ') };
+}
+
+// local LLM engine (Ollama / OpenAI-compatible): prompt → JSON section parameters
+function llmSchema(sec) {
+  const md = MODS[sec], ranges = Object.entries(D.SECTION_PARAMS[sec]).map(([k, [lo, hi]]) => `"${k}": number ${lo}..${hi}`).join(', ');
+  const extra = sec === 'cup' ? `, "arrangement": "ring"|"double"|"bouquet", "bottleType": ${D.BEERS.filter((b) => b.id !== 'custom').map((b) => `"${b.id}"`).join('|')}, "facets": integer 0..16 (0 = smooth; only used by variant "custom"), "useReferenceShape": boolean` : sec === 'enc' ? `, "led": boolean, "useReferenceSkin": boolean, "useReferencePalette": boolean` : `, "led": boolean, "useReferenceSkin": boolean`;
+  return `{"name": short iteration name (max 4 words), "variant": one of ${md.list.map((v) => `"${v.id}"`).join('|')}, "finish": one of ${D.FINISHES.map((f) => `"${f}"`).join('|')}, "params": {${ranges}}${extra}, "notes": one short sentence describing the change}`;
+}
+async function llmGen(sec, prompt, cur) {
+  if (!isLocalURL(GEN.url)) throw new Error('Only local endpoints are allowed.');
+  if (!GEN.model && !(await testGen())) throw new Error('No local model available.');
+  const md = MODS[sec], refs = secRefs(sec).map((id) => REFS.find((r) => r.id === id)).filter(Boolean);
+  const curDesc = { variant: cur[md.key], finish: cur[md.fin], params: cur[md.P], ...(sec === 'cup' ? { bottleType: cur.beerType, facets: cur.facets } : {}) };
+  const refDesc = refs.map((r, i) => `#${i + 1} ${refLabel(r)}${r.source === 'slides' && GS.slides.find((s) => s.id === r.slideId)?.title ? ` (“${GS.slides.find((s) => s.id === r.slideId).title}”)` : ''}: palette ${r.palette.slice(0, 4).join(' ')}, ${r.crisp ? 'crisp faceted' : 'soft smooth'}, ${r.metal} tones${r.profile ? ', has a usable silhouette' : ''}`).join('\n') || 'none';
+  const sys = `You are a parametric product-design assistant for an oversize trophy-shaped beer cooler used on an NHL rink. It has three sections stacked vertically: sliding base (UHMW rink sled, deck 3in high), enclosure (36in tall sleeve that houses a fixed Meling DW-XL90 freezer 23.6x32.0x24.6in), and cup (bowl on top holding exactly 12 bottles in ice).
+You edit ONLY the ${md.label.toUpperCase()} section. Never change other sections. Keep everything the request doesn't mention close to the current design.
+Constraints: the freezer size is fixed; the cup must still hold 12 bottles plus ice; the base touches the ice only through UHMW.
+Variants: ${md.list.map((v) => `${v.id} = ${v.name}: ${v.blurb}`).join(' | ')}
+Reply with JSON only, matching: ${llmSchema(sec)}`;
+  const user = `Current ${md.label} design: ${JSON.stringify(curDesc)}\nReferences for this section:\n${refDesc}\n\nDesign request: ${prompt}`;
+  const imgs = GEN.vision ? refs.slice(0, 3).map((r) => r.thumb.split(',')[1]) : [];
+  let text;
+  if (GEN.engine === 'ollama') {
+    const r = await fetch(GEN.url + '/api/chat', { method: 'POST', headers: { 'Content-Type': 'application/json' }, signal: AbortSignal.timeout(180000),
+      body: JSON.stringify({ model: GEN.model, stream: false, format: 'json', options: { temperature: 0.7 }, messages: [{ role: 'system', content: sys }, { role: 'user', content: user, ...(imgs.length ? { images: imgs } : {}) }] }) });
+    if (!r.ok) throw new Error('Ollama HTTP ' + r.status + ' ' + (await r.text()).slice(0, 120));
+    text = (await r.json()).message?.content;
+  } else {
+    const content = imgs.length ? [{ type: 'text', text: user }, ...imgs.map((b) => ({ type: 'image_url', image_url: { url: 'data:image/jpeg;base64,' + b } }))] : user;
+    const r = await fetch(GEN.url + '/v1/chat/completions', { method: 'POST', headers: { 'Content-Type': 'application/json' }, signal: AbortSignal.timeout(180000),
+      body: JSON.stringify({ model: GEN.model, temperature: 0.7, messages: [{ role: 'system', content: sys }, { role: 'user', content }] }) });
+    if (!r.ok) throw new Error('Local server HTTP ' + r.status);
+    text = (await r.json()).choices?.[0]?.message?.content;
+  }
+  const m = String(text || '').match(/\{[\s\S]*\}/); if (!m) throw new Error('The model did not return JSON.');
+  const j = JSON.parse(m[0]), n = clone(cur), P = n[md.P];
+  if (md.list.some((v) => v.id === j.variant) && !(sec === 'cup' && j.variant === 'custom' && !(refs[0] && refs[0].profile))) n[md.key] = j.variant;
+  if (D.FINISHES.includes(j.finish)) n[md.fin] = j.finish;
+  for (const k of Object.keys(D.SECTION_PARAMS[sec])) if (typeof j.params?.[k] === 'number') P[k] = j.params[k];
+  if (typeof j.led === 'boolean' && sec !== 'cup') P.led = j.led;
+  const prim = S[md.ref] && REFS.find((r) => r.id === S[md.ref]);
+  if (sec === 'cup') {
+    if (D.ARRANGEMENTS.includes(j.arrangement)) P.arrangement = j.arrangement;
+    if (D.BEERS.some((b) => b.id === j.bottleType && b.id !== 'custom')) n.beerType = j.bottleType;
+    if (Number.isInteger(j.facets)) n.facets = j.facets;
+    if (j.useReferenceShape && prim && prim.profile) { n.cup = 'custom'; n.cupProfile = prim.profile.pts; n.profileSrc = prim.id; }
+  }
+  if (sec === 'enc' && prim) { if (j.useReferenceSkin) n.skin = prim.id; if (j.useReferencePalette) { n.palette = prim.palette; n.paletteSrc = 'Ref · ' + refLabel(prim); n.paletteRef = prim.id; } }
+  if (sec === 'base' && prim && j.useReferenceSkin) n.skinBase = prim.id;
+  return { patch: n, name: String(j.name || 'Iteration').slice(0, 40), notes: String(j.notes || '').slice(0, 160) };
+}
+function clampSection(sec, n) { // enforce ranges + fit constraints before anything is shown
+  const md = MODS[sec], P = n[md.P];
+  for (const [k, [lo, hi]] of Object.entries(D.SECTION_PARAMS[sec])) P[k] = Math.round(Math.min(hi, Math.max(lo, +P[k] || 0)) * 100) / 100;
+  if (!md.list.some((v) => v.id === n[md.key])) n[md.key] = md.list[0].id;
+  if (!D.FINISHES.includes(n[md.fin])) n[md.fin] = 'concept';
+  if (sec === 'cup') { n.facets = Math.max(0, Math.min(16, Math.round(n.facets || 0))); if (!D.ARRANGEMENTS.includes(P.arrangement)) P.arrangement = 'ring'; if (n.cup === 'custom' && !n.cupProfile) n.cup = 'champion'; }
+  return n;
+}
+$('ws-generate').onclick = async () => {
+  const sec = S.sel, prompt = $('ws-prompt').value.trim(), btn = $('ws-generate');
+  if (!prompt) { $('gen-status').textContent = 'Describe the change you want first.'; $('ws-prompt').focus(); return; }
+  btn.classList.add('busy'); const label = btn.textContent; btn.textContent = GEN.engine === 'procedural' ? 'Generating…' : 'Generating locally…';
+  $('gen-status').style.color = ''; $('gen-status').textContent = GEN.engine === 'procedural' ? 'Interpreting the prompt…' : `Asking ${GEN.model || 'the local model'} on this computer…`;
+  try {
+    const cur = snapSection(sec), res = GEN.engine === 'procedural' ? proceduralGen(sec, prompt, cur) : await llmGen(sec, prompt, cur);
+    const snap = clampSection(sec, res.patch);
+    if (sameSnap(snap, cur)) { $('gen-status').textContent = 'That request didn’t change any parameters. Try naming a shape, proportion, finish or arrangement.'; return; }
+    const it = addIteration(sec, snap, { name: res.name, prompt, engine: GEN.engine === 'procedural' ? 'Procedural' : `${ENGINE_NAMES[GEN.engine]} · ${GEN.model}`, notes: res.notes });
+    S.previewIter = it.id; S.compareIter = null; build(); captureThumb(it);
+    $('gen-status').textContent = `“${it.name}” is previewing in the viewport: ${res.notes}. Apply it, compare it, or keep exploring.`;
+  } catch (err) {
+    $('gen-status').style.color = '#ffb4b4';
+    $('gen-status').innerHTML = `Local generation failed: ${String(err.message || err).replace(/</g, '&lt;').replace(/\.$/, '').slice(0, 140)}. Nothing was sent to the cloud. <button class="linkbtn" id="gen-fallback" style="padding:0">Use the built-in procedural engine instead</button> or edit the parameters manually.`;
+    const fb = $('gen-fallback'); if (fb) fb.onclick = () => { GEN.engine = 'procedural'; saveGen(); renderGen(); renderWorkshop(); $('ws-generate').click(); };
+  } finally { btn.classList.remove('busy'); btn.textContent = label; }
+};
+
+// ---------- reference picker (Google Slides treatment · imported images / PDF) ----------
+const PK = { sec: 'cup', tab: 'slides', sel: new Set(), imports: [] };
+function openPicker(sec = S.sel) {
+  PK.sec = sec; PK.sel.clear(); $('picker').hidden = false;
+  $('pk-title').textContent = `${MODS[sec].n} · ${MODS[sec].label} — ${conceptName()}`;
+  $('pk-url').value = GS.url || $('deck-url').value || '';
+  setPkTab(GS.deck || !PK.imports.length ? 'slides' : 'import'); renderPicker();
+}
+function closePicker() { $('picker').hidden = true; }
+function setPkTab(t) { PK.tab = t; PK.sel.clear(); document.querySelectorAll('#pk-tabs button').forEach((b) => b.classList.toggle('active', b.dataset.tab === t)); $('pk-slides').hidden = t !== 'slides'; $('pk-import').hidden = t !== 'import'; renderPicker(); }
+function assignedBadges(refId) { return SECTIONS.filter((s) => secRefs(s).includes(refId)).map((s) => `<i>${EL_NAMES[s]}</i>`).join(''); }
+function renderPicker() {
+  if ($('picker').hidden) return;
+  if (PK.tab === 'slides') {
+    $('pk-grid').innerHTML = GS.deck ? GS.slides.map((s) => { const rid = 'gs:' + s.id, inSec = secRefs(PK.sec).includes(rid);
+      return `<button class="pk-card ${PK.sel.has(rid) ? 'on' : ''}" data-k="${rid}" title="Slide ID ${s.id}"><img loading="lazy" src="${slideURL(s.id)}" alt="Slide ${s.n}"><span class="asg">${assignedBadges(rid)}</span><div class="cap"><b>p.${s.n}</b><span>${(s.title || 'Untitled slide').replace(/</g, '&lt;')}${inSec ? ' · <em style="color:#8fb2ff;font-style:normal">in this section</em>' : ''}</span></div></button>`; }).join('') : '';
+    if (GS.deck) $('pk-status').textContent = `${GS.title || 'Treatment'} · ${GS.slides.length} slides. Select one or more, then assign them to the ${MODS[PK.sec].label.toLowerCase()}.`;
+  } else {
+    $('pk-imp-grid').innerHTML = PK.imports.map((m) => `<button class="pk-card ${PK.sel.has(m.k) ? 'on' : ''}" data-k="${m.k}"><img src="${m.src}" alt=""><div class="cap"><b>${m.page ? 'p.' + m.page : 'img'}</b><span>${m.name.replace(/</g, '&lt;')}</span></div></button>`).join('');
+  }
+  const n = PK.sel.size; $('pk-count').textContent = `${n} selected`; $('pk-assign').disabled = !n; $('pk-assign').textContent = `Assign${n ? ' ' + n : ''} to ${MODS[PK.sec].label}`;
+}
+$('ws-choose').onclick = () => openPicker();
+$('pk-close').onclick = closePicker; $('pk-cancel').onclick = closePicker;
+$('picker').onclick = (e) => { if (e.target === $('picker')) closePicker(); };
+document.addEventListener('keydown', (e) => { if (e.key === 'Escape' && !$('picker').hidden) closePicker(); });
+$('pk-tabs').onclick = (e) => { const b = e.target.closest('[data-tab]'); if (b) setPkTab(b.dataset.tab); };
+for (const g of ['pk-grid', 'pk-imp-grid']) $(g).onclick = (e) => { const b = e.target.closest('[data-k]'); if (!b) return; const k = b.dataset.k; PK.sel.has(k) ? PK.sel.delete(k) : PK.sel.add(k); renderPicker(); };
+$('pk-connect').onclick = async () => { $('pk-status').textContent = 'Reading the treatment…'; await connectDeck($('pk-url').value); renderPicker(); if (!GS.deck) $('pk-status').textContent = $('deck-status').textContent + ' You can also import slide images or a PDF in the other tab.'; };
+$('pk-refresh').onclick = async () => { await connectDeck(GS.url || $('pk-url').value); renderPicker(); };
+$('pk-url').onkeydown = (e) => { if (e.key === 'Enter') $('pk-connect').click(); };
+$('pk-assign').onclick = async () => {
+  const sec = PK.sec, keys = [...PK.sel], btn = $('pk-assign'); btn.disabled = true; btn.textContent = 'Assigning…';
+  let ok = 0;
+  for (const k of keys) {
+    try {
+      if (k.startsWith('gs:')) { if (!REFS.some((r) => r.id === k)) await addRef(slideURL(k.slice(3)), 'slide', false, { id: k, source: 'slides', slideId: k.slice(3) }); assignToSection(sec, k); }
+      else { const m = PK.imports.find((x) => x.k === k); const r = await addRef(m.src, m.page ? `${m.name} p.${m.page}` : m.name); assignToSection(sec, r.id); }
+      ok++;
+    } catch {}
+  }
+  closePicker(); build(); renderThumbs(); toast(`${ok} reference${ok === 1 ? '' : 's'} assigned to the ${MODS[sec].label.toLowerCase()} of ${conceptName()}`);
+};
+// fallback: images, screenshots (paste) and PDF exports of the deck
+const PDFJS = window.__PDFJS_BASE || 'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174';
+const pdfGlobal = () => window.pdfjsLib || window['pdfjs-dist/build/pdf'];
+function loadPdfJs() { return pdfGlobal() ? Promise.resolve(pdfGlobal()) : new Promise((ok, no) => { const s = document.createElement('script'); s.src = PDFJS + '/pdf.min.js'; s.onload = () => { const lib = pdfGlobal(); if (!lib) return no(new Error('PDF reader did not initialise')); lib.GlobalWorkerOptions.workerSrc = PDFJS + '/pdf.worker.min.js'; ok(lib); }; s.onerror = () => no(new Error('PDF reader could not load')); document.head.appendChild(s); }); }
+let impSeq = 0;
+async function importFiles(files) {
+  const st = $('pk-imp-status');
+  for (const f of files) {
+    try {
+      if (f.type === 'application/pdf' || /\.pdf$/i.test(f.name)) {
+        st.textContent = `Reading ${f.name}…`; const lib = await loadPdfJs(), pdf = await lib.getDocument({ data: new Uint8Array(await f.arrayBuffer()) }).promise;
+        for (let i = 1; i <= Math.min(pdf.numPages, 80); i++) {
+          const page = await pdf.getPage(i), vp0 = page.getViewport({ scale: 1 }), vp = page.getViewport({ scale: 900 / vp0.width }), c = mk(Math.round(vp.width), Math.round(vp.height));
+          await page.render({ canvasContext: c.getContext('2d'), viewport: vp }).promise;
+          PK.imports.push({ k: 'imp' + (++impSeq), name: f.name.replace(/\.pdf$/i, ''), page: i, src: c.toDataURL('image/jpeg', 0.85) }); st.textContent = `${f.name}: page ${i} of ${pdf.numPages}`; renderPicker();
+        }
+        st.textContent = `${f.name}: ${pdf.numPages} pages imported. Select the slides you want.`;
+      } else if (f.type.startsWith('image/')) { PK.imports.push({ k: 'imp' + (++impSeq), name: f.name || 'Screenshot', src: await readURL(f) }); st.textContent = `${PK.imports.length} image${PK.imports.length > 1 ? 's' : ''} ready to assign.`; }
+    } catch (err) { st.textContent = `Couldn’t read ${f.name}: ${err.message || err}`; }
+    renderPicker();
+  }
+}
+$('pk-file').onchange = (e) => { importFiles([...e.target.files]); e.target.value = ''; };
+$('pk-drop').addEventListener('dragover', (e) => { e.preventDefault(); $('pk-drop').classList.add('over'); });
+$('pk-drop').addEventListener('dragleave', () => $('pk-drop').classList.remove('over'));
+$('pk-drop').addEventListener('drop', (e) => { e.preventDefault(); $('pk-drop').classList.remove('over'); importFiles([...e.dataTransfer.files]); });
+document.addEventListener('paste', (e) => { if ($('picker').hidden) return; const fs = [...(e.clipboardData?.items || [])].filter((i) => i.type.startsWith('image/')).map((i) => i.getAsFile()).filter(Boolean); if (fs.length) { if (PK.tab !== 'import') setPkTab('import'); importFiles(fs.map((f, i) => new File([f], `Pasted screenshot ${impSeq + i + 1}.png`, { type: f.type }))); } });
+
+// ---------- remaining controls ----------
+$('metal').onclick = (e) => { const b = e.target.closest('button'); if (!b) return; S.metal = b.dataset.v; build(); };
+let colorT; for (const k of ['primary', 'accent']) $(k).oninput = (e) => { S[k] = e.target.value; $(k + '-v').textContent = S[k]; clearTimeout(colorT); colorT = setTimeout(build, 120); };
 let brandT; $('brand').oninput = (e) => { S.brand = e.target.value || ' '; clearTimeout(brandT); brandT = setTimeout(build, 250); };
 $('wordmark').oninput = (e) => { S.wordmark = e.target.value; $('wordmark-out').textContent = S.wordmark || ' '; saveSoon(); };
 for (const k of ['xray', 'contents', 'rink', 'spin']) $(k).onchange = (e) => { S[k] = e.target.checked; if (k === 'contents') S.vis.contents = S[k]; controls.autoRotate = S.spin; applyView(); renderLayers(); };
 $('door').oninput = (e) => { S.door = +e.target.value; $('door-v').textContent = S.door < 0.02 ? 'Closed' : Math.round(S.door * 100) + '%'; applyView(); };
 $('explode').oninput = (e) => { S.explode = +e.target.value; $('explode-v').textContent = Math.round(S.explode * 100) + '%'; applyView(); };
-$('reset').onclick = () => { const p = D.byId(D.PRESETS, S.preset); Object.assign(S, lookDefaults(p), { door: 0, explode: 0, xray: false, isolate: false, vis: { cup: true, contents: true, enc: true, fridge: true, base: true }, contents: true }); build(); toast('Concept look reset · references kept'); };
+$('reset').onclick = () => { const p = D.byId(D.PRESETS, S.preset); Object.assign(S, lookDefaults(p), { door: 0, explode: 0, xray: false, isolate: false, previewIter: null, compareIter: null, vis: { cup: true, contents: true, enc: true, fridge: true, base: true }, contents: true }); build(); toast('Concept look reset · references + iterations kept'); };
 $('copy').onclick = async () => {
   commitLook();
-  const slideIds = (c) => c.pins.filter((id) => id.startsWith('gs:')).map((id) => id.slice(3));
+  const refOut = (id) => { const r = REFS.find((x) => x.id === id); return id.startsWith('gs:') ? { slideId: id.slice(3), page: slidePos(id.slice(3)) } : { local: r ? r.name : id }; };
   const cfg = { activeConcept: S.preset, brand: { labelText: S.brand, logo: !!B.logo, colors: B.colors, appliesTo: 'all concepts' },
     referenceDeck: GS.deck ? `https://docs.google.com/presentation/d/${GS.deck}/edit` : null,
-    concepts: Object.fromEntries(D.PRESETS.map((p) => { const c = C[p.id]; return [p.id, { name: p.name, edited: isEdited(p.id), base: c.base, enclosure: c.enc, cup: c.cup, metal: c.metal, primary: c.primary, accent: c.accent, facets: c.facets, skin: c.skin, pinnedSlideIds: slideIds(c), localReferences: c.pins.filter((id) => !id.startsWith('gs:')).length }]; })) };
+    concepts: Object.fromEntries(D.PRESETS.map((p) => { const c = C[p.id]; return [p.id, { name: p.name, edited: isEdited(p.id),
+      sections: Object.fromEntries(SECTIONS.map((sec) => [sec, { design: snapSection(sec, c), references: c.secRefs[sec].map(refOut), primaryReference: c[MODS[sec].ref], iterations: c.iters[sec].map(({ name, prompt, engine, created, notes, snap }) => ({ name, prompt, engine, created: new Date(created).toISOString(), notes, design: snap })) }])) }]; })) };
   try { await navigator.clipboard.writeText(JSON.stringify(cfg, null, 2)); toast('Config copied to clipboard'); }
   catch { $('copied').style.display = ''; $('copied').textContent = JSON.stringify(cfg); }
 };
 $('mobileToggle').onclick = () => { const o = $('panel').classList.toggle('open'); $('mobileToggle').setAttribute('aria-expanded', o); };
 function syncToggles() { $('xray').checked = S.xray; $('contents').checked = S.contents; $('rink').checked = S.rink; $('spin').checked = S.spin; }
+function syncSkin() {
+  const md = MODS[S.sel], skKey = md.skin;
+  $('skin').innerHTML = [['default', 'Section default'], ...(B.logo ? [['logo', 'Logo monogram (brand)']] : []), ...secRefs(S.sel).map((id) => REFS.find((r) => r.id === id)).filter(Boolean).map((r) => [r.id, 'Ref · ' + refLabel(r)])].map(([v, l]) => `<option value="${v}">${l}</option>`).join('');
+  if (![...$('skin').options].some((o) => o.value === S[skKey])) $('skin').insertAdjacentHTML('beforeend', `<option value="${S[skKey]}">Reference (loading…)</option>`);
+  $('skin').value = S[skKey];
+}
 function syncUI() {
-  renderPresets(); renderLayers(); renderModule(); syncToggles();
+  renderPresets(); renderLayers(); renderWorkshop(); syncToggles(); syncSkin(); renderChips(); renderGen();
   document.querySelectorAll('#metal button').forEach((b) => b.classList.toggle('active', b.dataset.v === S.metal));
   $('primary').value = S.primary; $('accent').value = S.accent; $('primary-v').textContent = S.primary; $('accent-v').textContent = S.accent;
   if (document.activeElement !== $('brand')) $('brand').value = S.brand;
@@ -641,10 +1195,6 @@ function syncUI() {
   $('explode').value = S.explode; $('explode-v').textContent = Math.round(S.explode * 100) + '%';
   $('facets').value = S.facets; $('facets-v').textContent = S.facets || 'Smooth';
   $('skin-scale').value = S.skinScale; $('skin-scale-v').textContent = S.skinScale.toFixed(1) + '×';
-  const skKey = MODS[S.sel].skin || 'skin';
-  $('skin').innerHTML = [['default', 'Concept default'], ...(B.logo ? [['logo', 'Logo monogram (brand)']] : []), ...pinnedRefs().map((r) => [r.id, 'Ref · ' + refLabel(r)])].map(([v, l]) => `<option value="${v}">${l}</option>`).join('');
-  if (![...$('skin').options].some((o) => o.value === S[skKey])) $('skin').insertAdjacentHTML('beforeend', `<option value="${S[skKey]}">Loading reference…</option>`);
-  $('skin').value = S[skKey];
   $('pal-src').textContent = S.palette ? S.paletteSrc : 'Auto from accent'; $('pal-reset').style.display = S.palette ? '' : 'none';
   document.querySelectorAll('#logo-mode button').forEach((b) => b.classList.toggle('active', b.dataset.v === B.mode));
   renderBrand(); renderRefs();
@@ -813,7 +1363,7 @@ const pinnedRefs = () => pins().map((id) => REFS.find((r) => r.id === id)).filte
 const refLabel = (r) => (r.source === 'slides' ? (slidePos(r.slideId) ? 'Slide p.' + slidePos(r.slideId) : 'Slide (removed)') : r.name);
 function unpinRef(id) {
   const c = activeC(); c.pins = c.pins.filter((p) => p !== id);
-  for (const el of Object.keys(MODS)) if (S[MODS[el].ref] === id) assignRef(el, null);
+  for (const el of SECTIONS) removeFromSection(el, id);
   for (const k of ['skin', 'skinCup', 'skinBase']) if (S[k] === id) S[k] = 'default'; if (S.profileSrc === id) S.profileSrc = null; if (S.paletteRef === id) { S.palette = null; S.paletteSrc = null; S.paletteRef = null; }
   const r = REFS.find((x) => x.id === id);   // drop local images nobody pins any more
   if (r && r.source !== 'slides' && !Object.values(C).some((cc) => cc.pins.includes(id))) REFS.splice(REFS.indexOf(r), 1);
@@ -831,7 +1381,7 @@ function renderRefs() {
   const pn = D.byId(D.PRESETS, S.preset).name.replace(' · ', ' ');
   $('refs-for').textContent = pn;
   $('refs').innerHTML = (pins().length && !pinnedRefs().length ? `<p class="muted">Loading ${pins().length} pinned reference${pins().length > 1 ? 's' : ''}…</p>` : '') + pinnedRefs().map((r) => {
-    const pOn = S.paletteRef === r.id, as = Object.entries(MODS).filter(([, m]) => S[m.ref] === r.id).map(([k]) => k), sOn = as.length > 0, cOn = false;
+    const pOn = S.paletteRef === r.id, as = SECTIONS.filter((sec) => secRefs(sec).includes(r.id)), sOn = as.length > 0, cOn = false;
     const gs = r.source === 'slides', pos = gs ? slidePos(r.slideId) : null;
     const nm = gs ? `<span class="src">SLIDES</span>${pos ? 'p.' + pos : 'Removed from deck'}${GS.title ? ' · ' + GS.title : ''}` : r.name;
     return `<div class="ref ${pOn || sOn || cOn ? 'on' : ''} ${gs && !pos && GS.slides.length ? 'missing' : ''}" data-id="${r.id}" title="${gs ? 'Slide ID ' + r.slideId : ''}">
@@ -841,7 +1391,7 @@ function renderRefs() {
       ${r.profile ? '<canvas class="prof" width="68" height="88"></canvas>' : ''}
       <span class="rm" data-act="rm" title="Remove">×</span>
       <div class="acts">
-        ${['cup', 'enc', 'base', 'beer'].map((k) => `<button data-act="as-${k}" class="${as.includes(k) ? 'on' : ''}" title="Use for the ${EL_NAMES[k].toLowerCase()}">→ ${EL_NAMES[k]}</button>`).join('')}
+        ${['base', 'enc', 'cup'].map((k) => `<button data-act="as-${k}" class="${as.includes(k) ? 'on' : ''}" title="Use for the ${EL_NAMES[k].toLowerCase()}">→ ${EL_NAMES[k]}</button>`).join('')}
         <button data-act="pal" class="${pOn ? 'on' : ''}">Palette → glass</button>
         <button data-act="finish" title="Apply suggested metal + facet count">Finish: ${r.metal}${r.facets ? ' · ' + r.facets + ' facets' : ' · smooth'}</button>
         <button data-act="pa">Colors → P/A</button>
@@ -854,7 +1404,7 @@ $('refs').onclick = (e) => {
   const b = e.target.closest('[data-act]'), el = e.target.closest('.ref'); if (!b || !el) return; const r = REFS.find((x) => x.id === el.dataset.id), act = b.dataset.act;
   if (act === 'rm') { unpinRef(r.id); renderThumbs(); }
   if (act === 'pal') { if (S.paletteRef === r.id) { S.palette = null; S.paletteSrc = null; S.paletteRef = null; } else { S.palette = r.palette; S.paletteSrc = 'Ref · ' + refLabel(r); S.paletteRef = r.id; } }
-  if (act.startsWith('as-')) { const el = act.slice(3); assignRef(el, S[MODS[el].ref] === r.id ? null : r.id); S.sel = el; }
+  if (act.startsWith('as-')) { const el = act.slice(3); if (secRefs(el).includes(r.id)) removeFromSection(el, r.id); else assignToSection(el, r.id); S.sel = el; }
   if (act === 'finish') { S.metal = r.metal; S.facets = r.facets; if (S.cup !== 'custom' && r.profile) { S.cup = 'custom'; S.cupProfile = r.profile.pts; S.profileSrc = r.id; } markCustom(); }
   if (act === 'pa') { const sorted = [...r.palette]; const lum = (h) => { const c = new THREE.Color(h); return c.r * 0.3 + c.g * 0.59 + c.b * 0.11; };
     const dark = sorted.filter((c) => lum(c) < 0.45).sort((a, b) => lum(a) - lum(b))[0] || sorted[0];
@@ -904,30 +1454,31 @@ async function connectDeck(url, quiet) {
   $('deck-url').value = url; $('deck-head').style.display = 'flex'; $('deck-title').textContent = GS.title || 'Untitled deck';
   $('deck-open').href = `https://docs.google.com/presentation/d/${GS.deck}/edit`; $('pin-hint').style.display = '';
   deckStatus(deckSummary());
-  renderThumbs(); saveSoon();
+  renderThumbs(); saveSoon(); if (typeof renderPicker === 'function') renderPicker();
   // load pinned slides that aren't loaded yet (fresh from Google every session)
   const changed = await ensurePinsLoaded(S.preset);
   if (changed || !quiet) build();
 }
 function deckSummary() {
   const mine = pins().filter((id) => id.startsWith('gs:')), gone = mine.filter((id) => !slidePos(id.slice(3))).length;
-  return `${GS.slides.length} slides · ${mine.length} pinned for ${D.byId(D.PRESETS, S.preset).name.replace(' · ', ' ')}${gone ? ` · ${gone} no longer in the deck` : ''}`;
+  return `${GS.slides.length} slides · ${mine.length} used by ${conceptName()} · click a slide to assign it to the ${EL_NAMES[S.sel].toLowerCase()}${gone ? ` · ${gone} no longer in the deck` : ''}`;
 }
 function renderThumbs() {
   $('thumbs').innerHTML = GS.deck ? GS.slides.map((s) => {
-    const others = D.PRESETS.filter((p) => p.id !== S.preset && C[p.id].pins.includes('gs:' + s.id)).map((p) => `<i>${p.name.slice(0, 2)}</i>`).join('');
-    return `<button class="thumb ${pins().includes('gs:' + s.id) ? 'on' : ''}" data-id="${s.id}" title="Slide ${s.n} · ID ${s.id}"><img loading="lazy" alt="Slide ${s.n}" src="${slideURL(s.id)}"><span class="pn">p.${s.n}</span>${others ? `<span class="cb" title="Also pinned by other concepts">${others}</span>` : ''}</button>`;
+    const rid = 'gs:' + s.id, mine = SECTIONS.filter((sec) => secRefs(sec).includes(rid)).map((sec) => `<i>${EL_NAMES[sec].slice(0, 3)}</i>`).join('');
+    const others = mine + D.PRESETS.filter((p) => p.id !== S.preset && C[p.id].pins.includes(rid)).map((p) => `<i>${p.name.slice(0, 2)}</i>`).join('');
+    return `<button class="thumb ${secRefs(S.sel).includes(rid) ? 'on' : ''}" data-id="${s.id}" title="Slide ${s.n}${s.title ? ' · ' + s.title.replace(/"/g, '') : ''} · click to ${secRefs(S.sel).includes(rid) ? 'remove from' : 'assign to'} the ${EL_NAMES[S.sel].toLowerCase()}"><img loading="lazy" alt="Slide ${s.n}" src="${slideURL(s.id)}"><span class="pn">p.${s.n}</span>${others ? `<span class="cb" title="Also pinned by other concepts">${others}</span>` : ''}</button>`;
   }).join('') : '';
   if (GS.deck) deckStatus(deckSummary());
 }
 $('thumbs').onclick = async (e) => {
   const b = e.target.closest('.thumb'); if (!b) return; const id = b.dataset.id;
   const rid = 'gs:' + id;
-  if (pins().includes(rid)) { unpinRef(rid); renderThumbs(); build(); return; }
-  pinRef(rid); b.classList.add('on'); deckStatus('Analyzing slide…');
-  try { if (!REFS.some((r) => r.id === rid)) await addRef(slideURL(id), 'slide', false, { id: rid, source: 'slides', slideId: id }); }
+  if (secRefs(S.sel).includes(rid)) { removeFromSection(S.sel, rid); renderThumbs(); build(); return; }
+  b.classList.add('on'); deckStatus('Analyzing slide…');
+  try { if (!REFS.some((r) => r.id === rid)) await addRef(slideURL(id), 'slide', false, { id: rid, source: 'slides', slideId: id }); assignToSection(S.sel, rid); }
   catch { deckStatus('Couldn’t load that slide image.', true); }
-  build();
+  renderThumbs(); build();
 };
 $('deck-connect').onclick = () => connectDeck($('deck-url').value);
 $('deck-refresh').onclick = () => connectDeck(GS.url || $('deck-url').value);
@@ -946,7 +1497,12 @@ async function restore() {
     Object.assign(B, { mode: data.B?.mode || 'tint', use: data.B?.use !== false, colors: data.B?.colors || [] });
     if (data.gs) GS.url = data.gs.url || '';
     if (data.v === 3) {
-      for (const [id, c] of Object.entries(data.concepts || {})) if (C[id]) Object.assign(C[id], c);
+      for (const [id, c] of Object.entries(data.concepts || {})) if (C[id]) {
+        const d = newConcept(D.byId(D.PRESETS, id)); Object.assign(C[id], c);
+        for (const k of ['cupP', 'encP', 'baseP']) C[id][k] = { ...d[k], ...(c[k] || {}) };
+        if (!c.secRefs) C[id].secRefs = { cup: c.refCup ? [c.refCup] : [], enc: c.refEnc ? [c.refEnc] : [], base: c.refBase ? [c.refBase] : [] };
+        C[id].iters = { ...d.iters, ...(c.iters || {}) }; C[id].prompts = { ...d.prompts, ...(c.prompts || {}) };
+      }
       if (C[data.active]) S.preset = data.active; Object.assign(S, data.globals || {});
     } else if (data.S) { // migrate v2: one global look + pins → the concept that was active
       const id = C[data.S.preset] ? data.S.preset : D.PRESETS[0].id;
@@ -1019,7 +1575,7 @@ function goCam(k, instant) {
 }
 $('viewbar').onclick = (e) => { const b = e.target.closest('button'); if (b) goCam(b.dataset.view); };
 $('fit').onclick = () => { // frame whatever is visible
-  const box = new THREE.Box3(); root.traverse((o) => { if (o.isMesh && o.visible && o.parent && [parts.base, parts.enc, parts.fridge, parts.cupGroup].some((p) => p.visible && (p === o || p.getObjectById(o.id)))) box.expandByObject(o); });
+  const box = new THREE.Box3(); root.traverse((o) => { if (o.isMesh && o.visible && o.parent && [parts.base, parts.enc, parts.fridge, parts.cupGroup, parts.compare].filter(Boolean).some((p) => p.visible && (p === o || p.getObjectById(o.id)))) box.expandByObject(o); });
   if (box.isEmpty()) return; const c = box.getCenter(new THREE.Vector3()), r = box.getSize(new THREE.Vector3()).length() / 2;
   const dir = camera.position.clone().sub(controls.target).normalize(), dist = r / Math.sin(THREE.MathUtils.degToRad(camera.fov / 2)) * 1.05;
   tween = { t0: performance.now(), fromP: camera.position.clone(), fromT: controls.target.clone(), toP: c.clone().add(dir.multiplyScalar(dist)), toT: c };

@@ -1,5 +1,5 @@
 // Pass-through for Google Slides references. Stores nothing: no database, no files, no CDN cache.
-//   GET /api/slides?deck=<link or id>             → { deck, title, slides: [{ id, n }] }  (n = current position)
+//   GET /api/slides?deck=<link or id>             → { deck, title, slides: [{ id, n, title }] }  (n = current position)
 //   GET /api/slides?deck=<id>&page=<slideObjectId> → JPEG of that slide, streamed from Google
 // The deck must be shared as "Anyone with the link can view". Slides are addressed by their
 // permanent object ID, so pins survive reordering, inserts and edits.
@@ -30,8 +30,17 @@ export default async function handler(req, res) {
     const html = await r.text(), ids = [];
     for (const m of html.matchAll(/"([A-Za-z0-9_-]+):notes"/g)) if (!ids.includes(m[1])) ids.push(m[1]);
     if (!ids.length) return res.status(422).json({ error: 'no_slides', message: 'No slides found. Is this a Google Slides link shared with "Anyone with the link"?' });
+    // best-effort slide titles: first text inserted after each slide marker in the page model
+    const titles = {}; let cur = null;
+    for (const m of html.matchAll(/\[12,"([A-Za-z0-9_:-]+)"|\[15,"[A-Za-z0-9_-]+",null,0,"((?:[^"\\]|\\.){1,200})"/g)) {
+      if (m[1]) { cur = m[1].endsWith(':notes') ? null : m[1]; continue; }
+      if (!cur || titles[cur]) continue;
+      let t; try { t = JSON.parse('"' + m[2] + '"'); } catch { t = m[2]; }
+      t = t.replace(/[\u000b\n\r]+/g, ' ').trim();
+      if (t && !/^image sources/i.test(t) && !/^https?:/i.test(t)) titles[cur] = t.slice(0, 80);
+    }
     const title = decode(((html.match(/<title>([^<]*)<\/title>/) || [])[1] || '').replace(/\s+-\s+Google [^-]+$/, '').trim());
-    return res.status(200).json({ deck, title, slides: ids.map((id, i) => ({ id, n: i + 1 })) });
+    return res.status(200).json({ deck, title, slides: ids.map((id, i) => ({ id, n: i + 1, title: titles[id] || '' })) });
   } catch (e) {
     return res.status(502).json({ error: 'upstream', message: String((e && e.message) || e) });
   }
