@@ -31,22 +31,69 @@ export function clearances(P) {
 function rng(seed) { let s = (seed >>> 0) || 1; return () => { s ^= s << 13; s >>>= 0; s ^= s >>> 17; s ^= s << 5; s >>>= 0; return s / 4294967296; }; }
 const ss = (a, b, x) => { const t = Math.min(1, Math.max(0, (x - a) / (b - a))); return t * t * (3 - 2 * t); };
 function mesh(geo, mat, x = 0, y = 0, z = 0) { const m = new THREE.Mesh(geo, mat); m.position.set(x, y, z); m.castShadow = true; m.receiveShadow = true; return m; }
-const box = (w, h, d, mat, x, y, z) => mesh(new THREE.BoxGeometry(w, h, d), mat, x, y, z);
-const rbox = (w, h, d, r, mat, x, y, z) => mesh(new RoundedBoxGeometry(w, h, d, 5, Math.min(r, Math.min(w, h, d) / 2 - 0.01)), mat, x, y, z);
-const cyl = (rt, rb, h, seg, mat, x, y, z, open = false) => mesh(new THREE.CylinderGeometry(rt, rb, h, seg, 1, open), mat, x, y, z);
-const lathe = (pts, seg, mat) => mesh(new THREE.LatheGeometry(pts.map(([r, y]) => new THREE.Vector2(r, y)), seg), mat);
+// ---------- geometry cache ----------
+// Every BufferGeometry is built once per shape key and reused: camera moves never touch geometry, and changing a
+// material/colour reuses the cached meshes. Keys hold only the numbers that change the shape. LRU, evicted entries are
+// disposed (three re-uploads them if a live mesh still uses one). Geometries carry userData.cached so callers never dispose them.
+const GEO = new Map(), GEO_MAX = 600;
+const kf = (v) => (typeof v === 'number' ? +v.toFixed(4) : v);
+export function cachedGeometry(key, make) {
+  let g = GEO.get(key);
+  if (g) { GEO.delete(key); GEO.set(key, g); return g; }
+  g = make(); g.userData.cached = true; GEO.set(key, g);
+  if (GEO.size > GEO_MAX) { const old = GEO.keys().next().value; GEO.get(old).dispose(); GEO.delete(old); }
+  return g;
+}
+export const geometryCacheSize = () => GEO.size;
+export function clearGeometryCache() { GEO.forEach((g) => g.dispose()); GEO.clear(); }
+const K = (...a) => a.map(kf).join('|');
+const box = (w, h, d, mat, x, y, z) => mesh(cachedGeometry(K('box', w, h, d), () => new THREE.BoxGeometry(w, h, d)), mat, x, y, z);
+const rbox = (w, h, d, r, mat, x, y, z) => mesh(cachedGeometry(K('rbox', w, h, d, r), () => new RoundedBoxGeometry(w, h, d, 5, Math.min(r, Math.min(w, h, d) / 2 - 0.01))), mat, x, y, z);
+const cyl = (rt, rb, h, seg, mat, x, y, z, open = false) => mesh(cachedGeometry(K('cyl', rt, rb, h, seg, open), () => new THREE.CylinderGeometry(rt, rb, h, seg, 1, open)), mat, x, y, z);
+// baked ambient occlusion for lathe profiles: coves (concave turns of the profile) get darker vertex colours
+function profileAO(pts, strength = 0.55) {
+  const n = pts.length, ao = new Array(n).fill(1);
+  for (let j = 1; j < n - 1; j++) {
+    const ax = pts[j][0] - pts[j - 1][0], ay = pts[j][1] - pts[j - 1][1], bx = pts[j + 1][0] - pts[j][0], by = pts[j + 1][1] - pts[j][1];
+    const la = Math.hypot(ax, ay), lb = Math.hypot(bx, by); if (la < 1e-6 || lb < 1e-6) continue;
+    const turn = (ax * by - ay * bx) / (la * lb); // < 0: concave (cove), > 0: convex (bullnose)
+    ao[j] = 1 - strength * Math.max(0, -turn);
+  }
+  return ao.map((v, j) => (ao[Math.max(0, j - 1)] + 2 * v + ao[Math.min(n - 1, j + 1)]) / 4); // soften
+}
+function latheGeo(pts, seg, aoStrength = 0) {
+  return cachedGeometry(K('lathe', seg, aoStrength, pts.flat().map(kf).join(',')), () => {
+    const g = new THREE.LatheGeometry(pts.map(([r, y]) => new THREE.Vector2(r, y)), seg);
+    const ao = aoStrength ? profileAO(pts, aoStrength) : null, n = pts.length, col = new Float32Array(g.attributes.position.count * 3);
+    for (let i = 0; i <= seg; i++) for (let j = 0; j < n; j++) { const v = ao ? ao[j] : 1, o = (i * n + j) * 3; col[o] = col[o + 1] = col[o + 2] = v; }
+    g.setAttribute('color', new THREE.BufferAttribute(col, 3)); return g;
+  });
+}
+const lathe = (pts, seg, mat, aoStrength = 0) => mesh(latheGeo(pts, seg, aoStrength), mat);
+// static micro-detail maps (built once): faint roughness variation keeps paint and chrome from looking like plastic
+let DETAIL = null;
+function detailMaps() {
+  if (DETAIL) return DETAIL;
+  const N = 256, r = rng(3), a = new Float32Array(N * N), b = new Uint8Array(N * N * 4);
+  for (let i = 0; i < a.length; i++) a[i] = r();
+  for (let pass = 0; pass < 2; pass++) for (let y = 0; y < N; y++) for (let x = 0; x < N; x++) { let s = 0; for (let k = -1; k <= 1; k++) s += a[y * N + ((x + k + N) % N)] + a[((y + k + N) % N) * N + x]; a[y * N + x] = s / 6; }
+  for (let i = 0; i < a.length; i++) { const v = Math.round(255 * (0.82 + 0.36 * a[i])); b[i * 4] = b[i * 4 + 1] = b[i * 4 + 2] = Math.min(255, v); b[i * 4 + 3] = 255; }
+  const t = new THREE.DataTexture(b, N, N, THREE.RGBAFormat); t.wrapS = t.wrapT = THREE.RepeatWrapping; t.repeat.set(6, 6); t.needsUpdate = true;
+  return (DETAIL = { rough: t });
+}
 const named = (g, n) => { g.name = n; return g; };
 
 // ---------- materials ----------
-export function makeMaterials(P, o = {}) {
+export function makeMaterials(P, o = {}, { fast = false, detail = false } = {}) {
+  const D = detail ? detailMaps() : null;
   const metal = {
     chrome: { color: 0xf1f3f6, roughness: 0.07 }, satin: { color: 0xd3d8df, roughness: 0.3 }, gold: { color: 0xdcb763, roughness: 0.12 },
   }[P.metal] || { color: 0xf1f3f6, roughness: 0.07 };
   const blue = new THREE.Color(P.color);
-  return {
-    metal: new THREE.MeshPhysicalMaterial({ name: 'polished-metal', metalness: 1, ...metal }),
+  const M = {
+    metal: new THREE.MeshPhysicalMaterial({ name: 'polished-metal', metalness: 1, ...metal, roughnessMap: D ? D.rough : null }),
     liner: new THREE.MeshPhysicalMaterial({ name: 'bowl-liner', metalness: 1, color: 0xd9dde3, roughness: 0.18 }),
-    paint: new THREE.MeshPhysicalMaterial({ name: 'enclosure-paint', color: blue, metalness: 0.05, roughness: 0.42, clearcoat: 1, clearcoatRoughness: 0.08 }),
+    paint: new THREE.MeshPhysicalMaterial({ name: 'enclosure-paint', color: blue, metalness: 0.05, roughness: 0.42, clearcoat: 1, clearcoatRoughness: 0.08, roughnessMap: D ? D.rough : null }),
     paintDark: new THREE.MeshPhysicalMaterial({ name: 'enclosure-paint-dark', color: blue.clone().multiplyScalar(0.62), metalness: 0.08, roughness: 0.45, clearcoat: 0.8 }),
     grille: new THREE.MeshStandardMaterial({ name: 'vent-grille', color: 0x05070d, roughness: 0.6, metalness: 0.4 }),
     rubber: new THREE.MeshStandardMaterial({ name: 'caster-rubber', color: 0x16171a, roughness: 0.75 }),
@@ -62,6 +109,17 @@ export function makeMaterials(P, o = {}) {
     cap: new THREE.MeshPhysicalMaterial({ name: 'bottle-cap', color: 0xdfe3ea, metalness: 1, roughness: 0.2 }),
     logo: o.logo ? new THREE.MeshStandardMaterial({ name: 'front-logo', map: o.logo, transparent: true, roughness: 0.35 }) : null,
   };
+  // same chrome, with the baked AO vertex colours (bowl grooves, pedestal coves)
+  M.metalAO = M.metal.clone(); M.metalAO.name = 'polished-metal-ao'; M.metalAO.vertexColors = true;
+  if (fast) { // no transmission: avoids a full extra scene render per frame; reflections come from the precomputed environment map
+    M.ice = new THREE.MeshPhysicalMaterial({ name: 'ice', color: 0xe8f2ff, roughness: 0.05, metalness: 0, clearcoat: 1, clearcoatRoughness: 0.03, transparent: true, opacity: 0.8, envMapIntensity: 1.5 });
+    M.iceBed = new THREE.MeshPhysicalMaterial({ name: 'ice-bed', color: 0xd4e0ec, roughness: 0.3, clearcoat: 1, clearcoatRoughness: 0.15 });
+    M.glass = P.glass === 'clear'
+      ? new THREE.MeshPhysicalMaterial({ name: 'bottle-glass-clear', color: 0xcfe3d8, roughness: 0.03, clearcoat: 1, transparent: true, opacity: 0.4, envMapIntensity: 1.5 })
+      : new THREE.MeshPhysicalMaterial({ name: 'bottle-glass-amber', color: 0x5e2a07, roughness: 0.05, metalness: 0, clearcoat: 1, clearcoatRoughness: 0.03, envMapIntensity: 1.6 });
+    M.uhmw = new THREE.MeshStandardMaterial({ name: 'UHMW-PE', color: 0xe9e9e3, roughness: 0.6 });
+  }
+  return M;
 }
 
 // ======================================================================
@@ -123,31 +181,51 @@ export function bowlShape(P) { // outer radius as a function of t (0 = bowl base
   const s = P.bowlD / 61, R = P.bowlD / 2, rb = 6.1 * (P.bowlD / 32);
   return { s, R, rb, r: (t) => rb + (R - rb) * Math.pow(Math.sin((t * Math.PI) / 2), 0.62) }; // full, rounded belly
 }
-export function buildCup(P, M) {
-  const g = named(new THREE.Group(), 'cup'), { s, R, r } = bowlShape(P), kx = P.bowlD / 32, ky = P.pedH / 12;
-  const ped = named(lathe(PED.map(([rr, y]) => [rr * kx, y * ky]), 192, M.metal), 'pedestal'); g.add(ped);
-  const yb = P.pedH, H = P.bowlH, N = Math.round(P.flutes), tw = P.twist, amp = P.fluteDepth * s;
-  // fluted outer bowl: lathe-like grid with spiral ridges that fade out toward the smooth rim band
-  // gadroons: rounded lobes split by crisp grooves, swirling up the belly, tapering to teardrop tips under a smooth polished band
-  const RS = Math.max(N * 18, 240), HS = 150, pos = [], idx = [], uv = [];
-  for (let j = 0; j <= HS; j++) {
-    const t = j / HS, base = r(t), w = ss(0.0, 0.1, t) * (1 - ss(0.7, 0.78, t)), cut = 0.9 * ss(0.6, 0.76, t) + 0.6 * (1 - ss(0.0, 0.16, t));
-    for (let i = 0; i <= RS; i++) {
-      const th = (i / RS) * Math.PI * 2, ph = th - tw * 1.5 * Math.pow(t, 1.35), lobe = Math.abs(Math.cos((N * ph) / 2));
-      const ridge = Math.sqrt(Math.max(0, (lobe - cut) / (1 - cut)));
-      const rr = base + amp * w * (ridge - 0.25);
-      pos.push(rr * Math.sin(th), yb + t * H, rr * Math.cos(th)); uv.push(i / RS, t);
+// inverse-CDF sampling: more rows where the density (curvature, flute activity) is high, fewer on smooth spans
+function adaptiveRows(rows, dens) {
+  const F = 600, c = [0];
+  for (let k = 1; k <= F; k++) c.push(c[k - 1] + dens((k - 0.5) / F));
+  const out = []; let k = 0;
+  for (let j = 0; j <= rows; j++) { const target = (j / rows) * c[F]; while (k < F - 1 && c[k + 1] < target) k++; out.push(Math.min(1, (k + (target - c[k]) / Math.max(1e-9, c[k + 1] - c[k])) / F)); }
+  out[0] = 0; out[rows] = 1; return out;
+}
+// LOD budgets. 'high' for close views and stills, 'low' for slider drags and when the cup is small on screen.
+export const CUP_LOD = { high: { perFlute: 16, rows: 110, lathe: 160 }, low: { perFlute: 6, rows: 38, lathe: 56 } };
+function bowlGeometry(P, lod) {
+  const { s, R, r } = bowlShape(P), yb = P.pedH, H = P.bowlH, N = Math.round(P.flutes), tw = P.twist, amp = P.fluteDepth * s, L = CUP_LOD[lod];
+  return cachedGeometry(K('bowl', lod, P.bowlD, P.bowlH, P.pedH, N, tw, P.fluteDepth), () => {
+    const wAt = (t) => ss(0.0, 0.1, t) * (1 - ss(0.7, 0.78, t)), cutAt = (t) => 0.9 * ss(0.6, 0.76, t) + 0.6 * (1 - ss(0.0, 0.16, t));
+    const curv = (t) => Math.abs(r(Math.min(1, t + 0.004)) - 2 * r(t) + r(Math.max(0, t - 0.004))) / 1.6e-5 / R;
+    const ts = adaptiveRows(L.rows, (t) => 0.25 + 0.6 * Math.min(2, curv(t)) + 1.2 * wAt(t) + 6 * Math.abs(cutAt(t + 0.005) - cutAt(t - 0.005)));
+    const RS = Math.max(N * L.perFlute, lod === 'high' ? 240 : 96), HS = ts.length - 1, pos = [], idx = [], uv = [], col = [];
+    for (let j = 0; j <= HS; j++) {
+      const t = ts[j], base = r(t), w = wAt(t), cut = cutAt(t);
+      for (let i = 0; i <= RS; i++) {
+        const th = (i / RS) * Math.PI * 2, ph = th - tw * 1.5 * Math.pow(t, 1.35), lobe = Math.abs(Math.cos((N * ph) / 2));
+        const ridge = Math.sqrt(Math.max(0, (lobe - cut) / (1 - cut)));
+        const rr = base + amp * w * (ridge - 0.25);
+        pos.push(rr * Math.sin(th), yb + t * H, rr * Math.cos(th)); uv.push(i / RS, t);
+        const ao = (1 - 0.5 * w * Math.pow(1 - ridge, 1.5)) * (0.72 + 0.28 * ss(0, 0.18, t)); col.push(ao, ao, ao); // grooves + the stem junction
+      }
     }
+    for (let j = 0; j < HS; j++) for (let i = 0; i < RS; i++) { const a = j * (RS + 1) + i, b = a + RS + 1; idx.push(a, b, a + 1, b, b + 1, a + 1); }
+    const bg = new THREE.BufferGeometry(); bg.setAttribute('position', new THREE.Float32BufferAttribute(pos, 3)); bg.setAttribute('uv', new THREE.Float32BufferAttribute(uv, 2));
+    bg.setAttribute('color', new THREE.Float32BufferAttribute(col, 3)); bg.setIndex(idx); bg.computeVertexNormals(); return bg;
+  });
+}
+export function buildCup(P, M, { lod = 'high' } = {}) {
+  const g = named(new THREE.Group(), 'cup'), { s, R, r } = bowlShape(P), kx = P.bowlD / 32, ky = P.pedH / 12, mAO = M.metalAO || M.metal;
+  const yb = P.pedH, H = P.bowlH, rim = yb + H, wall = 1.3 * s;
+  const levels = lod === 'both' ? ['high', 'low'] : [lod];
+  for (const lv of levels) { // the shape parts that carry the detail come in LOD pairs; only one is visible at a time
+    const L = CUP_LOD[lv], tag = (o) => { if (lod === 'both') { o.userData.lod = lv; o.visible = lv === 'high'; } return o; };
+    g.add(tag(named(lathe(PED.map(([rr, y]) => [rr * kx, y * ky]), L.lathe, mAO, 0.6), 'pedestal')));
+    g.add(tag(named(mesh(bowlGeometry(P, lv), mAO), 'bowl-fluted')));
+    g.add(tag(named(lathe([[R - 0.05, rim - 1.9 * s], [R + 0.35 * s, rim - 1.5 * s], [R + 0.45 * s, rim - 0.2], [R + 0.2 * s, rim + 0.25], [R - wall, rim + 0.25], [R - wall, rim - 0.4]], L.lathe, mAO, 0.4), 'rim-band')));
   }
-  for (let j = 0; j < HS; j++) for (let i = 0; i < RS; i++) { const a = j * (RS + 1) + i, b = a + RS + 1; idx.push(a, b, a + 1, b, b + 1, a + 1); }
-  const bg = new THREE.BufferGeometry(); bg.setAttribute('position', new THREE.Float32BufferAttribute(pos, 3)); bg.setAttribute('uv', new THREE.Float32BufferAttribute(uv, 2)); bg.setIndex(idx); bg.computeVertexNormals();
-  g.add(named(mesh(bg, M.metal), 'bowl-fluted'));
-  // rim band (thick polished lip) + inner liner + floor
-  const rim = yb + H, wall = 1.3 * s;
-  g.add(named(lathe([[R - 0.05, rim - 1.9 * s], [R + 0.35 * s, rim - 1.5 * s], [R + 0.45 * s, rim - 0.2], [R + 0.2 * s, rim + 0.25], [R - wall, rim + 0.25], [R - wall, rim - 0.4]], 160, M.metal), 'rim-band'));
   const depth = Math.min(H * 0.7, 14.5), floor = rim - depth, inner = (y) => r(Math.min(1, Math.max(0, (y - yb) / H))) - wall;
   const lp = []; for (let k = 0; k <= 24; k++) { const y = floor + (k / 24) * (rim - floor); lp.push([inner(y), y]); }
-  g.add(named(lathe([[0, floor], ...lp], 160, M.liner), 'bowl-liner'));
+  g.add(named(lathe([[0, floor], ...lp], 96, M.liner), 'bowl-liner'));
   g.userData.bowl = { floor, rim, rAt: inner };
   return g;
 }
@@ -156,12 +234,12 @@ export function buildCup(P, M) {
 // 12 oz longneck: straight body, long gentle shoulder, tapered neck, crown lip
 const BOTTLE = [[0, 0], [1.14, 0], [1.2, 0.15], [1.2, 4.9], [1.16, 5.5], [1.0, 6.2], [0.74, 6.9], [0.61, 7.4], [0.55, 8.5], [0.6, 8.62], [0.6, 8.92], [0, 8.97]];
 const rBottle = (y) => { for (let i = 1; i < BOTTLE.length; i++) if (y <= BOTTLE[i][1]) { const [r0, y0] = BOTTLE[i - 1], [r1, y1] = BOTTLE[i]; return r0 + (r1 - r0) * (y - y0) / Math.max(1e-6, y1 - y0); } return 0.5; };
-export function buildContents(P, M, bowl, { instanced = true, seed = 7 } = {}) {
+export function buildContents(P, M, bowl, { instanced = true, seed = 7, lod = 'high' } = {}) {
   const g = named(new THREE.Group(), 'bottles-and-ice'), r = rng(seed), Ri = bowl.rAt(bowl.rim) - 0.4, heap = P.heap;
   const surf = (x, z) => { const q = Math.min(1, Math.hypot(x, z) / Ri); return bowl.rim - 0.9 + heap * (1 - q * q) + 0.35 * Math.sin(x * 0.7) * Math.cos(z * 0.6); };
   // ice bed: one displaced surface that reads as packed ice
-  const bed = new THREE.CircleGeometry(Ri, 96, 0, Math.PI * 2); bed.rotateX(-Math.PI / 2);
-  const bp = bed.attributes.position; for (let i = 0; i < bp.count; i++) bp.setY(i, surf(bp.getX(i), bp.getZ(i)) - 0.6); bed.computeVertexNormals();
+  const bed = cachedGeometry(K('bed', Ri, bowl.rim, heap), () => { const b = new THREE.CircleGeometry(Ri, 96, 0, Math.PI * 2); b.rotateX(-Math.PI / 2);
+    const bp = b.attributes.position; for (let i = 0; i < bp.count; i++) bp.setY(i, surf(bp.getX(i), bp.getZ(i)) - 0.6); b.computeVertexNormals(); return b; });
   g.add(named(mesh(bed, M.iceBed), 'ice-bed'));
   // bottles: pushed into the ice at different depths, each tilted and turned a little differently, labels mostly facing out
   const n = Math.round(P.bottles), nIn = n >= 10 ? Math.round(n / 4) : 0, nOut = n - nIn, slots = [], jit = (k) => (r() * 2 - 1) * k;
@@ -174,11 +252,12 @@ export function buildContents(P, M, bowl, { instanced = true, seed = 7 } = {}) {
     const lean = inner ? 0.04 + r() * (P.lean + 0.08) : 0.1 + r() * (P.lean * 2 + 0.12), side = jit(0.16);
     slots.push([a, x, z, surf(x, z) - bury, yaw, lean, side]);
   }
-  const lathe32 = new THREE.LatheGeometry(BOTTLE.map(([q, y]) => new THREE.Vector2(q, y)), 40);
-  const beer = new THREE.LatheGeometry(BOTTLE.filter(([, y]) => y < 7.2).map(([q, y]) => new THREE.Vector2(Math.max(0, q - 0.12), y + 0.05)), 24);
-  const lab = new THREE.CylinderGeometry(1.222, 1.222, 3.9, 64, 1, true); lab.translate(0, 2.65, 0);
-  const nk = new THREE.CylinderGeometry(rBottle(8.5) + 0.02, rBottle(7.0) + 0.02, 1.5, 40, 1, true); nk.translate(0, 7.75, 0);
-  const cp = new THREE.CylinderGeometry(0.6, 0.64, 0.36, 24); cp.translate(0, 8.86, 0);
+  const hi = lod !== 'low', bs = hi ? 40 : 16; // bottle part geometries are shared by every bottle and every rebuild
+  const lathe32 = cachedGeometry(K('bottle', bs), () => new THREE.LatheGeometry(BOTTLE.map(([q, y]) => new THREE.Vector2(q, y)), bs));
+  const beer = cachedGeometry(K('beer', bs), () => new THREE.LatheGeometry(BOTTLE.filter(([, y]) => y < 7.2).map(([q, y]) => new THREE.Vector2(Math.max(0, q - 0.12), y + 0.05)), Math.max(12, bs - 16)));
+  const lab = cachedGeometry(K('label', bs), () => new THREE.CylinderGeometry(1.222, 1.222, 3.9, hi ? 64 : 24, 1, true).translate(0, 2.65, 0));
+  const nk = cachedGeometry(K('neck', bs), () => new THREE.CylinderGeometry(rBottle(8.5) + 0.02, rBottle(7.0) + 0.02, 1.5, bs, 1, true).translate(0, 7.75, 0));
+  const cp = cachedGeometry(K('cap', bs), () => new THREE.CylinderGeometry(0.6, 0.64, 0.36, hi ? 24 : 12).translate(0, 8.86, 0));
   const parts = [[lathe32, M.glass], [beer, M.beer], [lab, M.label], [nk, M.neck], [cp, M.cap]], mats = [];
   for (const [a, x, z, y, yaw, lean, side] of slots) { const o = new THREE.Object3D(); o.position.set(x, y, z); o.rotation.set(0, yaw, 0); o.rotateX(lean); o.rotateZ(side); o.updateMatrix(); mats.push(o.matrix.clone()); }
   for (const [geo, mat] of parts) {
@@ -194,11 +273,11 @@ export function buildContents(P, M, bowl, { instanced = true, seed = 7 } = {}) {
     if (near.some(([cx, cz]) => Math.hypot(x - cx, z - cz) < 1.0)) continue;
     cubes.push([x, z]); (cell.get(k) || cell.set(k, []).get(k)).push([x, z]);
   }
-  const cg = new THREE.IcosahedronGeometry(0.62, instanced ? 1 : 0), d = new THREE.Object3D(), cm = []; // crushed ice: irregular faceted chunks
-  if (instanced) { const p = cg.attributes.position, rq = rng(11); for (let i = 0; i < p.count; i++) { const f = 0.82 + rq() * 0.3; p.setXYZ(i, p.getX(i) * f, p.getY(i) * f, p.getZ(i) * f); } cg.computeVertexNormals(); }
+  const chunkDetail = instanced && hi ? 1 : 0, d = new THREE.Object3D(), cm = []; // crushed ice: irregular faceted chunks
+  const cg = cachedGeometry(K('ice-chunk', chunkDetail), () => { const c = new THREE.IcosahedronGeometry(0.62, chunkDetail); if (chunkDetail) { const p = c.attributes.position, rq = rng(11); for (let i = 0; i < p.count; i++) { const f = 0.82 + rq() * 0.3; p.setXYZ(i, p.getX(i) * f, p.getY(i) * f, p.getZ(i) * f); } c.computeVertexNormals(); } return c; });
   for (const [x, z] of cubes) { d.position.set(x, surf(x, z) - 0.15 + r() * 0.8, z); d.rotation.set(r() * 3, r() * 3, r() * 3); d.scale.set(0.8 + r() * 0.7, 0.6 + r() * 0.5, 0.8 + r() * 0.7); d.updateMatrix(); cm.push(d.matrix.clone()); }
   if (instanced) { const im = new THREE.InstancedMesh(cg, M.ice, cm.length); cm.forEach((m, i) => im.setMatrixAt(i, m)); im.castShadow = true; im.receiveShadow = true; g.add(im); }
-  else g.add(mesh(mergeGeometries(cm.map((m) => cg.clone().applyMatrix4(m))), M.ice));
+  else g.add(mesh(cachedGeometry(K('ice-merged', Ri, bowl.rim, heap, P.bottles, P.lean, seed), () => mergeGeometries(cm.map((m) => cg.clone().applyMatrix4(m)))), M.ice));
   g.userData.top = Math.max(...slots.map(([, , , y, l]) => y + 9.1 * Math.cos(l)));
   return g;
 }

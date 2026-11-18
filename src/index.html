@@ -170,11 +170,18 @@ details b{color:#d6dbe4;font-weight:600}
 .focusbtn{position:absolute;right:20px;top:20px;min-height:36px;font-size:11px;z-index:2}
 #still-pane{display:none;position:absolute;left:0;top:0;bottom:0;width:50%;z-index:4;background:#000;border-right:1px solid #ffffff14;flex-direction:column}
 #stage.split #still-pane{display:flex}
-#stage.split canvas{margin-left:50%}
+#stage.split #gl{margin-left:50%}
 #stage.split .viewbar,#stage.split .scene-label,#stage.split .hint{left:calc(50% + 20px)}
 #still-pane .imgwrap{flex:1;min-height:0;display:flex;align-items:center;justify-content:center;overflow:hidden}
-#still-pane img{max-width:100%;max-height:100%;object-fit:contain;cursor:zoom-in}
-#still-pane img.zoom{max-width:none;max-height:none;cursor:zoom-out}
+#still-pane .still{max-width:100%;max-height:100%;object-fit:contain;cursor:zoom-in}
+#still-pane .still.zoom{max-width:none;max-height:none;cursor:zoom-out}
+#tt-view{position:absolute;left:0;top:0;pointer-events:none;opacity:0;transition:opacity .18s;z-index:1}
+#tt-view.on{opacity:1;transition:none}
+#stage.split #tt-view{left:50%}
+.perfchip{position:absolute;right:20px;bottom:18px;width:max-content;z-index:3;pointer-events:none;padding:6px 11px;font-size:10.5px;line-height:1.5;color:#dfe6f5;background:#0a0b0ee6;border:1px solid #345496;border-radius:9px;backdrop-filter:blur(12px);text-align:right;max-width:min(420px,70%)}
+.perfchip.cpu{border-color:#b08a2e}
+.perfchip b{font-weight:600;color:#fff}
+.perfchip .sub{color:#8f97a5}
 #still-pane .imgwrap.zoom{overflow:auto;display:block}
 #still-pane .bar{display:flex;align-items:center;gap:8px;padding:10px 14px;border-top:1px solid #ffffff10;background:#0a0b0e;font-size:11px;color:#a1a8b7}
 #still-pane .bar .tag{margin-right:auto;letter-spacing:1px;text-transform:uppercase;font-size:9.5px}
@@ -218,7 +225,7 @@ details b{color:#d6dbe4;font-weight:600}
 <header class="topbar">
   <div class="header-left"><span class="pill"><span class="statusdot"></span><span id="pill-txt">3D model · from the reference render</span></span><button class="mobile-toggle" id="mobileToggle" aria-controls="panel" aria-expanded="false">Controls</button></div>
   <div class="brand" id="brand-mark"><span class="txt">MICHELOB ULTRA</span></div>
-  <div class="header-actions"><button id="still">Render still</button><button id="capture">Capture view</button><button id="export">Export GLB</button></div>
+  <div class="header-actions"><button id="still">Final render</button><button id="capture">Capture view</button><button id="export">Export GLB</button></div>
 </header>
 <div class="study-title"><h1>3D study <span id="study-sub">· Trophy cooler — chrome fluted cup on a Michelob blue freezer enclosure</span></h1></div>
 <div class="layout">
@@ -266,8 +273,12 @@ details b{color:#d6dbe4;font-weight:600}
 
   <section class="section"><h2>View settings</h2>
     <div class="input-row"><label>Environment</label><div class="seg" id="env" style="width:170px"><button data-v="studio">Studio</button><button data-v="rink">Rink</button></div></div>
-    <label class="toggle-row" id="photo-row"><input type="checkbox" id="photo" checked>Photoreal (path-traced; refines when the view is still · studio only)</label>
-    <label class="toggle-row"><input type="checkbox" id="hq" checked>Ambient occlusion while orbiting</label>
+    <div class="input-row"><label>Preview</label><div class="seg" id="mode" style="width:170px"><button data-v="fast">Fast</button><button data-v="high">High quality</button></div></div>
+    <p class="note" id="mode-note"></p>
+    <label class="toggle-row" id="hq-row"><input type="checkbox" id="hq" checked>Ambient occlusion when still</label>
+    <label class="toggle-row" id="photo-row"><input type="checkbox" id="photo">Photoreal when still (path-traced, studio only)</label>
+    <label class="toggle-row"><input type="checkbox" id="tt-toggle">Cached turntable while dragging (for computers without a graphics card)</label>
+    <div class="input-row"><label>Final render</label><select id="final-size" style="width:170px"><option value="1600x64">1600 px · 64 samples</option><option value="2400x128">2400 px · 128 samples</option><option value="2400x256">2400 px · 256 samples</option><option value="3200x256">3200 px · 256 samples</option></select></div>
     <label class="toggle-row"><input type="checkbox" id="spin">Auto-rotate</label>
     <div class="slider-head"><label for="explode">Explode sections</label><output id="explode-v">0%</output></div><input class="range" id="explode" type="range" min="0" max="1" step="0.01" value="0">
     <button id="reset" class="wide">Reset to the render</button>
@@ -300,10 +311,11 @@ details b{color:#d6dbe4;font-weight:600}
   <div class="scene-label" id="scene-label">Freezer enclosed · 12 Michelob ULTRA on ice</div>
   <div class="hint">Drag to orbit<span>·</span>Scroll to zoom<span>·</span>Right-drag to pan</div>
   <div id="toast" role="status" aria-live="polite"></div>
-  <div id="still-pane"><div class="pane-tag" style="left:20px">Still render · path-traced</div><div class="imgwrap"><img id="still-img" alt="Full-resolution path-traced still of the trophy cooler"></div>
-    <div class="bar"><span class="tag" id="still-info"></span><button id="still-again">Re-render</button><button id="still-dl">Download PNG</button><button id="still-close">Close</button></div></div>
+  <div id="still-pane"><div class="pane-tag" style="left:20px">Still render · path-traced</div><div class="imgwrap"><canvas id="still-cv" class="still" role="img" aria-label="Full-resolution path-traced still of the trophy cooler"></canvas></div>
+    <div class="bar"><span class="tag" id="still-info"></span><button id="still-again">Re-render</button><button id="still-dl" disabled>Download PNG</button><button id="still-close">Close</button></div></div>
   <div id="still-busy"><div id="still-msg">Rendering still…</div><div class="track"><div class="fill" id="still-fill"></div></div><button id="still-cancel">Cancel</button></div>
-  <div class="vchip" id="pt-chip" style="position:absolute;right:20px;bottom:18px;z-index:3;display:none;pointer-events:none;padding:6px 12px">Photoreal</div>
+  <div class="vchip" id="pt-chip" style="position:absolute;right:20px;bottom:66px;z-index:3;display:none;pointer-events:none;padding:6px 12px">Photoreal</div>
+  <div class="perfchip" id="perf" aria-live="off"></div>
   <div class="loader" id="loading"><div class="loadbox"><div class="spin"></div><h3>Building the trophy</h3><p>Fluted bowl, pedestal and freezer enclosure.</p></div></div>
 </main>
 </div>
@@ -323,6 +335,7 @@ import studioHDRI from '@pmndrs/assets/hdri/studio.exr.js';
 import logoWhiteURL from './assets/logo-white.png';
 import logoColorURL from './assets/logo-color.png';
 import * as T from './trophy.js';
+import * as S from './stage.js';
 
 const $ = (id) => document.getElementById(id);
 const mk = (w, h) => { const c = document.createElement('canvas'); c.width = w; c.height = h; return c; };
@@ -332,81 +345,64 @@ const V = { sel: 'cup', isolate: false, xray: false, panel: 0, explode: 0, env: 
 const B = { logo: null, logoSrc: null };
 try { const d = JSON.parse(localStorage.getItem(KEY) || 'null'); if (d) { P = { ...P, ...d.P }; lock = d.lock !== false; V.env = d.env || 'studio'; if (d.logo) B.logoSrc = d.logo; } } catch {}
 let HQ = true; try { HQ = localStorage.getItem('trophy-cooler-hq') !== '0'; } catch {}
+let DIRTY = true, EDIT = false; // render on demand: DIRTY = something changed; EDIT = a shape slider is being dragged
 let saveT; const save = () => { clearTimeout(saveT); saveT = setTimeout(() => { try { localStorage.setItem(KEY, JSON.stringify({ P, lock, env: V.env, logo: B.logoSrc })); } catch {} }, 400); };
 
 // ---------- renderer ----------
 const view = $('stage');
-const renderer = new THREE.WebGLRenderer({ antialias: true, preserveDrawingBuffer: true });
-renderer.setPixelRatio(Math.min(devicePixelRatio, 2));
+// Who draws the pixels? Software WebGL (SwiftShader, llvmpipe, Microsoft Basic Render…) means every pixel is shaded on the CPU.
+const GPU = (() => {
+  let ren = 'unknown', caveat = false;
+  try {
+    const c1 = document.createElement('canvas'), g1 = c1.getContext('webgl2', { failIfMajorPerformanceCaveat: true }); caveat = !g1; if (g1) g1.getExtension('WEBGL_lose_context')?.loseContext();
+    const c2 = document.createElement('canvas'), gl = c2.getContext('webgl2') || c2.getContext('webgl');
+    if (gl) { const e = gl.getExtension('WEBGL_debug_renderer_info'); ren = String(e ? gl.getParameter(e.UNMASKED_RENDERER_WEBGL) : gl.getParameter(gl.RENDERER)); gl.getExtension('WEBGL_lose_context')?.loseContext(); }
+  } catch {}
+  const software = caveat || /swiftshader|llvmpipe|softpipe|software|basic render|mesa offscreen/i.test(ren);
+  const short = (ren.match(/SwiftShader|llvmpipe|Microsoft Basic Render[\w ]*|Apple [A-Z0-9][\w ]*|Intel[^,)]*|NVIDIA[^,)]*|AMD[^,)]*|Radeon[^,)]*|Mali[^,)]*|Adreno[^,)]*/i) || [ren])[0].replace(/\s+/g, ' ').trim();
+  return { ren, short, software };
+})();
+// Preview modes. 'fast' (default): precomputed reflections, static shadow, no mirror / AO / transmission, redraw only on change.
+// 'high': adds the mirror floor, see-through ice and glass, ambient occlusion when idle, and the optional progressive path tracer.
+let MODE = 'fast'; try { MODE = localStorage.getItem('trophy-cooler-mode') || 'fast'; } catch {}
+// Adaptive resolution = canvas pixel ratio. Starts low on weak systems, drops while dragging, steps back up when you stop.
+const Q = { idle: GPU.software ? 0.75 : Math.min(devicePixelRatio || 1, 1.5), adapt: GPU.software ? 0.6 : 0.85, min: 0.3, scale: GPU.software ? 0.6 : 1,
+  fps: 0, dtEMA: 0, lastT: 0, lastRenderMs: 0, interacting: false, settleUntil: 0, lastAdapt: 0, slowSince: 0, lastStep: 0, chipT: 0 };
+const renderer = new THREE.WebGLRenderer({ antialias: !GPU.software, preserveDrawingBuffer: true });
+renderer.setPixelRatio(Q.scale);
 renderer.toneMapping = THREE.ACESFilmicToneMapping; renderer.toneMappingExposure = 1.0;
 renderer.shadowMap.enabled = true; renderer.shadowMap.type = THREE.VSMShadowMap;
-view.prepend(renderer.domElement);
-const scene = new THREE.Scene(), pmrem = new THREE.PMREMGenerator(renderer);
+renderer.shadowMap.autoUpdate = false; // the key light never moves relative to the object: compute its shadow once per model change
+renderer.domElement.id = 'gl'; view.prepend(renderer.domElement);
+const scene = new THREE.Scene();
 const camera = new THREE.PerspectiveCamera(30, 1, 1, 20000);
 const controls = new OrbitControls(camera, renderer.domElement);
 controls.enableDamping = true; controls.minDistance = 40; controls.maxDistance = 900; controls.maxPolarAngle = 1.55;
 
-// studio: black room with large softboxes (like the render) · rink: arena lights over ice
-function envScene(kind) {
-  const s = new THREE.Scene(), geo = new THREE.SphereGeometry(100, 64, 32), pos = geo.attributes.position, col = [], c = new THREE.Color();
-  const [top, hor, lo] = kind === 'studio' ? [0x15171b, 0x50545c, 0x16171a] : [0x0b0f18, 0x5d6b82, 0xe9eff6];
-  for (let i = 0; i < pos.count; i++) { const y = pos.getY(i) / 100; c.lerpColors(new THREE.Color(hor), new THREE.Color(y >= 0 ? top : lo), Math.pow(Math.abs(y), 0.5)); col.push(c.r, c.g, c.b); }
-  geo.setAttribute('color', new THREE.Float32BufferAttribute(col, 3));
-  s.add(new THREE.Mesh(geo, new THREE.MeshBasicMaterial({ vertexColors: true, side: THREE.BackSide })));
-  const panel = (w, h, k, x, y, z, tint = [1, 1, 1]) => { const m = new THREE.Mesh(new THREE.PlaneGeometry(w, h), new THREE.MeshBasicMaterial({ color: new THREE.Color(k * tint[0], k * tint[1], k * tint[2]), side: THREE.DoubleSide })); m.position.set(x, y, z); m.lookAt(0, 20, 0); s.add(m); };
-  if (kind === 'studio') {
-    panel(110, 70, 6, 0, 88, 0);                        // large overhead softbox
-    panel(34, 110, 5.5, -70, 30, 25); panel(34, 110, 5.5, 70, 30, 25);   // tall strip softboxes left / right (vertical highlights in the chrome)
-    panel(26, 90, 3, -45, 30, -60); panel(26, 90, 3, 45, 30, -60);       // rear kickers
-    panel(90, 50, 2.6, 0, 30, 85);                       // front fill
-    panel(90, 10, 0.9, 0, 4, -80, [0.4, 0.6, 1.4]);    // faint blue kicker behind
-  } else {
-    const hot = new THREE.MeshBasicMaterial({ color: new THREE.Color(9, 9, 9.4) });
-    for (let row = -2; row <= 2; row++) for (let k = -3; k <= 3; k++) { const m = new THREE.Mesh(new THREE.BoxGeometry(9, 0.6, 2.2), hot); m.position.set(k * 13, 70, row * 16); m.rotation.x = Math.PI / 2; s.add(m); }
-    panel(46, 26, 5, 45, 40, 60); panel(60, 20, 1.4, -70, 20, 40);
-    const boards = new THREE.Mesh(new THREE.CylinderGeometry(88, 88, 7, 64, 1, true), new THREE.MeshBasicMaterial({ color: new THREE.Color(0.25, 0.55, 2.4), side: THREE.BackSide })); boards.position.y = 4; s.add(boards);
-  }
-  return pmrem.fromScene(s, 0.015).texture;
-}
-const ENV = { studio: envScene('studio'), rink: envScene('rink') };
+// reflection environments: rendered once into PMREM cubes, reused every frame (no per-frame reflection work)
+const ENV = { studio: S.pmremEnv(renderer, 'studio'), rink: S.pmremEnv(renderer, 'rink') };
 let studioEq = null;
 new EXRLoader().setDataType(THREE.FloatType).load(studioHDRI, (t) => {
   t.mapping = THREE.EquirectangularReflectionMapping;
-  studioEq = t; ptDirty(); // the HDRI lights the path tracer; the real-time view keeps its tuned softbox environment
+  studioEq = t; ptDirty(); if (typeof RW !== 'undefined' && RW) RW.postMessage({ type: 'hdri', data: t.image.data, width: t.image.width, height: t.image.height }); // the HDRI lights the path tracer; the real-time view keeps its tuned softbox environment
 });
 const hemi = new THREE.HemisphereLight(0xdfe9ff, 0x20242c, 0.25); scene.add(hemi);
-const key = new THREE.DirectionalLight(0xfff5ea, 2.4); key.position.set(30, 220, 80); key.castShadow = true;
-Object.assign(key.shadow.camera, { left: -70, right: 70, top: 110, bottom: -40, near: 40, far: 500 });
-key.shadow.mapSize.set(2048, 2048); key.shadow.bias = -0.0006; key.shadow.normalBias = 0.25; key.shadow.radius = 10; key.shadow.blurSamples = 20; scene.add(key);
-const rimL = new THREE.DirectionalLight(0xbcd2ff, 1.3); rimL.position.set(-160, 90, -60); scene.add(rimL);
-const rimR = new THREE.DirectionalLight(0xffffff, 0.9); rimR.position.set(160, 70, -40); scene.add(rimR);
-const front = new THREE.DirectionalLight(0xffffff, 0.55); front.position.set(0, 50, 200); scene.add(front);
-
-// floors: glossy black studio floor with a soft reflection, or a rink disc
+const LIGHTS = S.addLights(scene);
+// floors: black studio floor (+ mirror reflection in High quality only), or a rink disc; cached contact shadow under the object
 const floor = new THREE.Group(); scene.add(floor);
 const mirror = new Reflector(new THREE.CircleGeometry(260, 96), { textureWidth: 1024, textureHeight: 1024, color: 0x1c1e23 });
 mirror.rotation.x = -Math.PI / 2; mirror.position.y = -0.02; floor.add(mirror);
-function radial(stops) { const c = mk(1024, 1024), x = c.getContext('2d'), g = x.createRadialGradient(512, 512, 0, 512, 512, 512); stops.forEach(([o, s]) => g.addColorStop(o, s)); x.fillStyle = g; x.fillRect(0, 0, 1024, 1024); const t = new THREE.CanvasTexture(c); t.colorSpace = THREE.SRGBColorSpace; return t; }
+const radial = S.radial;
 const studioFloor = new THREE.Mesh(new THREE.CircleGeometry(262, 96), new THREE.MeshBasicMaterial({ color: 0x020203, transparent: true, alphaMap: radial([[0, '#c8c8c8'], [0.2, '#d6d6d6'], [0.5, '#ffffff'], [1, '#ffffff']]), toneMapped: false }));
 studioFloor.rotation.x = -Math.PI / 2; studioFloor.position.y = 0.01; floor.add(studioFloor);
-function iceTexture() {
-  const N = 2048, R = 170, c = mk(N, N), x = c.getContext('2d'), k = N / (2 * R);
-  x.fillStyle = '#8f9cab'; x.fillRect(0, 0, N, N);
-  const line = (z, col, w) => { x.fillStyle = col; x.fillRect(0, N / 2 + z * k - w * k / 2, N, w * k); }; line(-75, '#c8102e', 8); line(130, '#1a49b8', 8);
-  x.strokeStyle = '#c8102e'; x.lineWidth = 2 * k; x.beginPath(); x.arc(N / 2, N / 2, 110 * k, 0, 6.283); x.stroke();
-  x.globalCompositeOperation = 'destination-in'; const g = x.createRadialGradient(N / 2, N / 2, N * 0.18, N / 2, N / 2, N / 2); g.addColorStop(0, 'rgba(0,0,0,.85)'); g.addColorStop(1, 'rgba(0,0,0,0)'); x.fillStyle = g; x.fillRect(0, 0, N, N);
-  const t = new THREE.CanvasTexture(c); t.colorSpace = THREE.SRGBColorSpace; t.anisotropy = 8; return t;
-}
-const rink = new THREE.Mesh(new THREE.PlaneGeometry(340, 340), new THREE.MeshPhysicalMaterial({ map: iceTexture(), transparent: true, depthWrite: false, roughness: 0.55, clearcoat: 0.55 }));
-rink.rotation.x = -Math.PI / 2; rink.position.y = 0.01; rink.receiveShadow = true; scene.add(rink);
-const contact = new THREE.Mesh(new THREE.PlaneGeometry(1, 1), new THREE.MeshBasicMaterial({ map: radial([[0, 'rgba(0,0,0,.7)'], [0.5, 'rgba(0,0,0,.4)'], [1, 'rgba(0,0,0,0)']]), transparent: true, depthWrite: false, toneMapped: false }));
-contact.rotation.x = -Math.PI / 2; contact.position.y = 0.05; contact.renderOrder = 2; scene.add(contact);
+const { rink, contact } = S.makeGround(scene);
 function applyEnv() {
   const studio = V.env === 'studio';
-  scene.environment = ENV[V.env]; floor.visible = studio; rink.visible = !studio;
+  scene.environment = ENV[V.env]; scene.environmentIntensity = 1; floor.visible = studio; rink.visible = !studio; mirror.visible = MODE === 'high';
   scene.background = studio ? new THREE.Color(0x020203) : backdrop || new THREE.Color(0x15181c);
   document.querySelectorAll('#env button').forEach((b) => b.classList.toggle('active', b.dataset.v === V.env));
   view.style.backgroundColor = studio ? '#020203' : '#15181c';
+  redraw();
 }
 let backdrop = null;
 function stageBackdrop(w, h) { const k = renderer.getPixelRatio(), c = mk(Math.max(2, Math.round(w * k)), Math.max(2, Math.round(h * k))), x = c.getContext('2d'); x.fillStyle = '#15181c'; x.fillRect(0, 0, c.width, c.height); x.fillStyle = 'rgba(110,118,136,.42)'; const st = 22 * k; for (let yy = st / 2; yy < c.height; yy += st) for (let xx = st / 2; xx < c.width; xx += st) { x.beginPath(); x.arc(xx, yy, 0.85 * k, 0, 6.283); x.fill(); } const t = new THREE.CanvasTexture(c); t.colorSpace = THREE.SRGBColorSpace; return t; }
@@ -417,21 +413,16 @@ const gtao = new GTAOPass(scene, camera, 4, 4);
 gtao.updateGtaoMaterial({ radius: 6, distanceExponent: 1.6, thickness: 3, scale: 1.1, samples: 16, distanceFallOff: 1, screenSpaceRadius: false });
 gtao.updatePdMaterial({ lumaPhi: 10, depthPhi: 2, normalPhi: 3, radius: 6, rings: 2, samples: 16 }); gtao.blendIntensity = 0.8; composer.addPass(gtao);
 composer.addPass(new OutputPass());
-const renderFrame = () => (HQ ? composer.render() : renderer.render(scene, camera));
-let PHOTO = true; try { PHOTO = localStorage.getItem('trophy-cooler-photo') !== '0'; } catch {}
+const renderFrame = (withAO) => (withAO ? composer.render() : renderer.render(scene, camera));
+function redraw() { DIRTY = true; }
+let PHOTO = false; try { PHOTO = localStorage.getItem('trophy-cooler-photo2') === '1'; } catch {} // progressive path tracing in the live view: opt-in, High quality only
 for (const k of ['environmentRotation', 'backgroundRotation']) if (!(k in THREE.Scene.prototype) && !(k in scene)) THREE.Scene.prototype[k] = new THREE.Euler(); // fields the path tracer reads (three r162+)
 const pt = new WebGLPathTracer(renderer);
 Object.assign(pt, { minSamples: 2, renderDelay: 250, fadeDuration: 350, bounces: 8, transmissiveBounces: 10, filterGlossyFactor: 0.5, renderScale: Math.min(1, 1.25 / renderer.getPixelRatio()) });
 pt.tiles.set(2, 2);
-const ptFloor = new THREE.Mesh(new THREE.CircleGeometry(1, 96), new THREE.MeshPhysicalMaterial({ color: 0x000000, roughness: 1, metalness: 0, specularIntensity: 0 }));
-ptFloor.rotation.x = -Math.PI / 2; ptFloor.visible = false; scene.add(ptFloor);
-// studio softboxes, seen only by the path tracer: they light the piece and put long highlights in the chrome, like the reference
-const softboxes = new THREE.Group(); softboxes.visible = false; scene.add(softboxes);
-for (const [w, h, i, pos, look] of [[40, 90, 9, [-70, 70, 40], [0, 40, 0]], [40, 90, 9, [70, 70, 40], [0, 40, 0]], [90, 40, 6, [0, 120, 30], [0, 40, 0]], [60, 30, 3, [0, 40, 110], [0, 40, 0]], [30, 90, 5, [0, 60, -80], [0, 40, 0]]]) {
-  const l = new THREE.RectAreaLight(0xffffff, i, w, h); l.position.set(...pos); l.lookAt(...look); softboxes.add(l);
-}
+const { floor: ptFloor, softboxes } = S.makePTExtras(scene);
 let ptReady = false, ptT = 0;
-function photoActive() { return typeof PHOTO !== 'undefined' && PHOTO && V.env === 'studio' && studioEq; }
+function photoActive() { return typeof PHOTO !== 'undefined' && PHOTO && MODE === 'high' && V.env === 'studio' && studioEq; }
 function ptDirty() { if (typeof pt === 'undefined') return; ptReady = false; clearTimeout(ptT); if (photoActive()) ptT = setTimeout(syncPT, 220); }
 async function syncPT() { // swap raster-only helpers for path-traceable stand-ins, then rebuild the BVH
   if (!photoActive() || !root) return;
@@ -439,9 +430,13 @@ async function syncPT() { // swap raster-only helpers for path-traceable stand-i
   try { pt.setScene(scene, camera); ptReady = true; } catch (e) { console.warn('path tracer unavailable', e); PHOTO = false; ptMode(false); syncUI(); }
 }
 function ptMode(on) {
-  mirror.visible = !on; studioFloor.visible = !on; ptFloor.visible = on && V.env === 'studio'; softboxes.visible = on;
-  if (on) { ptFloor.scale.set(600, 600, 1); scene.environmentIntensity = 0.4; scene.background = new THREE.Color(0x000000); scene.environment = studioEq; } else applyEnv(); contact.visible = !on && !!parts.base && (parts.base.visible || parts.enc.visible);
+  mirror.visible = !on && MODE === 'high'; studioFloor.visible = !on; ptFloor.visible = on && V.env === 'studio'; softboxes.visible = on;
+  if (on) { scene.environmentIntensity = 0.4; scene.background = new THREE.Color(0x000000); scene.environment = studioEq; } else applyEnv();
+  contact.visible = !on && !!parts.base && (parts.base.visible || parts.enc.visible);
+  if (on && parts.contents && !parts.contentsMerged) { parts.contentsMerged = T.buildContents(P, MATS, parts.cup.userData.bowl, { instanced: false }); parts.cupGroup.add(parts.contentsMerged); } // built only when the path tracer needs it
   if (parts.contents && parts.contentsMerged) { parts.contents.visible = !on && parts.cvis; parts.contentsMerged.visible = on && parts.cvis; }
+  if (on) setLOD('high');
+  redraw();
 }
 controls.addEventListener('change', () => { if (ptReady) { pt.pausePathTracing = false; pt.updateCamera(); } });
 
@@ -499,32 +494,37 @@ function neckLabel() { // white neck foil: red ribbon at the front, blue band wi
 // ---------- build ----------
 let root = null, parts = {}, texs = [];
 const ghost = new THREE.MeshStandardMaterial({ color: 0x9cc4ff, transparent: true, opacity: 0.12, depthWrite: false });
-function dispose(o) { o.traverse((m) => { if (m.geometry) m.geometry.dispose(); const mm = m.userData.orig || m.material; if (mm && mm !== ghost) [mm].flat().forEach((x) => x.dispose && x.dispose()); }); }
+function dispose(o) { o.traverse((m) => { if (m.geometry && !m.geometry.userData.cached) m.geometry.dispose(); const mm = m.userData.orig || m.material; if (mm && mm !== ghost) [mm].flat().forEach((x) => x.dispose && x.dispose()); }); }
+// Brand textures are drawn once and only redrawn when the logo changes; geometry comes from the trophy.js cache,
+// so a colour or material change only makes new materials.
+let MATS = null, TX = null, txKey = '', txVersion = 0;
 function build() {
-  if (root) { scene.remove(root); dispose(root); } texs.forEach((t) => t.dispose());
   if (lock) { const k = P.W / 32; P.bowlD = Math.round(P.W * 2) / 2; P.bowlH = +(10.7 * k).toFixed(1); P.pedH = +(12 * k).toFixed(1); }
-  const tx = { logo: frontLogo(), bottleLabel: bottleLabel(), neckLabel: neckLabel() }; texs = Object.values(tx);
-  const M = T.makeMaterials(P, tx); root = new THREE.Group(); scene.add(root);
-  parts.base = T.buildBase(P, M); parts.enc = T.buildEnclosure(P, M); parts.fridge = T.buildFridge(P);
-  parts.cupGroup = new THREE.Group(); parts.cup = T.buildCup(P, M); parts.contents = T.buildContents(P, M, parts.cup.userData.bowl); parts.contentsMerged = T.buildContents(P, M, parts.cup.userData.bowl, { instanced: false }); parts.contentsMerged.visible = false; parts.cupGroup.add(parts.cup, parts.contents, parts.contentsMerged);
-  root.add(parts.base, parts.enc, parts.fridge, parts.cupGroup);
-  parts.enc.traverse((m) => { if (m.isMesh) m.userData.orig = m.material; });
-  applyView(); specs(); syncUI(); save();
+  const tk = (B.logo ? 'upload' : 'default') + ':' + txVersion;
+  if (!TX || tk !== txKey) { if (TX) Object.values(TX).forEach((t) => t.dispose()); TX = { logo: frontLogo(), bottleLabel: bottleLabel(), neckLabel: neckLabel() }; txKey = tk; }
+  if (root) { scene.remove(root); dispose(root); }
+  MATS = T.makeMaterials(P, TX, { fast: MODE === 'fast', detail: true });
+  const m = S.buildModel(P, MATS, { lod: EDIT ? 'low' : 'both' }); root = m.root; parts = m.parts; scene.add(root);
+  parts.enc.traverse((o) => { if (o.isMesh) o.userData.orig = o.material; });
+  LODLEVEL = null; applyView(); specs(); syncUI(); save();
 }
 function applyView() {
   if (!root) return;
-  const top = T.casterH(P) + P.H, only = V.isolate ? V.sel : null, vis = V.vis;
-  parts.cup.visible = only ? only === 'cup' : vis.cup;
-  parts.cvis = only ? only === 'cup' || only === 'contents' : vis.contents; parts.contents.visible = parts.cvis;
-  parts.enc.visible = only ? only === 'enc' : vis.enc;
-  parts.fridge.visible = only ? only === 'enc' || only === 'fridge' : vis.fridge;
-  parts.base.visible = only ? only === 'base' : vis.base;
+  const a = S.arrange(parts, P, V);
+  if (parts.contentsMerged) parts.contentsMerged.visible = false;
   parts.enc.traverse((m) => { if (m.isMesh) { m.material = V.xray ? ghost : m.userData.orig; m.castShadow = !V.xray; } });
-  parts.enc.userData.setPanel(V.panel);
-  const ex = only ? 0 : V.explode;
-  parts.base.position.y = -ex * 6; parts.enc.position.y = 0; parts.cupGroup.position.y = top + ex * 40;
-  contact.scale.set(P.W * 1.5, P.D * 2.6, 1); contact.visible = parts.base.visible || parts.enc.visible;
-  ptMode(false); ptDirty();
+  contact.scale.set(P.W * 1.5, P.D * 2.6, 1); contact.visible = a.grounded;
+  root.updateMatrixWorld(true); parts.cupSphere = new THREE.Box3().setFromObject(parts.cup).getBoundingSphere(new THREE.Sphere());
+  renderer.shadowMap.needsUpdate = true; // static shadow: recomputed here, never per frame
+  ptMode(false); ptDirty(); ttSchedule();
+}
+// Level of detail by screen size: the low cup is shown while a shape slider is dragged or when the cup is small on screen.
+let LODLEVEL = null;
+function setLOD(want) { if (want === LODLEVEL || !parts.cup) return; LODLEVEL = want; parts.cup.traverse((o) => { if (o.userData.lod) o.visible = o.userData.lod === want; }); redraw(); }
+function updateLOD() {
+  if (!parts.cupSphere || (photoActive() && ptReady)) return;
+  const sp = parts.cupSphere, d = Math.max(1, camera.position.distanceTo(sp.center)), px = (sp.radius * 2) / (2 * d * Math.tan(THREE.MathUtils.degToRad(camera.fov / 2))) * view.clientHeight;
+  setLOD(px < (LODLEVEL === 'low' ? 330 : 270) ? 'low' : 'high'); // hysteresis so it never flickers at the threshold
 }
 
 // ---------- specs ----------
@@ -552,28 +552,36 @@ function renderLayers() {
 $('layers').onclick = (e) => { const eye = e.target.closest('[data-eye]'); if (eye) { V.vis[eye.dataset.eye] = !V.vis[eye.dataset.eye]; applyView(); renderLayers(); return; } const s = e.target.closest('[data-sel]'); if (s) { V.sel = s.dataset.sel; if (V.isolate) applyView(); renderLayers(); } };
 $('isolate').onclick = () => { V.isolate = !V.isolate; applyView(); renderLayers(); setTimeout(fit, 30); };
 const SL = { W: [() => Math.ceil(T.MIN.W), 64, (v) => `${v}″`], D: [() => Math.ceil(T.MIN.D), 40, (v) => `${v}″`], H: [() => Math.ceil(T.MIN.H * 4) / 4, 44, (v) => `${v}″`],
-  bowlD: [24, 60, (v) => `${v}″`], bowlH: [8, 24, (v) => `${v}″`], pedH: [6, 28, (v) => `${v}″`], flutes: [12, 48, (v) => `${v}`], twist: [0, 2, (v) => v.toFixed(2)], fluteDepth: [0, 1.6, (v) => `${v.toFixed(2)}″`],
+  bowlD: [24, 60, (v) => `${v}″`], bowlH: [8, 24, (v) => `${v}″`], pedH: [6, 28, (v) => `${v}″`], flutes: [12, 48, (v) => `${v}`], twist: [0, 2, (v) => v.toFixed(2)], fluteDepth: [0, 4, (v) => `${v.toFixed(2)}″`],
   bottles: [12, 36, (v) => `${v}`], heap: [0, 5, (v) => `${v.toFixed(1)}″`], lean: [0, 0.4, (v) => `${Math.round(v * 57.3)}°`] };
 let bt;
 for (const [k, [lo, hi, fmt]] of Object.entries(SL)) { const el = $(k); el.min = typeof lo === 'function' ? lo() : lo; el.max = hi;
-  el.oninput = () => { P[k] = +el.value; if (['bowlD', 'bowlH', 'pedH'].includes(k)) { lock = false; $('lock').checked = false; } $(k + '-v').textContent = fmt(P[k]); clearTimeout(bt); bt = setTimeout(build, 120); }; }
+  el.oninput = () => { P[k] = +el.value; if (['bowlD', 'bowlH', 'pedH'].includes(k)) { lock = false; $('lock').checked = false; } $(k + '-v').textContent = fmt(P[k]); EDIT = true; queueBuild(); };
+  el.onchange = () => { EDIT = false; queueBuild(); }; }
+let qb = 0; function queueBuild() { if (qb) return; qb = requestAnimationFrame(() => { qb = 0; build(); }); } // at most one rebuild per frame
 const seg = (id, key) => { $(id).onclick = (e) => { const b = e.target.closest('button'); if (!b) return; P[key] = b.dataset.v; build(); }; };
 seg('metal', 'metal'); seg('glass', 'glass');
-$('env').onclick = (e) => { const b = e.target.closest('button'); if (!b) return; V.env = b.dataset.v; applyEnv(); ptMode(false); ptDirty(); syncUI(); save(); };
+$('env').onclick = (e) => { const b = e.target.closest('button'); if (!b) return; V.env = b.dataset.v; applyEnv(); ptMode(false); ptDirty(); ttSchedule(); syncUI(); save(); };
 $('lock').onchange = (e) => { lock = e.target.checked; build(); };
 $('color').oninput = (e) => { P.color = e.target.value; $('color-v').textContent = P.color; clearTimeout(bt); bt = setTimeout(build, 120); };
 $('xray').onchange = (e) => { V.xray = e.target.checked; applyView(); };
 $('panel-open').oninput = (e) => { V.panel = +e.target.value; $('panel-open-v').textContent = V.panel < 0.02 ? 'On' : V.panel > 0.98 ? 'Lifted off' : 'Lifting…'; applyView(); };
 $('explode').oninput = (e) => { V.explode = +e.target.value; $('explode-v').textContent = Math.round(V.explode * 100) + '%'; applyView(); };
 $('spin').onchange = (e) => { controls.autoRotate = e.target.checked; };
-$('photo').onchange = (e) => { PHOTO = e.target.checked; try { localStorage.setItem('trophy-cooler-photo', PHOTO ? '1' : '0'); } catch {} ptMode(false); ptDirty(); };
-$('hq').onchange = (e) => { HQ = e.target.checked; try { localStorage.setItem('trophy-cooler-hq', HQ ? '1' : '0'); } catch {} };
+$('mode').onclick = (e) => { const b = e.target.closest('button'); if (!b || b.dataset.v === MODE) return; MODE = b.dataset.v; try { localStorage.setItem('trophy-cooler-mode', MODE); } catch {} build(); applyEnv(); toast(MODE === 'fast' ? 'Fast preview' : 'High-quality preview'); };
+$('tt-toggle').onchange = (e) => { TT.enabled = e.target.checked; TT.userSet = true; try { localStorage.setItem('trophy-cooler-tt', TT.enabled ? '1' : '0'); } catch {} if (TT.enabled) ttSchedule(); else ttCancel(); syncUI(); };
+$('final-size').onchange = (e) => { try { localStorage.setItem('trophy-cooler-final', e.target.value); } catch {} };
+$('photo').onchange = (e) => { PHOTO = e.target.checked; try { localStorage.setItem('trophy-cooler-photo2', PHOTO ? '1' : '0'); } catch {} ptMode(false); ptDirty(); };
+$('hq').onchange = (e) => { HQ = e.target.checked; try { localStorage.setItem('trophy-cooler-hq', HQ ? '1' : '0'); } catch {} redraw(); };
 $('reset').onclick = () => { P = { ...T.DEFAULTS }; lock = true; V.panel = 0; V.explode = 0; V.xray = false; build(); goCam('front'); toast('Reset to the render'); };
 $('mobileToggle').onclick = () => { const o = $('panel').classList.toggle('open'); $('mobileToggle').setAttribute('aria-expanded', o); };
 function syncUI() {
   for (const [k, [, , fmt]] of Object.entries(SL)) { $(k).value = P[k]; $(k + '-v').textContent = fmt(P[k]); }
   for (const [id, key] of [['metal', 'metal'], ['glass', 'glass']]) document.querySelectorAll(`#${id} button`).forEach((b) => b.classList.toggle('active', b.dataset.v === P[key]));
-  $('photo').checked = PHOTO; $('photo').disabled = V.env !== 'studio'; $('photo-row').style.opacity = V.env === 'studio' ? 1 : 0.5; $('lock').checked = lock; $('color').value = P.color; $('color-v').textContent = P.color; $('xray').checked = V.xray; $('hq').checked = HQ;
+  document.querySelectorAll('#mode button').forEach((b) => b.classList.toggle('active', b.dataset.v === MODE));
+  $('mode-note').textContent = MODE === 'fast' ? 'Precomputed reflections and a static shadow; redraws only when something changes, at lower resolution while you drag.' : 'Adds the mirror floor, see-through ice and glass, and ambient occlusion when still. Heavy without a graphics card.';
+  const hi = MODE === 'high'; $('photo').checked = PHOTO; $('photo').disabled = !hi || V.env !== 'studio'; $('photo-row').style.opacity = hi && V.env === 'studio' ? 1 : 0.45; $('hq').disabled = !hi; $('hq-row').style.opacity = hi ? 1 : 0.45;
+  $('tt-toggle').checked = TT.enabled; $('tt-toggle').disabled = !RW; $('lock').checked = lock; $('color').value = P.color; $('color-v').textContent = P.color; $('xray').checked = V.xray; $('hq').checked = HQ;
   $('logo-prev').style.display = B.logo ? 'block' : 'none';
   $('brand-mark').innerHTML = B.logo ? `<img alt="Brand" src="${tint(B.logo, '#ffffff').toDataURL('image/png')}">` : '<span class="txt">MICHELOB ULTRA</span>';
   renderLayers();
@@ -582,13 +590,13 @@ function toast(m) { const t = $('toast'); t.textContent = m; t.classList.add('sh
 
 // logo upload (kept in this browser)
 const loadImg = (src) => new Promise((ok, no) => { const im = new Image(); im.onload = () => ok(im); im.onerror = no; im.src = src; });
-async function setLogo(src) { const im = await loadImg(src); let w = im.naturalWidth || 1200, h = im.naturalHeight || 600; const k = Math.min(1, 1400 / Math.max(w, h)); const c = mk(Math.round(w * k), Math.round(h * k)); c.getContext('2d').drawImage(im, 0, 0, c.width, c.height); B.logo = keyBackground(c); B.logoSrc = B.logo.toDataURL('image/png'); build(); toast('Logo applied to the panel, labels and header'); }
+async function setLogo(src) { txVersion++; const im = await loadImg(src); let w = im.naturalWidth || 1200, h = im.naturalHeight || 600; const k = Math.min(1, 1400 / Math.max(w, h)); const c = mk(Math.round(w * k), Math.round(h * k)); c.getContext('2d').drawImage(im, 0, 0, c.width, c.height); B.logo = keyBackground(c); B.logoSrc = B.logo.toDataURL('image/png'); build(); toast('Logo applied to the panel, labels and header'); }
 const readURL = (f) => new Promise((ok) => { const r = new FileReader(); r.onload = () => ok(r.result); r.readAsDataURL(f); });
 $('f-logo').onchange = async (e) => { if (e.target.files[0]) await setLogo(await readURL(e.target.files[0])); e.target.value = ''; };
 $('drop-logo').addEventListener('dragover', (e) => { e.preventDefault(); $('drop-logo').classList.add('over'); });
 $('drop-logo').addEventListener('dragleave', () => $('drop-logo').classList.remove('over'));
 $('drop-logo').addEventListener('drop', async (e) => { e.preventDefault(); $('drop-logo').classList.remove('over'); const f = [...e.dataTransfer.files].find((f) => f.type.startsWith('image/')); if (f) await setLogo(await readURL(f)); });
-$('logo-rm').onclick = () => { B.logo = null; B.logoSrc = null; build(); };
+$('logo-rm').onclick = () => { B.logo = null; B.logoSrc = null; txVersion++; build(); };
 
 // ---------- export ----------
 let hostDL = null; if (window.claude && typeof window.claude.use === 'function') window.claude.use('downloads').then((d) => { hostDL = d; }).catch(() => {});
@@ -608,53 +616,169 @@ $('glb').onclick = async () => {
   Object.assign(V, keep); applyView();
 };
 $('export').onclick = () => { $('glb-what').value = 'all'; $('glb').click(); };
-$('capture').onclick = async () => { controls.update(); if (!(photoActive() && ptReady)) renderFrame(); const blob = await new Promise((r) => renderer.domElement.toBlob(r, 'image/png')); await saveFile('michelob-ultra-trophy-cooler.png', blob, false); };
+$('capture').onclick = async () => { controls.update(); setScale(Q.idle); if (!(photoActive() && ptReady)) renderFrame(MODE === 'high' && HQ); const blob = await new Promise((r) => renderer.domElement.toBlob(r, 'image/png')); await saveFile('michelob-ultra-trophy-cooler.png', blob, false); };
 $('copy').onclick = async () => { const cfg = { units: 'inches', enclosure: { W: P.W, D: P.D, H: P.H, color: P.color }, iceSled: { height: T.SLED_H, contact: 'UHMW-PE skid plate + 4 runners' }, cup: { bowlDiameter: P.bowlD, bowlHeight: P.bowlH, pedestalHeight: P.pedH, flutes: P.flutes, twist: P.twist, fluteDepth: P.fluteDepth, metal: P.metal }, bottles: P.bottles, freezer: T.FRIDGE, clearances: T.clearances(P) };
   try { await navigator.clipboard.writeText(JSON.stringify(cfg, null, 2)); toast('Dimensions copied'); } catch { $('glb-msg').textContent = JSON.stringify(cfg); } };
 
-// ---------- full-resolution still, shown beside the live 3D view ----------
-let STILL = false, stillCancel = false, stillURL = null, stillBlob = null;
+// ---------- background render worker: turntable cache + final render (never blocks this thread) ----------
+const RW = (() => {
+  try {
+    const src = document.getElementById('render-worker-src');
+    if (!src || typeof OffscreenCanvas === 'undefined' || typeof Worker === 'undefined') return null;
+    const w = new Worker(URL.createObjectURL(new Blob([src.textContent], { type: 'text/javascript' })));
+    w.onmessage = (e) => onWorker(e.data); w.onerror = (e) => console.warn('render worker:', e.message);
+    if (studioEq) w.postMessage({ type: 'hdri', data: studioEq.image.data, width: studioEq.image.width, height: studioEq.image.height });
+    return w;
+  } catch (e) { console.warn('render worker unavailable', e); return null; }
+})();
+let rwTexKey = '';
+async function texMessage() { // brand textures as pre-flipped ImageBitmaps (only sent when they changed)
+  if (rwTexKey === txKey) return null;
+  const one = async (t) => t && { bitmap: await createImageBitmap(t.image, { imageOrientation: 'flipY' }), wrapS: t.wrapS, repeat: [t.repeat.x, t.repeat.y], offset: [t.offset.x, t.offset.y] };
+  const m = { key: txKey, logo: await one(TX.logo), bottleLabel: await one(TX.bottleLabel), neckLabel: await one(TX.neckLabel) };
+  rwTexKey = txKey; return m;
+}
+const bitmapsOf = (m) => (m ? [m.logo, m.bottleLabel, m.neckLabel].filter(Boolean).map((d) => d.bitmap) : []);
+const objectState = () => ({ P: { ...P }, V: { sel: V.sel, isolate: V.isolate, panel: V.panel, explode: V.explode, env: V.env, vis: { ...V.vis } }, mode: MODE });
+function hash(str) { let h = 2166136261; for (let i = 0; i < str.length; i++) { h ^= str.charCodeAt(i); h = Math.imul(h, 16777619); } return (h >>> 0).toString(36); }
+
+// IndexedDB: cached turntables survive reloads. Keyed by a hash of everything that changes the picture; newest 4 kept.
+const IDB = (() => {
+  let dbp = null;
+  const open = () => dbp || (dbp = new Promise((res, rej) => { const r = indexedDB.open('trophy-cooler-cache', 1); r.onupgradeneeded = () => r.result.createObjectStore('turntables', { keyPath: 'key' }); r.onsuccess = () => res(r.result); r.onerror = () => rej(r.error); }));
+  const run = async (mode, fn) => { const db = await open(); return new Promise((res, rej) => { const t = db.transaction('turntables', mode), req = fn(t.objectStore('turntables')); t.oncomplete = () => res(req && req.result); t.onerror = () => rej(t.error); }); };
+  return {
+    get: (key) => run('readonly', (st) => st.get(key)).catch(() => null),
+    put: (rec) => run('readwrite', (st) => st.put(rec)).catch(() => null),
+    async prune(keep = 4) { try { const all = await run('readonly', (st) => st.getAll()); for (const r of all.sort((a, b) => b.created - a.created).slice(keep)) await run('readwrite', (st) => st.delete(r.key)); } catch {} },
+  };
+})();
+
+// ---------- cached turntable (CPU fallback) ----------
+// A ring of N views around the current target, at the current elevation and distance, rendered by the worker.
+// While you drag, the nearest two views are cross-faded (zoom/pan approximated in 2D). When you let go, the live
+// 3D render takes over again, so the real geometry and materials stay the source of truth.
+const TT = { enabled: GPU.software, userSet: false, n: 36, key: '', meta: null, frames: [], blobs: [], count: 0, job: 0, t: 0, from: '' };
+try { const v = localStorage.getItem('trophy-cooler-tt'); if (v != null) { TT.enabled = v === '1'; TT.userSet = true; } } catch {}
+if (!RW) TT.enabled = false;
+const ttCanvas = document.createElement('canvas'); ttCanvas.id = 'tt-view'; view.appendChild(ttCanvas);
+const sph = new THREE.Spherical(), tmpV = new THREE.Vector3(), tmpR = new THREE.Vector3(), tmpU = new THREE.Vector3();
+function ttCancel() { clearTimeout(TT.t); if (TT.job && RW) RW.postMessage({ type: 'cancel' }); TT.job = 0; }
+function ttReset() { TT.frames.forEach((b) => b && b.close && b.close()); TT.frames = []; TT.blobs = []; TT.count = 0; }
+function ttSchedule() { clearTimeout(TT.t); if (TT.enabled && RW) TT.t = setTimeout(ttEnsure, 900); }
+async function ttEnsure() {
+  if (!TT.enabled || !RW || !root || FIN.running) return ttSchedule();
+  if (busy(performance.now())) return ttSchedule();
+  sph.setFromVector3(tmpV.copy(camera.position).sub(controls.target));
+  const k = Math.min(1, Q.idle), w = Math.max(64, Math.round(cssW() * k)), h = Math.max(64, Math.round(view.clientHeight * k));
+  const meta = { phi: +sph.phi.toFixed(3), radius: +sph.radius.toFixed(1), target: controls.target.toArray().map((v) => +v.toFixed(2)), fov: camera.fov, w, h, env: V.env };
+  const objKey = hash(JSON.stringify([objectState(), txKey, B.logoSrc ? B.logoSrc.length : 0, TT.n, w, h, V.env]));
+  // same object and the existing ring still covers this view (zoom/pan are handled in 2D): keep it
+  if (objKey === TT.objKey && TT.meta && Math.abs(sph.phi - TT.meta.phi) < 0.08 && sph.radius / TT.meta.radius > 0.75 && sph.radius / TT.meta.radius < 1.35 && controls.target.distanceTo(TT.meta.target) < sph.radius * 0.08) return;
+  const key = 'tt-' + hash(objKey + JSON.stringify(meta));
+  if (key === TT.key) return;
+  ttCancel(); ttReset(); TT.key = key; TT.objKey = objKey; TT.meta = { ...meta, target: new THREE.Vector3(...meta.target) }; TT.from = 'rendering';
+  const rec = await IDB.get(key); // cached on disk from an earlier session?
+  if (TT.key !== key) return;
+  if (rec && rec.blobs && rec.blobs.length === TT.n) {
+    const bms = await Promise.all(rec.blobs.map((b) => createImageBitmap(b)));
+    if (TT.key !== key) { bms.forEach((b) => b.close()); return; }
+    TT.frames = bms; TT.blobs = rec.blobs; TT.count = TT.n; TT.from = 'disk'; return;
+  }
+  const tex = await texMessage(); if (TT.key !== key) return;
+  TT.job = ++FIN.seq;
+  RW.postMessage({ type: 'turntable', id: TT.job, key, state: objectState(), tex, cam: { radius: meta.radius, phi: meta.phi, target: meta.target, fov: meta.fov }, size: { w, h }, n: TT.n }, bitmapsOf(tex));
+}
+function ttDraw() {
+  const m = TT.meta; if (!m || TT.count < 2 || V.xray || m.env !== V.env || cssW() < 2) return false;
+  sph.setFromVector3(tmpV.copy(camera.position).sub(controls.target));
+  const s = m.radius / sph.radius; if (Math.abs(sph.phi - m.phi) > 0.12 || s < 0.6 || s > 1.7) return false; // too far from the cached ring: use the live view
+  const n = TT.n, step = (Math.PI * 2) / n, th = ((sph.theta % (Math.PI * 2)) + Math.PI * 2) % (Math.PI * 2), f = th / step, i0 = Math.floor(f) % n, i1 = (i0 + 1) % n, a = f - Math.floor(f);
+  const f0 = TT.frames[i0], f1 = TT.frames[i1]; if (!f0 || !f1) return false;
+  const c = ttCanvas, W = c.width, H = c.height, x = c.getContext('2d');
+  x.fillStyle = V.env === 'studio' ? '#020203' : '#15181c'; x.fillRect(0, 0, W, H);
+  camera.updateMatrixWorld(); tmpR.setFromMatrixColumn(camera.matrixWorld, 0); tmpU.setFromMatrixColumn(camera.matrixWorld, 1);
+  const d = tmpV.subVectors(m.target, controls.target), kpx = (H / 2) / (sph.radius * Math.tan(THREE.MathUtils.degToRad(camera.fov / 2)));
+  const sc = (s * H) / f0.height, dw = f0.width * sc, dh = f0.height * sc;
+  x.save(); x.translate(W / 2 + d.dot(tmpR) * kpx, H / 2 - d.dot(tmpU) * kpx);
+  x.globalAlpha = 1; x.drawImage(f0, -dw / 2, -dh / 2, dw, dh);
+  if (a > 0.01) { x.globalAlpha = a; x.drawImage(f1, -dw / 2, -dh / 2, dw, dh); }
+  x.restore(); return true;
+}
+let ttShown = false;
+function ttOverlay(on) { if (on === ttShown) return; ttShown = on; ttCanvas.classList.toggle('on', on); if (!on) redraw(); }
+
+// ---------- final render: path-traced still in the worker, shown beside the live 3D view ----------
+const FIN = { seq: 0, id: 0, running: false, blob: null, t0: 0, w: 0, h: 0 };
+try { const v = localStorage.getItem('trophy-cooler-final'); $('final-size').value = v || (GPU.software ? '1600x64' : '2400x256'); } catch {}
+function showStillBitmap(bmp) { const c = $('still-cv'); c.width = bmp.width; c.height = bmp.height; c.getContext('2d').drawImage(bmp, 0, 0); bmp.close && bmp.close(); }
+async function finalRender() {
+  if (FIN.running) return;
+  const [height, samples] = $('final-size').value.split('x').map(Number);
+  if (!RW) return renderStill({ height, samples });
+  if (!studioEq) { toast('Studio lighting is still loading. Try again in a moment.'); return; }
+  if (V.env !== 'studio') { V.env = 'studio'; applyEnv(); syncUI(); save(); }
+  const cam = { position: camera.position.toArray(), target: controls.target.toArray(), fov: camera.fov }; // the view you framed
+  view.classList.add('split'); resize(); fit();
+  const paneW = view.clientWidth * 0.5, paneH = Math.max(100, view.clientHeight - 50), H = Math.round(height), W = Math.round(H * paneW / paneH);
+  ttCancel(); TT.key = ''; // the worker is busy with the still; the turntable resumes afterwards
+  const tex = await texMessage();
+  FIN.id = ++FIN.seq; FIN.running = true; FIN.blob = null; FIN.t0 = performance.now(); FIN.w = W; FIN.h = H;
+  $('still-again').textContent = 'Cancel'; $('still-dl').disabled = true; $('still-info').textContent = `Preparing ${W} × ${H} render…`;
+  RW.postMessage({ type: 'final', id: FIN.id, state: objectState(), tex, cam, size: { w: W, h: H }, samples }, bitmapsOf(tex));
+}
+function finalStop(msg) { FIN.running = false; $('still-again').textContent = 'Re-render'; $('still-dl').disabled = !FIN.blob; if (msg) $('still-info').textContent = msg; ttSchedule(); }
+function onWorker(m) {
+  if (m.type === 'frame') {
+    if (m.key !== TT.key) { m.bitmap.close(); return; }
+    TT.frames[m.i] = m.bitmap; TT.blobs[m.i] = m.blob; TT.count++;
+    if (TT.count === TT.n) { TT.job = 0; TT.from = 'fresh'; IDB.put({ key: m.key, created: Date.now(), blobs: TT.blobs.slice(), meta: { ...TT.meta, target: TT.meta.target.toArray() } }).then(() => IDB.prune(4)); }
+  } else if (m.type === 'final-progress' && m.id === FIN.id) {
+    if (m.bitmap) showStillBitmap(m.bitmap);
+    const k = m.samples / m.total, el = (performance.now() - FIN.t0) / 1000, eta = k > 0.03 ? el / k - el : null;
+    $('still-info').textContent = `Rendering ${FIN.w} × ${FIN.h} · ${Math.floor(m.samples)} / ${m.total} samples${eta != null ? ` · about ${eta < 90 ? Math.round(eta) + ' s' : Math.round(eta / 60) + ' min'} left` : ''}`;
+  } else if (m.type === 'final-done' && m.id === FIN.id) {
+    FIN.blob = m.blob; createImageBitmap(m.blob).then(showStillBitmap);
+    finalStop(`${m.w} × ${m.h} px · ${m.samples} samples · path-traced`);
+  } else if (m.type === 'error') {
+    if (m.id === FIN.id && FIN.running) finalStop('Final render failed: ' + m.message); else console.warn('render worker:', m.message);
+  }
+}
+
+// main-thread fallback for browsers without OffscreenCanvas workers (blocks the viewer while it renders)
+let STILL = false, stillCancel = false;
 const frame = () => new Promise((r) => requestAnimationFrame(r));
 async function renderStill({ height = 2400, samples = 256 } = {}) {
   if (STILL) return;
   if (!studioEq) { toast('Studio lighting is still loading. Try again in a moment.'); return; }
   if (V.env !== 'studio') { V.env = 'studio'; applyEnv(); syncUI(); }
-  const split = true, paneW = view.clientWidth * 0.5, paneH = view.clientHeight, H = Math.round(height), W = Math.round(H * paneW / paneH);
+  const paneW = view.clientWidth * 0.5, paneH = view.clientHeight, H = Math.round(height), W = Math.round(H * paneW / paneH);
   STILL = true; stillCancel = false; $('still-busy').classList.add('on'); $('still-fill').style.width = '0%';
-  const keep = { pr: renderer.getPixelRatio(), aspect: camera.aspect, delay: pt.renderDelay, fade: pt.fadeDuration, min: pt.minSamples, scale: pt.renderScale, tiles: pt.tiles.clone(), dyn: pt.dynamicLowRes };
+  const keep = { pr: renderer.getPixelRatio(), delay: pt.renderDelay, fade: pt.fadeDuration, min: pt.minSamples, scale: pt.renderScale, tiles: pt.tiles.clone(), dyn: pt.dynamicLowRes };
   try {
     renderer.setPixelRatio(1); renderer.setSize(W, H, false); camera.aspect = W / H; camera.updateProjectionMatrix();
     ptMode(true); pt.setScene(scene, camera); ptReady = true;
     Object.assign(pt, { renderDelay: 0, fadeDuration: 0, minSamples: 0, renderScale: 1, dynamicLowRes: false, pausePathTracing: false }); pt.tiles.set(3, 3); pt.reset();
-    const t0 = performance.now();
     while (pt.samples < samples && !stillCancel) {
       pt.renderSample(); await frame();
-      const k = pt.samples / samples, el = (performance.now() - t0) / 1000, eta = k > 0.02 ? Math.round(el / k - el) : null;
-      $('still-fill').style.width = (k * 100).toFixed(1) + '%';
-      $('still-msg').textContent = `Rendering ${W} × ${H} still · ${Math.floor(pt.samples)} / ${samples} samples${eta != null ? ` · about ${eta < 90 ? eta + ' s' : Math.round(eta / 60) + ' min'} left` : ''}`;
-      window.__stillProgress = pt.samples;
+      $('still-fill').style.width = ((pt.samples / samples) * 100).toFixed(1) + '%';
+      $('still-msg').textContent = `Rendering ${W} × ${H} still · ${Math.floor(pt.samples)} / ${samples} samples`;
     }
-    if (!stillCancel) {
-      stillBlob = await new Promise((r) => renderer.domElement.toBlob(r, 'image/png'));
-      if (stillURL) URL.revokeObjectURL(stillURL); stillURL = URL.createObjectURL(stillBlob);
-      $('still-img').src = stillURL; $('still-img').classList.remove('zoom'); $('still-img').parentElement.classList.remove('zoom');
-      $('still-info').textContent = `${W} × ${H} px · ${Math.floor(pt.samples)} samples`;
-      window.__stillDone = true;
-    }
+    if (!stillCancel) { FIN.blob = await new Promise((r) => renderer.domElement.toBlob(r, 'image/png')); showStillBitmap(await createImageBitmap(FIN.blob)); $('still-info').textContent = `${W} × ${H} px · ${Math.floor(pt.samples)} samples`; $('still-dl').disabled = false; }
   } finally {
     Object.assign(pt, { renderDelay: keep.delay, fadeDuration: keep.fade, minSamples: keep.min, renderScale: keep.scale, dynamicLowRes: keep.dyn }); pt.tiles.copy(keep.tiles);
-    renderer.setPixelRatio(keep.pr); STILL = false; $('still-busy').classList.remove('on');
-    if (!stillCancel && split) view.classList.add('split');
-    resize(); ptMode(false); ptDirty(); if (!stillCancel && split) fit();
+    STILL = false; $('still-busy').classList.remove('on');
+    if (!stillCancel) view.classList.add('split');
+    resize(); ptMode(false); ptReady = false; ptDirty(); if (!stillCancel) fit();
   }
 }
-window.renderStill = renderStill;
-$('still').onclick = () => renderStill();
-$('still-again').onclick = () => renderStill();
+window.renderStill = renderStill; window.finalRender = finalRender; window.__quality = Q; // diagnostics
+$('still').onclick = () => finalRender();
+$('still-again').onclick = () => { if (FIN.running) { RW.postMessage({ type: 'cancel' }); FIN.id = -1; finalStop('Final render cancelled'); } else finalRender(); };
 $('still-cancel').onclick = () => { stillCancel = true; };
-$('still-close').onclick = () => { view.classList.remove('split'); resize(); ptDirty(); };
-$('still-dl').onclick = () => stillBlob && saveFile('michelob-ultra-trophy-cooler-still.png', stillBlob, false);
-$('still-img').onclick = (e) => { e.target.classList.toggle('zoom'); e.target.parentElement.classList.toggle('zoom'); };
+$('still-close').onclick = () => { if (FIN.running) { RW.postMessage({ type: 'cancel' }); FIN.id = -1; finalStop(); } view.classList.remove('split'); resize(); ptDirty(); };
+$('still-dl').onclick = () => FIN.blob && saveFile('michelob-ultra-trophy-cooler-still.png', FIN.blob, false);
+$('still-cv').onclick = (e) => { e.target.classList.toggle('zoom'); e.target.parentElement.classList.toggle('zoom'); };
 
 // ---------- cameras ----------
 let tween = null;
@@ -667,13 +791,73 @@ function goCam(k, instant) { document.querySelectorAll('#viewbar button').forEac
 function fit() { const b = new THREE.Box3(); root.traverse((o) => { if (o.isMesh && o.visible && [parts.base, parts.enc, parts.fridge, parts.cupGroup].some((p) => p.visible && p.getObjectById(o.id))) b.expandByObject(o); }); if (b.isEmpty()) return; const c = b.getCenter(new THREE.Vector3()), r = b.getSize(new THREE.Vector3()).length() / 2, dir = camera.position.clone().sub(controls.target).normalize(); tween = { t0: performance.now(), fromP: camera.position.clone(), fromT: controls.target.clone(), toP: c.clone().add(dir.multiplyScalar(r / Math.sin(THREE.MathUtils.degToRad(camera.fov / 2)) * 1.02)), toT: c }; }
 $('viewbar').onclick = (e) => { const b = e.target.closest('button'); if (b) goCam(b.dataset.view); };
 $('fit-btn').onclick = fit;
-function resize() { if (STILL) return; const w = view.clientWidth * (view.classList.contains('split') ? 0.5 : 1), h = view.clientHeight; renderer.setSize(w, h); composer.setSize(w, h); gtao.setSize(w * renderer.getPixelRatio(), h * renderer.getPixelRatio()); camera.aspect = w / h; camera.updateProjectionMatrix(); if (backdrop) backdrop.dispose(); backdrop = stageBackdrop(w, h); applyEnv(); mirror.getRenderTarget && mirror.getRenderTarget().setSize(Math.min(1024, w), Math.min(1024, h)); if (ptReady) pt.updateCamera(); }
+const cssW = () => view.clientWidth * (view.classList.contains('split') ? 0.5 : 1);
+function sizeBuffers() {
+  const w = cssW(), h = view.clientHeight, k = Q.scale;
+  renderer.setPixelRatio(k); renderer.setSize(w, h); composer.setPixelRatio(k); composer.setSize(w, h); gtao.setSize(w * k, h * k);
+  if (mirror.getRenderTarget) mirror.getRenderTarget().setSize(Math.max(64, Math.min(1024, Math.round(w * k))), Math.max(64, Math.min(1024, Math.round(h * k))));
+  if (ptReady) pt.updateCamera();
+}
+function setScale(k) { k = Math.round(k * 100) / 100; if (Math.abs(k - Q.scale) < 0.01) return; Q.scale = k; sizeBuffers(); redraw(); }
+function resize() {
+  if (STILL) return;
+  const w = cssW(), h = view.clientHeight; sizeBuffers();
+  camera.aspect = w / h; camera.updateProjectionMatrix();
+  if (backdrop) backdrop.dispose(); backdrop = stageBackdrop(w, h); applyEnv();
+  ttCanvas.width = Math.max(2, Math.round(w)); ttCanvas.height = Math.max(2, Math.round(h)); ttCanvas.style.width = w + 'px'; ttCanvas.style.height = h + 'px';
+  redraw(); ttSchedule();
+}
 addEventListener('resize', resize);
-function loop(now) { if (tween) { const k = Math.min(1, (now - tween.t0) / 900), e = 1 - Math.pow(1 - k, 3); camera.position.lerpVectors(tween.fromP, tween.toP, e); controls.target.lerpVectors(tween.fromT, tween.toT, e); if (k === 1) tween = null; } controls.update();
-  if (STILL) { requestAnimationFrame(loop); return; }
-  if (photoActive() && ptReady) { pt.renderSample(); const n = Math.floor(pt.samples); $('pt-chip').textContent = n < 2 ? 'Photoreal: starting…' : `Photoreal · ${n} sample${n === 1 ? '' : 's'}${n >= 300 ? ' · done' : ''}`; $('pt-chip').style.display = ''; if (n >= 300) pt.pausePathTracing = true; }
-  else { renderFrame(); $('pt-chip').style.display = 'none'; }
-  requestAnimationFrame(loop); }
+
+// ---------- interaction-aware render loop ----------
+controls.addEventListener('start', () => { Q.interacting = true; redraw(); });
+controls.addEventListener('end', () => { Q.interacting = false; Q.settleUntil = performance.now() + 250; ttSchedule(); });
+controls.addEventListener('change', redraw);
+function busy(now) { return Q.interacting || !!tween || EDIT || controls.autoRotate || now < Q.settleUntil; }
+let aoFade = 0;
+function adapt(now) { // tune the dragging resolution to the measured frame rate (gradually, both ways)
+  if (now - Q.lastAdapt < 600 || !Q.fps) return; Q.lastAdapt = now;
+  if (Q.fps < 20) Q.adapt = Math.max(Q.min / Q.idle, Q.adapt * 0.85); else if (Q.fps > 45) Q.adapt = Math.min(1, Q.adapt * 1.1);
+  if (Q.fps < 6 && Q.scale <= Q.min + 0.02 && RW && !TT.enabled && !TT.userSet) { // still unusable at the lowest resolution: use the cached turntable
+    if (!Q.slowSince) Q.slowSince = now; else if (now - Q.slowSince > 3000) { TT.enabled = true; syncUI(); ttSchedule(); toast('This computer is rendering in software. Using a cached turntable while you drag.'); }
+  } else Q.slowSince = 0;
+}
+function measure(now) { const dt = now - Q.lastT; Q.lastT = now; if (dt > 0 && dt < 3000) { Q.dtEMA = Q.dtEMA ? Q.dtEMA * 0.8 + dt * 0.2 : dt; Q.fps = 1000 / Q.dtEMA; } }
+function perfChip(now, state) {
+  if (now - Q.chipT < 250) return; Q.chipT = now;
+  const c = renderer.domElement, tt = !TT.enabled ? '' : TT.count === TT.n ? ` · turntable ${TT.from === 'disk' ? 'loaded from cache' : 'cached'}` : TT.key ? ` · caching turntable ${TT.count}/${TT.n}` : ' · turntable waiting';
+  const rate = state === 'idle' ? 'still · no redraw' : state === 'turntable' ? 'showing cached views' : `${Q.fps ? Q.fps.toFixed(Q.fps < 10 ? 1 : 0) : '–'} fps`;
+  $('perf').className = 'perfchip' + (GPU.software ? ' cpu' : '');
+  $('perf').innerHTML = `<b>${MODE === 'fast' ? 'Fast preview' : 'High quality'}</b> · ${rate} · ${c.width}×${c.height} (${Q.scale.toFixed(2)}×)<br><span class="sub">${GPU.software ? 'Software rendering (CPU)' : 'Hardware GPU'} · ${GPU.short}${tt}</span>`;
+}
+function loop(now) {
+  requestAnimationFrame(loop);
+  if (tween) { const k = Math.min(1, (now - tween.t0) / 900), e = 1 - Math.pow(1 - k, 3); camera.position.lerpVectors(tween.fromP, tween.toP, e); controls.target.lerpVectors(tween.fromT, tween.toT, e); if (k === 1) tween = null; DIRTY = true; }
+  if (controls.update()) DIRTY = true;
+  if (STILL) return;
+  const moving = busy(now);
+  // adaptive resolution: drop at once when movement starts (motion hides it), sharpen in small steps once still
+  const target = moving ? Math.max(Q.min, Math.min(Q.idle, Q.idle * Q.adapt)) : Q.idle;
+  if (target < Q.scale - 0.01) setScale(target);
+  else if (!moving && target > Q.scale + 0.01 && now - Q.lastStep > 140) { Q.lastStep = now; setScale(Math.min(target, Q.scale + (GPU.software ? 0.05 : 0.15))); }
+  updateLOD();
+  // CPU fallback: show the cached turntable instead of rendering while dragging
+  const useTT = TT.enabled && moving && !EDIT && !tween && ttDraw();
+  ttOverlay(useTT);
+  if (useTT) { measure(now); perfChip(now, 'turntable'); return; }
+  if (photoActive() && ptReady) { // opt-in progressive path tracing (High quality)
+    pt.renderSample(); const n = Math.floor(pt.samples); $('pt-chip').textContent = n < 2 ? 'Photoreal: starting…' : `Photoreal · ${n} sample${n === 1 ? '' : 's'}${n >= 300 ? ' · done' : ''}`; $('pt-chip').style.display = ''; if (n >= 300) pt.pausePathTracing = true;
+    measure(now); perfChip(now, 'live'); return;
+  }
+  $('pt-chip').style.display = 'none';
+  const ao = MODE === 'high' && HQ && !moving;
+  if (!ao) aoFade = 0; else if (aoFade < 1) { aoFade = Math.min(1, aoFade + 0.25); gtao.blendIntensity = 0.8 * aoFade; DIRTY = true; } // AO fades in, no pop
+  if (!DIRTY) { perfChip(now, 'idle'); return; }
+  DIRTY = false;
+  const t0 = performance.now(); renderFrame(ao); Q.lastRenderMs = performance.now() - t0; Q.renders = (Q.renders || 0) + 1;
+  if (moving) { measure(now); adapt(now); } else Q.lastT = now;
+  perfChip(now, moving ? 'live' : 'idle');
+}
 
 try { await Promise.all([LOGO.white.decode(), LOGO.color.decode()]); } catch {}
 try { await Promise.race([Promise.all([document.fonts.load('italic 700 64px "Playfair Display"'), document.fonts.load('600 64px Montserrat'), document.fonts.load('700 64px "Barlow Condensed"')]), new Promise((r) => setTimeout(r, 2500))]); } catch {}
