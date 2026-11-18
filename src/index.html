@@ -168,6 +168,21 @@ details b{color:#d6dbe4;font-weight:600}
 .viewbar button:hover{background:#0c245c;color:#fff}
 .viewbar button.active{background:linear-gradient(180deg,#224796,#08277d);border-color:#355994;color:#fff}
 .focusbtn{position:absolute;right:20px;top:20px;min-height:36px;font-size:11px;z-index:2}
+#still-pane{display:none;position:absolute;left:0;top:0;bottom:0;width:50%;z-index:4;background:#000;border-right:1px solid #ffffff14;flex-direction:column}
+#stage.split #still-pane{display:flex}
+#stage.split canvas{margin-left:50%}
+#stage.split .viewbar,#stage.split .scene-label,#stage.split .hint{left:calc(50% + 20px)}
+#still-pane .imgwrap{flex:1;min-height:0;display:flex;align-items:center;justify-content:center;overflow:hidden}
+#still-pane img{max-width:100%;max-height:100%;object-fit:contain;cursor:zoom-in}
+#still-pane img.zoom{max-width:none;max-height:none;cursor:zoom-out}
+#still-pane .imgwrap.zoom{overflow:auto;display:block}
+#still-pane .bar{display:flex;align-items:center;gap:8px;padding:10px 14px;border-top:1px solid #ffffff10;background:#0a0b0e;font-size:11px;color:#a1a8b7}
+#still-pane .bar .tag{margin-right:auto;letter-spacing:1px;text-transform:uppercase;font-size:9.5px}
+#still-pane .bar button{min-height:30px;font-size:10.5px;padding:0 12px}
+.pane-tag{position:absolute;top:20px;z-index:5;font-size:9.5px;letter-spacing:1.2px;text-transform:uppercase;color:#dfe6f5;background:#0a0b0ee6;border:1px solid #345496;border-radius:7px;padding:6px 10px;pointer-events:none}
+#still-busy{display:none;position:absolute;inset:0;z-index:6;background:#000d;align-items:center;justify-content:center;flex-direction:column;gap:12px;color:#dfe6f5;font-size:12px}
+#still-busy.on{display:flex}
+#still-busy .track{width:260px;height:4px;border-radius:2px;background:#ffffff18;overflow:hidden}#still-busy .fill{height:100%;width:0;background:#4d7dff}
 .legend{position:absolute;left:25px;top:78px;display:none;font-size:10px;line-height:1.6;color:#929aaa;pointer-events:none;max-width:280px}
 .scene-label{position:absolute;bottom:52px;left:20px;font-size:9px;letter-spacing:1.2px;color:#8f97a5;text-transform:uppercase;pointer-events:none;background:#0a0b0ecc;backdrop-filter:blur(10px);border:1px solid #ffffff0c;border-radius:7px;padding:5px 10px}
 .hint{position:absolute;bottom:18px;left:20px;font-size:10px;line-height:1.4;color:#a1a8b7;pointer-events:none;background:#0a0b0ecc;backdrop-filter:blur(10px);border:1px solid #ffffff0c;border-radius:7px;padding:5px 10px}
@@ -203,7 +218,7 @@ details b{color:#d6dbe4;font-weight:600}
 <header class="topbar">
   <div class="header-left"><span class="pill"><span class="statusdot"></span><span id="pill-txt">3D model · from the reference render</span></span><button class="mobile-toggle" id="mobileToggle" aria-controls="panel" aria-expanded="false">Controls</button></div>
   <div class="brand" id="brand-mark"><span class="txt">MICHELOB ULTRA</span></div>
-  <div class="header-actions"><button id="capture">Capture view</button><button id="export">Export GLB</button></div>
+  <div class="header-actions"><button id="still">Render still</button><button id="capture">Capture view</button><button id="export">Export GLB</button></div>
 </header>
 <div class="study-title"><h1>3D study <span id="study-sub">· Trophy cooler — chrome fluted cup on a Michelob blue freezer enclosure</span></h1></div>
 <div class="layout">
@@ -285,6 +300,9 @@ details b{color:#d6dbe4;font-weight:600}
   <div class="scene-label" id="scene-label">Freezer enclosed · 12 Michelob ULTRA on ice</div>
   <div class="hint">Drag to orbit<span>·</span>Scroll to zoom<span>·</span>Right-drag to pan</div>
   <div id="toast" role="status" aria-live="polite"></div>
+  <div id="still-pane"><div class="pane-tag" style="left:20px">Still render · path-traced</div><div class="imgwrap"><img id="still-img" alt="Full-resolution path-traced still of the trophy cooler"></div>
+    <div class="bar"><span class="tag" id="still-info"></span><button id="still-again">Re-render</button><button id="still-dl">Download PNG</button><button id="still-close">Close</button></div></div>
+  <div id="still-busy"><div id="still-msg">Rendering still…</div><div class="track"><div class="fill" id="still-fill"></div></div><button id="still-cancel">Cancel</button></div>
   <div class="vchip" id="pt-chip" style="position:absolute;right:20px;bottom:18px;z-index:3;display:none;pointer-events:none;padding:6px 12px">Photoreal</div>
   <div class="loader" id="loading"><div class="loadbox"><div class="spin"></div><h3>Building the trophy</h3><p>Fluted bowl, pedestal and freezer enclosure.</p></div></div>
 </main>
@@ -302,6 +320,8 @@ import { GLTFExporter } from 'three/addons/exporters/GLTFExporter.js';
 import { EXRLoader } from 'three/addons/loaders/EXRLoader.js';
 import { WebGLPathTracer } from 'three-gpu-pathtracer';
 import studioHDRI from '@pmndrs/assets/hdri/studio.exr.js';
+import logoWhiteURL from './assets/logo-white.png';
+import logoColorURL from './assets/logo-color.png';
 import * as T from './trophy.js';
 
 const $ = (id) => document.getElementById(id);
@@ -403,7 +423,7 @@ for (const k of ['environmentRotation', 'backgroundRotation']) if (!(k in THREE.
 const pt = new WebGLPathTracer(renderer);
 Object.assign(pt, { minSamples: 2, renderDelay: 250, fadeDuration: 350, bounces: 8, transmissiveBounces: 10, filterGlossyFactor: 0.5, renderScale: Math.min(1, 1.25 / renderer.getPixelRatio()) });
 pt.tiles.set(2, 2);
-const ptFloor = new THREE.Mesh(new THREE.CircleGeometry(1, 96), new THREE.MeshPhysicalMaterial({ color: 0x010102, roughness: 0.2, metalness: 0, specularIntensity: 0.22 }));
+const ptFloor = new THREE.Mesh(new THREE.CircleGeometry(1, 96), new THREE.MeshPhysicalMaterial({ color: 0x000000, roughness: 1, metalness: 0, specularIntensity: 0 }));
 ptFloor.rotation.x = -Math.PI / 2; ptFloor.visible = false; scene.add(ptFloor);
 // studio softboxes, seen only by the path tracer: they light the piece and put long highlights in the chrome, like the reference
 const softboxes = new THREE.Group(); softboxes.visible = false; scene.add(softboxes);
@@ -427,6 +447,7 @@ controls.addEventListener('change', () => { if (ptReady) { pt.pausePathTracing =
 
 // ---------- brand textures ----------
 const BLUE = '#14217f', RED = '#d0142c';
+const LOGO = { white: new Image(), color: new Image() }; LOGO.white.src = logoWhiteURL; LOGO.color.src = logoColorURL; // brand lockup supplied by the client (script + ULTRA + ribbon)
 function ribbon(x, cx, top, w, h) { x.fillStyle = RED; x.beginPath(); x.moveTo(cx - w / 2, top); x.lineTo(cx + w / 2, top); x.lineTo(cx + w / 2, top + h); x.lineTo(cx, top + h - w * 0.45); x.lineTo(cx - w / 2, top + h); x.closePath(); x.fill(); }
 function keyBackground(c) { const x = c.getContext('2d'), id = x.getImageData(0, 0, c.width, c.height), d = id.data; let a = false; for (let i = 3; i < d.length; i += 28) if (d[i] < 245) { a = true; break; } if (a) return c; const [br, bg, bb] = [d[0], d[1], d[2]]; for (let i = 0; i < d.length; i += 4) { const dist = Math.hypot(d[i] - br, d[i + 1] - bg, d[i + 2] - bb); d[i + 3] = Math.max(0, Math.min(255, (dist - 28) * 10)); } x.putImageData(id, 0, 0); return c; }
 function tint(src, color) { const c = mk(src.width, src.height), x = c.getContext('2d'); x.drawImage(src, 0, 0); x.globalCompositeOperation = 'source-in'; x.fillStyle = color; x.fillRect(0, 0, c.width, c.height); return c; }
@@ -442,9 +463,8 @@ function lockup(x, cx, cy, w, color, sub = true) { // placeholder wordmark: scri
 }
 function frontLogo() {
   const c = mk(1600, 1400), x = c.getContext('2d');
-  if (B.logo) { const L = tint(B.logo, '#ffffff'); let w = 1500, h = w * L.height / L.width; if (h > 820) { h = 820; w = h * L.width / L.height; } x.drawImage(L, (1600 - w) / 2, 60 + (820 - h) / 2, w, h); }
-  else lockup(x, 800, 340, 1560, '#ffffff');
-  ribbon(x, 800, 930, 170, 400);
+  if (B.logo) { const L = tint(B.logo, '#ffffff'); let w = 1500, h = w * L.height / L.width; if (h > 820) { h = 820; w = h * L.width / L.height; } x.drawImage(L, (1600 - w) / 2, 60 + (820 - h) / 2, w, h); ribbon(x, 800, 930, 170, 400); }
+  else { const L = LOGO.white, w = 1480, h = w * L.height / L.width; x.drawImage(L, (1600 - w) / 2, (1400 - h) / 2, w, h); }
   const t = new THREE.CanvasTexture(c); t.colorSpace = THREE.SRGBColorSpace; t.anisotropy = 8; return t;
 }
 function bottleLabel() { // oval wrap label, one face per half of the bottle (front and back)
@@ -458,8 +478,8 @@ function bottleLabel() { // oval wrap label, one face per half of the bottle (fr
   x.textAlign = 'center'; x.fillStyle = '#ffffff'; x.font = '600 58px Montserrat, Arial, sans-serif'; try { x.letterSpacing = '3px'; } catch {}
   x.fillText('SUPERIOR', cx, 140); x.fillText('LIGHT BEER', cx, 205);
   if (B.logo) { const L = tint(B.logo, BLUE); let w = 820, h = w * L.height / L.width; if (h > 300) { h = 300; w = h * L.width / L.height; } x.drawImage(L, cx - w / 2, 330 + (300 - h) / 2, w, h); }
-  else lockup(x, cx, 430, 880, BLUE);
-  ribbon(x, cx, 650, 64, 165);
+  else { const L = LOGO.color, w = 640, h = w * L.height / L.width; x.drawImage(L, cx - w / 2, 300, w, h); }
+  if (B.logo) ribbon(x, cx, 650, 64, 165);
   x.fillStyle = BLUE; try { x.letterSpacing = '1px'; } catch {}
   x.font = '600 66px Montserrat, Arial, sans-serif'; x.fillText('2.6', cx - 245, 715); x.fillText('95', cx + 245, 715);
   x.font = '500 30px Montserrat, Arial, sans-serif'; x.fillText('CARBS', cx - 245, 755); x.fillText('CALS', cx + 245, 755);
@@ -592,6 +612,50 @@ $('capture').onclick = async () => { controls.update(); if (!(photoActive() && p
 $('copy').onclick = async () => { const cfg = { units: 'inches', enclosure: { W: P.W, D: P.D, H: P.H, color: P.color }, iceSled: { height: T.SLED_H, contact: 'UHMW-PE skid plate + 4 runners' }, cup: { bowlDiameter: P.bowlD, bowlHeight: P.bowlH, pedestalHeight: P.pedH, flutes: P.flutes, twist: P.twist, fluteDepth: P.fluteDepth, metal: P.metal }, bottles: P.bottles, freezer: T.FRIDGE, clearances: T.clearances(P) };
   try { await navigator.clipboard.writeText(JSON.stringify(cfg, null, 2)); toast('Dimensions copied'); } catch { $('glb-msg').textContent = JSON.stringify(cfg); } };
 
+// ---------- full-resolution still, shown beside the live 3D view ----------
+let STILL = false, stillCancel = false, stillURL = null, stillBlob = null;
+const frame = () => new Promise((r) => requestAnimationFrame(r));
+async function renderStill({ height = 2400, samples = 256 } = {}) {
+  if (STILL) return;
+  if (!studioEq) { toast('Studio lighting is still loading. Try again in a moment.'); return; }
+  if (V.env !== 'studio') { V.env = 'studio'; applyEnv(); syncUI(); }
+  const split = true, paneW = view.clientWidth * 0.5, paneH = view.clientHeight, H = Math.round(height), W = Math.round(H * paneW / paneH);
+  STILL = true; stillCancel = false; $('still-busy').classList.add('on'); $('still-fill').style.width = '0%';
+  const keep = { pr: renderer.getPixelRatio(), aspect: camera.aspect, delay: pt.renderDelay, fade: pt.fadeDuration, min: pt.minSamples, scale: pt.renderScale, tiles: pt.tiles.clone(), dyn: pt.dynamicLowRes };
+  try {
+    renderer.setPixelRatio(1); renderer.setSize(W, H, false); camera.aspect = W / H; camera.updateProjectionMatrix();
+    ptMode(true); pt.setScene(scene, camera); ptReady = true;
+    Object.assign(pt, { renderDelay: 0, fadeDuration: 0, minSamples: 0, renderScale: 1, dynamicLowRes: false, pausePathTracing: false }); pt.tiles.set(3, 3); pt.reset();
+    const t0 = performance.now();
+    while (pt.samples < samples && !stillCancel) {
+      pt.renderSample(); await frame();
+      const k = pt.samples / samples, el = (performance.now() - t0) / 1000, eta = k > 0.02 ? Math.round(el / k - el) : null;
+      $('still-fill').style.width = (k * 100).toFixed(1) + '%';
+      $('still-msg').textContent = `Rendering ${W} × ${H} still · ${Math.floor(pt.samples)} / ${samples} samples${eta != null ? ` · about ${eta < 90 ? eta + ' s' : Math.round(eta / 60) + ' min'} left` : ''}`;
+      window.__stillProgress = pt.samples;
+    }
+    if (!stillCancel) {
+      stillBlob = await new Promise((r) => renderer.domElement.toBlob(r, 'image/png'));
+      if (stillURL) URL.revokeObjectURL(stillURL); stillURL = URL.createObjectURL(stillBlob);
+      $('still-img').src = stillURL; $('still-img').classList.remove('zoom'); $('still-img').parentElement.classList.remove('zoom');
+      $('still-info').textContent = `${W} × ${H} px · ${Math.floor(pt.samples)} samples`;
+      window.__stillDone = true;
+    }
+  } finally {
+    Object.assign(pt, { renderDelay: keep.delay, fadeDuration: keep.fade, minSamples: keep.min, renderScale: keep.scale, dynamicLowRes: keep.dyn }); pt.tiles.copy(keep.tiles);
+    renderer.setPixelRatio(keep.pr); STILL = false; $('still-busy').classList.remove('on');
+    if (!stillCancel && split) view.classList.add('split');
+    resize(); ptMode(false); ptDirty(); if (!stillCancel && split) fit();
+  }
+}
+window.renderStill = renderStill;
+$('still').onclick = () => renderStill();
+$('still-again').onclick = () => renderStill();
+$('still-cancel').onclick = () => { stillCancel = true; };
+$('still-close').onclick = () => { view.classList.remove('split'); resize(); ptDirty(); };
+$('still-dl').onclick = () => stillBlob && saveFile('michelob-ultra-trophy-cooler-still.png', stillBlob, false);
+$('still-img').onclick = (e) => { e.target.classList.toggle('zoom'); e.target.parentElement.classList.toggle('zoom'); };
+
 // ---------- cameras ----------
 let tween = null;
 function camFor(k) {
@@ -603,13 +667,15 @@ function goCam(k, instant) { document.querySelectorAll('#viewbar button').forEac
 function fit() { const b = new THREE.Box3(); root.traverse((o) => { if (o.isMesh && o.visible && [parts.base, parts.enc, parts.fridge, parts.cupGroup].some((p) => p.visible && p.getObjectById(o.id))) b.expandByObject(o); }); if (b.isEmpty()) return; const c = b.getCenter(new THREE.Vector3()), r = b.getSize(new THREE.Vector3()).length() / 2, dir = camera.position.clone().sub(controls.target).normalize(); tween = { t0: performance.now(), fromP: camera.position.clone(), fromT: controls.target.clone(), toP: c.clone().add(dir.multiplyScalar(r / Math.sin(THREE.MathUtils.degToRad(camera.fov / 2)) * 1.02)), toT: c }; }
 $('viewbar').onclick = (e) => { const b = e.target.closest('button'); if (b) goCam(b.dataset.view); };
 $('fit-btn').onclick = fit;
-function resize() { const w = view.clientWidth, h = view.clientHeight; renderer.setSize(w, h); composer.setSize(w, h); gtao.setSize(w * renderer.getPixelRatio(), h * renderer.getPixelRatio()); camera.aspect = w / h; camera.updateProjectionMatrix(); if (backdrop) backdrop.dispose(); backdrop = stageBackdrop(w, h); applyEnv(); mirror.getRenderTarget && mirror.getRenderTarget().setSize(Math.min(1024, w), Math.min(1024, h)); if (ptReady) pt.updateCamera(); }
+function resize() { if (STILL) return; const w = view.clientWidth * (view.classList.contains('split') ? 0.5 : 1), h = view.clientHeight; renderer.setSize(w, h); composer.setSize(w, h); gtao.setSize(w * renderer.getPixelRatio(), h * renderer.getPixelRatio()); camera.aspect = w / h; camera.updateProjectionMatrix(); if (backdrop) backdrop.dispose(); backdrop = stageBackdrop(w, h); applyEnv(); mirror.getRenderTarget && mirror.getRenderTarget().setSize(Math.min(1024, w), Math.min(1024, h)); if (ptReady) pt.updateCamera(); }
 addEventListener('resize', resize);
 function loop(now) { if (tween) { const k = Math.min(1, (now - tween.t0) / 900), e = 1 - Math.pow(1 - k, 3); camera.position.lerpVectors(tween.fromP, tween.toP, e); controls.target.lerpVectors(tween.fromT, tween.toT, e); if (k === 1) tween = null; } controls.update();
+  if (STILL) { requestAnimationFrame(loop); return; }
   if (photoActive() && ptReady) { pt.renderSample(); const n = Math.floor(pt.samples); $('pt-chip').textContent = n < 2 ? 'Photoreal: starting…' : `Photoreal · ${n} sample${n === 1 ? '' : 's'}${n >= 300 ? ' · done' : ''}`; $('pt-chip').style.display = ''; if (n >= 300) pt.pausePathTracing = true; }
   else { renderFrame(); $('pt-chip').style.display = 'none'; }
   requestAnimationFrame(loop); }
 
+try { await Promise.all([LOGO.white.decode(), LOGO.color.decode()]); } catch {}
 try { await Promise.race([Promise.all([document.fonts.load('italic 700 64px "Playfair Display"'), document.fonts.load('600 64px Montserrat'), document.fonts.load('700 64px "Barlow Condensed"')]), new Promise((r) => setTimeout(r, 2500))]); } catch {}
 if (B.logoSrc) { try { const im = await loadImg(B.logoSrc); const c = mk(im.naturalWidth, im.naturalHeight); c.getContext('2d').drawImage(im, 0, 0); B.logo = c; } catch {} }
 resize(); build(); goCam('front', true); $('loading').remove(); requestAnimationFrame(loop);

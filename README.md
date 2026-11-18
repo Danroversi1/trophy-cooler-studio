@@ -16,6 +16,10 @@ An interactive 3D model of the trophy cooler, built from the reference render. A
 
 - **Bottles:** 12 oz amber longnecks with an oval wrap label and a neck foil, pushed into the ice at varied depths and angles.
 
+**Render still:** path-traces the current camera at full resolution (2400 px tall, 256 samples) on your GPU and shows it beside the live 3D model. Click the still to view it at 100 %, or download it as a PNG.
+
+**Brand:** the enclosure and bottle labels use the supplied Michelob ULTRA logo (`src/assets/`). An uploaded logo replaces it.
+
 **Rendering:** **Photoreal** mode path-traces the scene with a studio HDRI and softbox area lights, and refines whenever the view is still. On by default in the studio view. Orbiting uses the real-time renderer.
 
 All dimensions are parametric. **Keep the render's proportions** scales the cup with the enclosure width. The freezer fit is checked live, and the box can't be made smaller than the freezer.
