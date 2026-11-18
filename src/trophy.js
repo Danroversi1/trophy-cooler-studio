@@ -8,13 +8,13 @@ export const IN_TO_M = 0.0254;
 export const FRIDGE = { w: 23.62, d: 24.57, h: 31.97, weight: 130.07 }; // Meling DW-XL90 (listed gross weight)
 export const WALL = 0.75, LID = 2, FLOOR = 1, PANEL = 1.0, VENT = 5.5;
 
-// Proportions measured from the reference render (enclosure : bowl : pedestal),
-// scaled so the enclosure fits the freezer: 36" body → ~61" wide box and a ~61" bowl.
+// Bowl ≈ box width and pedestal ≈ bowl height, as in the reference render; the box is
+// sized to the freezer and the bowl to 12 bottles + ice.
 export const DEFAULTS = {
-  W: 61, D: 30, H: 36.5,            // enclosure (body incl. vent band + lid)
-  bowlD: 61, bowlH: 20.4, pedH: 22.9, // cup
+  W: 32, D: 30, H: 36.5,            // enclosure: snug around the freezer (≈2.5" clear each side)
+  bowlD: 32, bowlH: 10.7, pedH: 12,  // cup: as wide as the box (as in the render), sized for 12 bottles
   flutes: 28, twist: 0.9, fluteDepth: 1.5,
-  bottles: 12, heap: 2.5, lean: 0.2,
+  bottles: 12, heap: 1.6, lean: 0.2,
   base: 'casters', metal: 'chrome', color: '#0b2a8c', glass: 'amber',
 };
 // minimum box that still houses the freezer with service clearances
@@ -158,7 +158,7 @@ export function buildContents(P, M, bowl, { instanced = true, seed = 7 } = {}) {
   const bp = bed.attributes.position; for (let i = 0; i < bp.count; i++) bp.setY(i, surf(bp.getX(i), bp.getZ(i)) - 0.6); bed.computeVertexNormals();
   g.add(named(mesh(bed, M.iceBed), 'ice-bed'));
   // bottles: a ring near the rim, leaning out, alternating heights; labels face outward
-  const n = Math.round(P.bottles), ringR = Math.max(6, Ri * 0.8), slots = [];
+  const n = Math.round(P.bottles), ringR = Math.max(5.6, Math.min(Ri - 2.4, Ri * 0.74 + (n - 12) * 0.35)), slots = [];
   for (let i = 0; i < n; i++) { const a = (i / n) * Math.PI * 2 + 0.13, x = ringR * Math.cos(a), z = ringR * Math.sin(a), lift = i % 2 ? 1.0 : 0; slots.push([a, x, z, Math.max(surf(x, z), bowl.rim) - 1.4 + lift, P.lean * (i % 2 ? 0.75 : 1.2)]); }
   const lathe32 = new THREE.LatheGeometry(BOTTLE.map(([q, y]) => new THREE.Vector2(q, y)), 40);
   const beer = new THREE.LatheGeometry(BOTTLE.filter(([, y]) => y < 7.2).map(([q, y]) => new THREE.Vector2(Math.max(0, q - 0.12), y + 0.05)), 24);
@@ -201,6 +201,6 @@ export function buildFridge(P) {
 // ---------- weights (lb, estimates for spun aluminum cup + ACM/aluminum enclosure) ----------
 export function weights(P) {
   const s = P.bowlD / 61, area = (P.W * P.D) / (61 * 30);
-  return { enclosure: Math.round(115 * area * (P.H / 36)), cup: Math.round(78 * s * s * (P.bowlH / 20.4)), pedestal: Math.round(46 * s * s * (P.pedH / 22.9)), base: P.base === 'skids' ? 22 : 18,
+  return { enclosure: Math.round(115 * Math.max(0.55, area) * (P.H / 36)), cup: Math.round(78 * s * s * (P.bowlH / 20.4)), pedestal: Math.round(46 * s * s * (P.pedH / 22.9)), base: P.base === 'skids' ? 22 : 18,
     bottles: Math.round(P.bottles * 1.2), ice: Math.round(0.9 * Math.PI * Math.pow(P.bowlD / 2 - 1.7, 2) * 0.55 / 28), fridge: FRIDGE.weight };
 }

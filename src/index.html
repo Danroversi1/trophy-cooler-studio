@@ -227,9 +227,9 @@ details b{color:#d6dbe4;font-weight:600}
 
   <section class="section"><h2>Cup <small>chrome fluted bowl + pedestal</small></h2>
     <label class="toggle-row"><input type="checkbox" id="lock" checked>Keep the render's proportions (bowl as wide as the box)</label>
-    <div class="slider-head"><label for="bowlD">Bowl diameter</label><output id="bowlD-v"></output></div><input class="range" id="bowlD" type="range" min="36" max="72" step="0.5">
-    <div class="slider-head"><label for="bowlH">Bowl height</label><output id="bowlH-v"></output></div><input class="range" id="bowlH" type="range" min="12" max="30" step="0.2">
-    <div class="slider-head"><label for="pedH">Pedestal height</label><output id="pedH-v"></output></div><input class="range" id="pedH" type="range" min="12" max="34" step="0.2">
+    <div class="slider-head"><label for="bowlD">Bowl diameter</label><output id="bowlD-v"></output></div><input class="range" id="bowlD" type="range" min="24" max="60" step="0.5">
+    <div class="slider-head"><label for="bowlH">Bowl height</label><output id="bowlH-v"></output></div><input class="range" id="bowlH" type="range" min="8" max="24" step="0.2">
+    <div class="slider-head"><label for="pedH">Pedestal height</label><output id="pedH-v"></output></div><input class="range" id="pedH" type="range" min="6" max="28" step="0.2">
     <div class="slider-head"><label for="flutes">Spiral flutes</label><output id="flutes-v"></output></div><input class="range" id="flutes" type="range" min="12" max="48" step="1">
     <div class="slider-head"><label for="twist">Flute twist</label><output id="twist-v"></output></div><input class="range" id="twist" type="range" min="0" max="2" step="0.05">
     <div class="slider-head"><label for="fluteDepth">Flute depth</label><output id="fluteDepth-v"></output></div><input class="range" id="fluteDepth" type="range" min="0" max="1.6" step="0.05">
@@ -301,7 +301,7 @@ import * as T from './trophy.js';
 
 const $ = (id) => document.getElementById(id);
 const mk = (w, h) => { const c = document.createElement('canvas'); c.width = w; c.height = h; return c; };
-const KEY = 'trophy-cooler-model-v1';
+const KEY = 'trophy-cooler-model-v2';
 let P = { ...T.DEFAULTS }, lock = true;
 const V = { sel: 'cup', isolate: false, xray: false, panel: 0, explode: 0, env: 'studio', spin: false, vis: { cup: true, contents: true, enc: true, fridge: true, base: true } };
 const B = { logo: null, logoSrc: null };
@@ -425,7 +425,7 @@ const ghost = new THREE.MeshStandardMaterial({ color: 0x9cc4ff, transparent: tru
 function dispose(o) { o.traverse((m) => { if (m.geometry) m.geometry.dispose(); const mm = m.userData.orig || m.material; if (mm && mm !== ghost) [mm].flat().forEach((x) => x.dispose && x.dispose()); }); }
 function build() {
   if (root) { scene.remove(root); dispose(root); } texs.forEach((t) => t.dispose());
-  if (lock) { const k = P.W / 61; P.bowlD = Math.round(P.W * 2) / 2; P.bowlH = +(20.4 * k).toFixed(1); P.pedH = +(22.9 * k).toFixed(1); }
+  if (lock) { const k = P.W / 32; P.bowlD = Math.round(P.W * 2) / 2; P.bowlH = +(10.7 * k).toFixed(1); P.pedH = +(12 * k).toFixed(1); }
   const tx = { logo: frontLogo(), bottleLabel: bottleLabel(), neckLabel: neckLabel() }; texs = Object.values(tx);
   const M = T.makeMaterials(P, tx); root = new THREE.Group(); scene.add(root);
   parts.base = T.buildBase(P, M); parts.enc = T.buildEnclosure(P, M); parts.fridge = T.buildFridge(P);
@@ -460,7 +460,7 @@ function specs() {
   $('fit').innerHTML = cl.fits ? `✓ Meling DW-XL90 fits: ${cl.side.toFixed(1)}″ each side, ${cl.back.toFixed(1)}″ behind, ${cl.top.toFixed(1)}″ above. The vent band lines up with its bottom-front vent.` : '✕ The freezer does not fit at this size.';
   $('wt').innerHTML = [['Cup bowl (spun aluminum, chrome)', w.cup], ['Pedestal', w.pedestal], ['Enclosure (ACM / aluminum)', w.enclosure], [P.base === 'skids' ? 'UHMW ice skids' : 'Casters', w.base], ['Meling DW-XL90 (listed gross)', w.fridge], [`${P.bottles} × Michelob ULTRA`, w.bottles], ['Ice (top layer over a false floor)', w.ice]]
     .map(([k, v]) => `<tr><td>${k}</td><td>${Math.round(v)} lb</td></tr>`).join('') + `<tr class="tot"><td>Fully loaded</td><td>${Math.round(total)} lb</td></tr>`;
-  $('s-note').textContent = `At the render's proportions the trophy stands ${ftin(overall)} and the bowl is ${Math.round(P.bowlD)}″ across. Plan on moving it in three pieces (cup, enclosure with freezer, base) and check door heights at the venue. A false floor in the bowl keeps the ice to a top layer; a full bowl of ice would weigh several hundred pounds.`;
+  $('s-note').textContent = `The trophy stands ${ftin(overall)} with a ${Math.round(P.bowlD)}″ bowl. It moves as three pieces: the cup, the enclosure with the freezer, and the base. Most of the weight is the freezer, so the enclosure is a cart or 4-person lift.`;
   $('dims-readout').textContent = `Enclosure ${P.W}″ × ${P.D}″ × ${P.H}″ · bowl ${P.bowlD}″ · overall ${ftin(overall)}`;
   $('scene-label').textContent = `Freezer enclosed · ${P.bottles} Michelob ULTRA on ice · ${ftin(overall)} tall`;
 }
@@ -473,8 +473,8 @@ function renderLayers() {
 }
 $('layers').onclick = (e) => { const eye = e.target.closest('[data-eye]'); if (eye) { V.vis[eye.dataset.eye] = !V.vis[eye.dataset.eye]; applyView(); renderLayers(); return; } const s = e.target.closest('[data-sel]'); if (s) { V.sel = s.dataset.sel; if (V.isolate) applyView(); renderLayers(); } };
 $('isolate').onclick = () => { V.isolate = !V.isolate; applyView(); renderLayers(); setTimeout(fit, 30); };
-const SL = { W: [() => T.MIN.W + 0.5, 72, (v) => `${v}″`], D: [() => Math.ceil(T.MIN.D), 40, (v) => `${v}″`], H: [() => Math.ceil(T.MIN.H * 4) / 4, 44, (v) => `${v}″`],
-  bowlD: [36, 72, (v) => `${v}″`], bowlH: [12, 30, (v) => `${v}″`], pedH: [12, 34, (v) => `${v}″`], flutes: [12, 48, (v) => `${v}`], twist: [0, 2, (v) => v.toFixed(2)], fluteDepth: [0, 1.6, (v) => `${v.toFixed(2)}″`],
+const SL = { W: [() => Math.ceil(T.MIN.W), 64, (v) => `${v}″`], D: [() => Math.ceil(T.MIN.D), 40, (v) => `${v}″`], H: [() => Math.ceil(T.MIN.H * 4) / 4, 44, (v) => `${v}″`],
+  bowlD: [24, 60, (v) => `${v}″`], bowlH: [8, 24, (v) => `${v}″`], pedH: [6, 28, (v) => `${v}″`], flutes: [12, 48, (v) => `${v}`], twist: [0, 2, (v) => v.toFixed(2)], fluteDepth: [0, 1.6, (v) => `${v.toFixed(2)}″`],
   bottles: [12, 36, (v) => `${v}`], heap: [0, 5, (v) => `${v.toFixed(1)}″`], lean: [0, 0.4, (v) => `${Math.round(v * 57.3)}°`] };
 let bt;
 for (const [k, [lo, hi, fmt]] of Object.entries(SL)) { const el = $(k); el.min = typeof lo === 'function' ? lo() : lo; el.max = hi;
@@ -536,9 +536,9 @@ $('copy').onclick = async () => { const cfg = { units: 'inches', enclosure: { W:
 // ---------- cameras ----------
 let tween = null;
 function camFor(k) {
-  const top = T.casterH(P) + P.H, h = top + P.pedH + P.bowlH + 8, mid = h * 0.5, d = Math.max(h * 1.12, P.W) * 2.6;
+  const top = T.casterH(P) + P.H, h = top + P.pedH + P.bowlH + 8, mid = h * 0.5, d = Math.max(h * 1.12, P.W) * 2.05;
   return { front: [[0, mid * 1.05, d], [0, mid, 0]], hero: [[d * 0.62, mid * 1.25, d * 0.8], [0, mid, 0]], side: [[d, mid, 0], [0, mid, 0]], back: [[0, mid, -d], [0, mid, 0]], top: [[0.1, d * 1.15, 18], [0, top, 0]],
-    bottles: [[P.bowlD * 0.55, top + P.pedH + P.bowlH + 26, P.bowlD * 0.95], [0, top + P.pedH + P.bowlH, 0]] }[k];
+    bottles: [[P.bowlD * 0.75 + 8, top + P.pedH + P.bowlH + 30, P.bowlD * 1.3 + 22], [0, top + P.pedH + P.bowlH, 0]] }[k];
 }
 function goCam(k, instant) { document.querySelectorAll('#viewbar button').forEach((b) => b.classList.toggle('active', b.dataset.view === k)); const [p, t] = camFor(k), toP = new THREE.Vector3(...p), toT = new THREE.Vector3(...t); if (instant) { camera.position.copy(toP); controls.target.copy(toT); return; } tween = { t0: performance.now(), fromP: camera.position.clone(), fromT: controls.target.clone(), toP, toT }; }
 function fit() { const b = new THREE.Box3(); root.traverse((o) => { if (o.isMesh && o.visible && [parts.base, parts.enc, parts.fridge, parts.cupGroup].some((p) => p.visible && p.getObjectById(o.id))) b.expandByObject(o); }); if (b.isEmpty()) return; const c = b.getCenter(new THREE.Vector3()), r = b.getSize(new THREE.Vector3()).length() / 2, dir = camera.position.clone().sub(controls.target).normalize(); tween = { t0: performance.now(), fromP: camera.position.clone(), fromT: controls.target.clone(), toP: c.clone().add(dir.multiplyScalar(r / Math.sin(THREE.MathUtils.degToRad(camera.fov / 2)) * 1.02)), toT: c }; }
