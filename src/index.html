@@ -186,7 +186,12 @@ details b{color:#d6dbe4;font-weight:600}
 @media(max-width:760px){.topbar{height:74px;padding:0 15px}.brand .txt{font-size:22px}.brand img{max-width:200px}.header-actions button{font-size:10px;padding:0 10px;height:32px}.pill{display:none}.mobile-toggle{display:block;font-size:10px;min-height:32px;padding:0 10px}.layout{display:block;position:relative;padding:0 12px;min-height:0}#stage{height:100%}aside{position:absolute;left:12px;top:0;bottom:0;width:min(300px,calc(100vw - 50px));transform:translateX(calc(-100% - 25px));transition:transform .2s;box-shadow:10px 0 35px #0008;background:#141519fa}aside.open{transform:translateX(0)}.study-title{padding:14px 16px}.study-title h1{font-size:12px}.wordmark-footer{height:80px}.viewbar{left:12px;top:12px}.viewbar button{padding:7px 8px;font-size:10px}.focusbtn{right:12px;top:auto;bottom:12px}.legend{display:none}#toast{white-space:normal;text-align:center}}
 @media(max-width:520px){.topbar{height:96px;align-items:flex-end;padding:0 14px 11px}.brand{top:24px}.header-actions{gap:7px}.header-actions button{height:30px;font-size:10px}.hint{display:none}.scene-label{bottom:20px}}
 @media(prefers-reduced-motion:reduce){*{transition:none!important}}
+.wordmark-footer span{font-family:"DM Serif Display",Georgia,serif}
+.fit{display:flex;align-items:center;gap:8px;font-size:11px;margin-top:12px;padding:9px 10px;border-radius:8px;background:#0e2a1d;border:1px solid #1f5c3f;color:#9fe3c0}
+.fit.bad{background:#2b1414;border-color:#6b2a2a;color:#ffb4b4}
+.note{font-size:10.5px;line-height:1.6;color:#9aa1ad;margin:8px 0 0}
 </style>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@1,700&family=Montserrat:wght@600&display=swap" rel="stylesheet">
 <script type="importmap">
 { "imports": {
   "three": "https://cdn.jsdelivr.net/npm/three@0.160.0/build/three.module.js",
@@ -196,15 +201,13 @@ details b{color:#d6dbe4;font-weight:600}
 </head>
 <body>
 <header class="topbar">
-  <div class="header-left"><span class="pill"><span class="statusdot"></span><span id="pill-txt">Parametric 3D concept</span></span><button class="mobile-toggle" id="mobileToggle" aria-controls="panel" aria-expanded="false">Controls</button></div>
+  <div class="header-left"><span class="pill"><span class="statusdot"></span><span id="pill-txt">3D model · from the reference render</span></span><button class="mobile-toggle" id="mobileToggle" aria-controls="panel" aria-expanded="false">Controls</button></div>
   <div class="brand" id="brand-mark"><span class="txt">MICHELOB ULTRA</span></div>
   <div class="header-actions"><button id="capture">Capture view</button><button id="export">Export GLB</button></div>
 </header>
-<div class="study-title"><h1>3D study <span id="study-sub">· Trophy cooler</span></h1></div>
+<div class="study-title"><h1>3D study <span id="study-sub">· Trophy cooler — chrome fluted cup on a Michelob blue freezer enclosure</span></h1></div>
 <div class="layout">
 <aside id="panel" aria-label="Studio controls">
-
-  <section class="section"><h2>Concepts <small>each keeps its own sections + iterations</small></h2><div id="presets"></div><p class="muted">Brand assets apply to every concept. Selecting a concept restores its sections and iteration history. <span style="color:#e0b24a">●</span> = edited.</p></section>
 
   <section class="section"><h2>Scene objects</h2>
     <div id="layers"></div>
@@ -212,153 +215,79 @@ details b{color:#d6dbe4;font-weight:600}
     <p class="muted" id="dims-readout"></p>
   </section>
 
-  <section class="section" id="workshop"><h2>Section workshop <small id="ws-concept"></small></h2>
-    <div class="seg3" id="ws-tabs"><button data-sec="base">01 Base</button><button data-sec="enc">02 Enclosure</button><button data-sec="cup">03 Cup</button></div>
-    <div class="selected-title" id="ws-title" style="margin:14px 0 2px">03 · Cup</div>
-    <p class="muted" id="ws-sub" style="margin:0 0 12px"></p>
-    <div class="seg"><button id="ws-isolate">Isolate section</button><button id="ws-assembled" class="ghost">Assembled trophy</button></div>
-
-    <div style="height:14px"></div>
-    <div class="box">
-      <div class="box-head"><span>Design prompt</span><span class="badge" id="ws-engine-badge">procedural</span></div>
-      <textarea id="ws-prompt" rows="3" placeholder="e.g. Taller bowl with a flared rim, gold finish, more ice heaped above the rim"></textarea>
-      <div class="gen-row"><button id="ws-generate">Generate iteration</button><button class="ghost" id="ws-save">Save current</button></div>
-      <p class="muted" id="gen-status"></p>
-    </div>
-
-    <div class="box">
-      <div class="box-head"><span>Iterations</span><span class="badge" id="ws-itcount">0</span></div>
-      <div id="ws-iters"></div>
-    </div>
-
-    <div class="box">
-      <div class="box-head"><span>Design parameters</span><span class="badge">manual · no generation</span></div>
-      <div id="variants" style="margin-top:8px"></div>
-      <p class="muted" id="v-blurb"></p>
-      <div id="ws-params"></div>
-      <div id="mod-skin">
-        <div class="input-row"><label>Surface skin</label><select id="skin"></select></div>
-        <div class="slider-head"><label for="skin-scale">Skin scale <span style="color:#6b717d">· all skins</span></label><output id="skin-scale-v">1.0×</output></div>
-        <input class="range" id="skin-scale" type="range" min="0.5" max="4" step="0.1" value="1">
-      </div>
-      <div id="mod-cup">
-        <div class="subhead" style="margin-top:6px">Bottles + ice <small>always 12 Michelob ULTRA</small></div>
-        <div class="input-row"><label>Bottle</label><select id="beer-type"></select></div>
-        <div class="warnbox" id="cup-warn"></div>
-      </div>
-      <div id="mod-enc">
-        <div class="slider-head"><label for="door">Service door</label><output id="door-v">Closed</output></div>
-        <input class="range" id="door" type="range" min="0" max="1" step="0.01" value="0">
-        <label class="toggle-row"><input type="checkbox" id="xray">X-ray sleeve · show the freezer</label>
-        <p class="muted">The freezer (23.6 × 32.0 × 24.6″) is fixed: the sleeve can grow, never shrink below it, and stays 36″ tall so the cup and base don't move.</p>
-      </div>
-      <div id="mod-base"><p class="muted" id="base-note">Ice contact is always UHMW-PE. The deck stays at 3″, and the footprint grows automatically if the enclosure needs it.</p></div>
-    </div>
+  <section class="section"><h2>Enclosure <small>sized for the freezer</small></h2>
+    <div class="slider-head"><label for="W">Width</label><output id="W-v"></output></div><input class="range" id="W" type="range" step="0.5">
+    <div class="slider-head"><label for="D">Depth</label><output id="D-v"></output></div><input class="range" id="D" type="range" step="0.5">
+    <div class="slider-head"><label for="H">Height (body)</label><output id="H-v"></output></div><input class="range" id="H" type="range" step="0.25">
+    <div class="fit" id="fit"></div>
+    <div class="slider-head"><label for="panel-open">Front panel</label><output id="panel-open-v">On</output></div><input class="range" id="panel-open" type="range" min="0" max="1" step="0.01" value="0">
+    <label class="toggle-row"><input type="checkbox" id="xray">X-ray enclosure · show the freezer</label>
+    <div class="input-row"><label>Base</label><div class="seg" id="base" style="width:170px"><button data-v="casters">Casters</button><button data-v="skids">UHMW ice skids</button></div></div>
   </section>
 
-  <section class="section"><h2>Finish</h2>
-    <div class="input-row"><label>Metal</label><div class="seg" id="metal" style="width:150px"><button data-v="chrome">Chrome</button><button data-v="gold">Gold</button></div></div>
-    <div class="input-row"><label>Primary lacquer</label><div class="input-wrap"><input type="color" id="primary"><span class="val" id="primary-v"></span></div></div>
-    <div class="input-row"><label>Accent · glass · LED</label><div class="input-wrap"><input type="color" id="accent"><span class="val" id="accent-v"></span></div></div>
-    <div class="input-row"><label>Glass palette</label><span class="chipsrc"><span id="pal-src">Auto from accent</span><button class="linkbtn" id="pal-reset" style="display:none;padding:0">reset</button></span></div>
-    <div class="input-row"><label>Label text</label><div class="input-wrap" style="width:150px"><input type="text" id="brand" maxlength="28"></div></div>
-    <div class="input-row"><label>Footer wordmark</label><div class="input-wrap" style="width:150px"><input type="text" id="wordmark" maxlength="22"></div></div>
+  <section class="section"><h2>Cup <small>chrome fluted bowl + pedestal</small></h2>
+    <label class="toggle-row"><input type="checkbox" id="lock" checked>Keep the render's proportions (bowl as wide as the box)</label>
+    <div class="slider-head"><label for="bowlD">Bowl diameter</label><output id="bowlD-v"></output></div><input class="range" id="bowlD" type="range" min="36" max="72" step="0.5">
+    <div class="slider-head"><label for="bowlH">Bowl height</label><output id="bowlH-v"></output></div><input class="range" id="bowlH" type="range" min="12" max="30" step="0.2">
+    <div class="slider-head"><label for="pedH">Pedestal height</label><output id="pedH-v"></output></div><input class="range" id="pedH" type="range" min="12" max="34" step="0.2">
+    <div class="slider-head"><label for="flutes">Spiral flutes</label><output id="flutes-v"></output></div><input class="range" id="flutes" type="range" min="12" max="48" step="1">
+    <div class="slider-head"><label for="twist">Flute twist</label><output id="twist-v"></output></div><input class="range" id="twist" type="range" min="0" max="2" step="0.05">
+    <div class="slider-head"><label for="fluteDepth">Flute depth</label><output id="fluteDepth-v"></output></div><input class="range" id="fluteDepth" type="range" min="0" max="1.6" step="0.05">
+    <div class="input-row"><label>Metal</label><div class="seg" id="metal" style="width:170px;grid-template-columns:repeat(3,1fr)"><button data-v="chrome">Chrome</button><button data-v="satin">Satin</button><button data-v="gold">Gold</button></div></div>
   </section>
 
-  <section class="section" id="inputs"><h2>Brand assets <small>shared by all 5 concepts</small></h2>
-    <label class="drop" id="drop-logo"><input type="file" id="f-logo" accept="image/png,image/svg+xml,image/jpeg,image/webp"><b>Drop logo</b>PNG / SVG / JPG → labels, header, monogram skin</label>
-    <div class="box" id="logo-prev" style="display:none;margin:8px 0 0">
-      <div class="box-head"><span>Logo on labels</span><label class="toggle-row" style="margin:0"><input type="checkbox" id="use-logo" checked>On</label></div>
-      <div class="logo-prev"><div class="pv" id="logo-pv"></div><div style="flex:1"><div class="seg" id="logo-mode"><button data-v="tint">Tinted</button><button data-v="original">Original</button></div><button class="linkbtn" id="logo-rm">Remove logo</button></div></div>
-    </div>
-    <div class="input-row"><label>Brand font <span style="color:#6b717d">.ttf .otf .woff</span></label><label class="ghost" style="cursor:pointer;font-size:11px;padding:7px 10px;border:1px solid #34363e;border-radius:7px;background:#1d1f25"><input type="file" id="f-font" accept=".ttf,.otf,.woff,.woff2" style="display:none"><span id="font-name">Upload</span></label></div>
-    <div class="input-row"><label>Brand colors</label><div class="input-wrap" style="width:auto"><input type="color" id="c-add" value="#0b2a6b"><button id="c-add-btn" style="border:0;border-radius:0;padding:7px 10px;font-size:10.5px">Add</button></div></div>
-    <div class="swatches" id="brand-sw"></div>
-    <div id="brand-pal-row" style="display:none"><p class="muted">Swatch → <b>P</b> primary · <b>A</b> accent</p><button class="wide" id="brand-pal">Use brand colors as glass palette</button></div>
-
+  <section class="section"><h2>Bottles + ice</h2>
+    <div class="slider-head"><label for="bottles">Michelob ULTRA bottles</label><output id="bottles-v"></output></div><input class="range" id="bottles" type="range" min="12" max="36" step="6">
+    <div class="slider-head"><label for="heap">Ice heap above the rim</label><output id="heap-v"></output></div><input class="range" id="heap" type="range" min="0" max="5" step="0.1">
+    <div class="slider-head"><label for="lean">Bottle lean</label><output id="lean-v"></output></div><input class="range" id="lean" type="range" min="0" max="0.4" step="0.01">
+    <div class="input-row"><label>Bottle glass</label><div class="seg" id="glass" style="width:170px"><button data-v="amber">Amber</button><button data-v="clear">Clear</button></div></div>
   </section>
 
-  <section class="section" id="gen"><h2>Local generator <small>your computer only</small></h2>
-    <div class="input-row"><label>Engine</label><select id="gen-engine" style="width:170px"><option value="procedural">Built-in procedural (no model)</option><option value="ollama">Ollama · local LLM</option><option value="openai">LM Studio / llama.cpp</option></select></div>
-    <div id="gen-llm">
-      <div class="input-row"><label>Endpoint</label><div class="input-wrap" style="width:170px"><input type="text" id="gen-url" spellcheck="false"></div></div>
-      <div class="input-row"><label>Model</label><select id="gen-model" style="width:170px"><option value="">— test connection —</option></select></div>
-      <button class="wide" id="gen-test">Test connection</button>
-    </div>
-    <p class="muted" id="gen-state"></p>
-    <details><summary>How local generation works</summary>
-      <ul>
-        <li>Each iteration is <b>editable parameters</b> for one section (shape, proportions, finish, bottle arrangement), checked against the freezer fit and the 12-bottle capacity before it's shown.</li>
-        <li><b>Ollama:</b> install from ollama.com, run <code>ollama pull qwen2.5:7b</code>, then start it allowing this site: <code>OLLAMA_ORIGINS="https://trophy-cooler-studio.vercel.app" ollama serve</code>. For the standalone file use <code>OLLAMA_ORIGINS="*"</code>.</li>
-        <li><b>LM Studio:</b> load a model, open Developer → Local Server, enable CORS and start it (default <code>http://localhost:1234</code>). llama.cpp's <code>llama-server --port 8080</code> also works.</li>
-        <li>Only <b>localhost / private-network</b> addresses are accepted, and nothing ever falls back to a cloud API. The built-in procedural engine runs in this page with no model at all.</li>
-      </ul></details>
+  <section class="section"><h2>Brand <small>front panel · bottle labels · header</small></h2>
+    <div class="input-row"><label>Enclosure color</label><div class="input-wrap"><input type="color" id="color"><span class="val" id="color-v"></span></div></div>
+    <label class="drop" id="drop-logo" style="margin-top:12px"><input type="file" id="f-logo" accept="image/png,image/svg+xml,image/jpeg,image/webp"><b>Drop the Michelob ULTRA logo</b>PNG / SVG / JPG · replaces the placeholder lockup on the panel and labels</label>
+    <div class="box" id="logo-prev" style="display:none;margin:8px 0 0"><div class="box-head"><span>Logo loaded</span><button class="linkbtn" id="logo-rm" style="padding:0">Remove</button></div></div>
   </section>
 
   <section class="section"><h2>View settings</h2>
-    <label class="toggle-row"><input type="checkbox" id="contents" checked>Show 12 beers + ice</label>
-    <label class="toggle-row"><input type="checkbox" id="rink" checked>Show rink markings</label>
-    <label class="toggle-row"><input type="checkbox" id="spin">Auto-rotate</label>
+    <div class="input-row"><label>Environment</label><div class="seg" id="env" style="width:170px"><button data-v="studio">Studio</button><button data-v="rink">Rink</button></div></div>
     <label class="toggle-row"><input type="checkbox" id="hq" checked>Realistic shading (ambient occlusion)</label>
-    <div class="slider-head"><label for="explode">Explode modules</label><output id="explode-v">0%</output></div>
-    <input class="range" id="explode" type="range" min="0" max="1" step="0.01" value="0">
-    <button id="reset" class="wide">Reset this concept's look</button>
+    <label class="toggle-row"><input type="checkbox" id="spin">Auto-rotate</label>
+    <div class="slider-head"><label for="explode">Explode sections</label><output id="explode-v">0%</output></div><input class="range" id="explode" type="range" min="0" max="1" step="0.01" value="0">
+    <button id="reset" class="wide">Reset to the render</button>
   </section>
 
   <section class="section"><h2>Specs <small>estimates</small></h2>
     <div class="stat">
       <div><b id="s-h">—</b><span>Overall height</span></div>
-      <div><b id="s-f">—</b><span>Footprint on ice</span></div>
-      <div><b id="s-w">—</b><span>Fully loaded</span></div>
+      <div><b id="s-f">—</b><span>Footprint</span></div>
+      <div><b id="s-w">—</b><span>Loaded weight</span></div>
       <div><b id="s-c">—</b><span>Freezer clearance S / B / F / T</span></div>
     </div>
     <table id="wt"></table>
-    <div class="subhead" style="margin-top:16px">Carry plan <small>vs ~51 lb / person</small></div>
-    <div class="lift" id="lift"></div>
+    <p class="note" id="s-note"></p>
   </section>
 
   <section class="section"><h2>Export</h2>
-    <div class="input-row"><label>GLB scope</label><select id="glb-what"><option value="all">Whole assembly</option><option value="base">01 · Base</option><option value="enc">02 · Enclosure</option><option value="cup">03 · Cup + beers</option></select></div>
+    <div class="input-row"><label>GLB scope</label><select id="glb-what"><option value="all">Whole trophy</option><option value="cup">Cup + pedestal</option><option value="contents">Bottles + ice</option><option value="enc">Enclosure</option><option value="base">Base</option></select></div>
     <button class="wide" id="glb">Download .glb</button>
-    <button class="wide ghost" id="copy">Copy config JSON</button>
-    <p class="muted" id="glb-msg">GLB in meters, +Y up, +Z front — includes logo, skin and ★ cup.</p><p class="muted" id="copied" style="display:none"></p>
+    <button class="wide ghost" id="copy">Copy dimensions JSON</button>
+    <p class="muted" id="glb-msg">GLB in meters, +Y up, +Z front. Includes the freezer reference volume when exporting the whole trophy.</p>
   </section>
 
-  <section class="section"><h2>Engineering notes</h2>
-    <details open><summary>Ice-safe sliding base</summary><ul>
-      <li>UHMW-PE runners/skids: low friction on ice, non-marking, tough in the cold. No rubber (grabs, scuffs) or bare metal edges (cuts).</li>
-      <li>Radiused or beveled leading edges; fasteners counterbored from the top so no metal touches the ice.</li>
-      <li>~250 lb over the runners is a few psi — far below a skate blade. Add a perimeter drip lip.</li></ul></details>
-    <details><summary>Freezer integration · Meling DW-XL90</summary><ul>
-      <li><b>It's a freezer</b> (−15 to −30 °C): beer stored inside would freeze and burst. Use it as an ice / cold-pack reserve, or swap to a same-size +2–8 °C medical refrigerator.</li>
-      <li>Front-ventilated: door grille must line up with the bottom-front vent. ~1″ behind for the cord.</li>
-      <li>The enclosure is a <b>sleeve</b> that drops over the freezer and pins to the sled.</li>
-      <li>Confirm what the "48 hr backup battery" powers — often alarm/display only, not the compressor.</li>
-      <li>Transport upright; let it stand before power-up per Meling.</li></ul></details>
-    <details><summary>Cup / cooler</summary><ul>
-      <li>Double wall: decorative shell around a stainless or food-grade liner, foam-filled to cut sweating.</li>
-      <li>Melt water drains through the neck to a sealed reservoir — never onto the freezer or ice.</li>
-      <li>Twist-lock mount on the enclosure cap; carry it on empty, load beer + ice on the ice.</li></ul></details>
-    <details><summary>Getting it onto the ice</summary><ul>
-      <li>Three lifts, not one: freezer + sled by cart, sleeve by two people, cup by one.</li>
-      <li>Check on-ice equipment rules and approvals with the venue and league before fabrication.</li></ul></details>
-    <details><summary>Design language</summary><p>Inspired by the luxury sports-object approach associated with Victor Solomon — stained glass, mirror chrome and gold, sports icons scaled into precious objects. Forms are original, not copies of his pieces.</p></details>
-  </section>
-  <div class="disclaimer">Visual concept, not a fabrication model or a venue-approved installation. Weights and clearances are estimates and require technical validation. Brand marks are placeholders until approved artwork is uploaded.</div>
+  <div class="disclaimer">Visual concept built from the reference render, not a fabrication model. Weights and clearances are estimates that need technical validation. The front-panel lockup is a placeholder until the approved logo artwork is uploaded.</div>
 </aside>
 
 <main id="stage" aria-label="Interactive trophy cooler 3D viewer">
-  <div class="viewbar" id="viewbar"><button data-view="hero" class="active">3D</button><button data-view="front">Front</button><button data-view="back">Back</button><button data-view="top">Top</button><button data-view="side">Side</button><button data-view="bottles">Bottles</button><button data-view="rink">Rink</button></div>
-  <div class="vchips" id="vchips"></div>
-  <button class="focusbtn" id="fit">Fit view</button>
-  <div class="legend" id="legend">Drag the background to explore the model.</div>
-  <div class="scene-label" id="scene-label">03 modules · freezer enclosed · 12 beers on ice</div>
+  <div class="viewbar" id="viewbar"><button data-view="front" class="active">Front</button><button data-view="hero">3/4</button><button data-view="side">Side</button><button data-view="back">Back</button><button data-view="top">Top</button><button data-view="bottles">Bottles</button></div>
+  <button class="focusbtn" id="fit-btn">Fit view</button>
+  <div class="scene-label" id="scene-label">Freezer enclosed · 12 Michelob ULTRA on ice</div>
   <div class="hint">Drag to orbit<span>·</span>Scroll to zoom<span>·</span>Right-drag to pan</div>
   <div id="toast" role="status" aria-live="polite"></div>
-  <div class="loader" id="loading"><div class="loadbox"><div class="spin"></div><h3>Preparing the 3D study</h3><p>Building the base, sleeve and cup.</p></div></div>
+  <div class="loader" id="loading"><div class="loadbox"><div class="spin"></div><h3>Building the trophy</h3><p>Fluted bowl, pedestal and freezer enclosure.</p></div></div>
 </main>
 </div>
-<footer class="wordmark-footer"><span id="wordmark-out">Trophy Cooler</span></footer>
+<footer class="wordmark-footer"><span>Trophy Cooler</span></footer>
 <script type="module">
 import * as THREE from 'three';
 import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
@@ -366,912 +295,262 @@ import { EffectComposer } from 'three/addons/postprocessing/EffectComposer.js';
 import { RenderPass } from 'three/addons/postprocessing/RenderPass.js';
 import { GTAOPass } from 'three/addons/postprocessing/GTAOPass.js';
 import { OutputPass } from 'three/addons/postprocessing/OutputPass.js';
+import { Reflector } from 'three/addons/objects/Reflector.js';
 import { GLTFExporter } from 'three/addons/exporters/GLTFExporter.js';
-import * as D from './designs.js';
+import * as T from './trophy.js';
 
 const $ = (id) => document.getElementById(id);
-const fresh = (p) => ({ base: p.base, enc: p.enc, cup: p.cup, metal: p.metal, primary: p.primary, accent: p.accent });
-const S = { preset: D.PRESETS[0].id, ...fresh(D.PRESETS[0]), brand: 'MICHELOB ULTRA', xray: false, contents: true, rink: true, spin: false, door: 0, explode: 0,
-  skin: 'default', skinScale: 1, palette: null, paletteSrc: null, cupProfile: null, profileSrc: null, facets: 0, wordmark: 'Trophy Cooler',
-  sel: 'cup', isolate: false, view: 'hero', vis: { cup: true, contents: true, enc: true, fridge: true, base: true } };
-// Each concept keeps its own look + its own reference pins; brand assets (B) are shared by all.
-const LOOK = ['base', 'enc', 'cup', 'metal', 'primary', 'accent', 'skin', 'skinCup', 'skinBase', 'skinScale', 'palette', 'paletteSrc', 'paletteRef', 'cupProfile', 'profileSrc', 'facets', 'refCup', 'refEnc', 'refBase', 'refBeer', 'beerType', 'beerLabel', 'beerProfile', 'cupP', 'encP', 'baseP', 'cupFinish', 'encFinish', 'baseFinish'];
-const lookDefaults = (p) => ({ ...fresh(p), skin: 'default', skinCup: 'default', skinBase: 'default', skinScale: 1, palette: null, paletteSrc: null, paletteRef: null, cupProfile: null, profileSrc: null, facets: 0, refCup: null, refEnc: null, refBase: null, refBeer: null, beerType: 'longneck', beerLabel: false, beerProfile: null,
-  cupP: { ...Object.fromEntries(Object.entries(D.SECTION_PARAMS.cup).map(([k, v]) => [k, v[2]])), arrangement: 'ring' },
-  encP: { ...Object.fromEntries(Object.entries(D.SECTION_PARAMS.enc).map(([k, v]) => [k, v[2]])), led: true },
-  baseP: { ...Object.fromEntries(Object.entries(D.SECTION_PARAMS.base).map(([k, v]) => [k, v[2]])), led: true },
-  cupFinish: 'concept', encFinish: 'concept', baseFinish: 'concept' });
-const pickLook = (o) => JSON.parse(JSON.stringify(Object.fromEntries(LOOK.map((k) => [k, o[k] ?? null]))));
-const newConcept = (p) => ({ ...lookDefaults(p), pins: [], secRefs: { cup: [], enc: [], base: [] }, iters: { cup: [], enc: [], base: [] }, prompts: { cup: '', enc: '', base: '' } });
-const C = Object.fromEntries(D.PRESETS.map((p) => [p.id, newConcept(p)]));   // pins: ref ids ('gs:<slideId>' or local 'refN')
-const activeC = () => C[S.preset];
-const pins = () => activeC().pins;
-const commitLook = () => { Object.assign(activeC(), pickLook(S)); };   // deep copy: S and C never share objects
-Object.assign(S, pickLook(C[S.preset]));
-const isEdited = (id) => { const d = lookDefaults(D.byId(D.PRESETS, id)), c = C[id]; return LOOK.some((k) => JSON.stringify(c[k]) !== JSON.stringify(d[k])); };
-const B = { logo: null, logoSrc: null, mode: 'tint', use: true, font: null, colors: [], tints: {} };   // brand assets
-const REFS = [];                                                                                         // design references
+const mk = (w, h) => { const c = document.createElement('canvas'); c.width = w; c.height = h; return c; };
+const KEY = 'trophy-cooler-model-v1';
+let P = { ...T.DEFAULTS }, lock = true;
+const V = { sel: 'cup', isolate: false, xray: false, panel: 0, explode: 0, env: 'studio', spin: false, vis: { cup: true, contents: true, enc: true, fridge: true, base: true } };
+const B = { logo: null, logoSrc: null };
+try { const d = JSON.parse(localStorage.getItem(KEY) || 'null'); if (d) { P = { ...P, ...d.P }; lock = d.lock !== false; V.env = d.env || 'studio'; if (d.logo) B.logoSrc = d.logo; } } catch {}
+let HQ = true; try { HQ = localStorage.getItem('trophy-cooler-hq') !== '0'; } catch {}
+let saveT; const save = () => { clearTimeout(saveT); saveT = setTimeout(() => { try { localStorage.setItem(KEY, JSON.stringify({ P, lock, env: V.env, logo: B.logoSrc })); } catch {} }, 400); };
 
-// ---------- renderer / scene (physically based, ambient occlusion, soft shadows) ----------
+// ---------- renderer ----------
 const view = $('stage');
 const renderer = new THREE.WebGLRenderer({ antialias: true, preserveDrawingBuffer: true });
 renderer.setPixelRatio(Math.min(devicePixelRatio, 2));
 renderer.toneMapping = THREE.ACESFilmicToneMapping; renderer.toneMappingExposure = 1.0;
 renderer.shadowMap.enabled = true; renderer.shadowMap.type = THREE.VSMShadowMap;
 view.prepend(renderer.domElement);
-const scene = new THREE.Scene();
-const pmrem = new THREE.PMREMGenerator(renderer);
-// arena environment: dark roof with LED light rows, bright ice below, blue rink-board glow → believable reflections
-function arenaEnv() {
-  const s = new THREE.Scene(), geo = new THREE.SphereGeometry(100, 64, 32), pos = geo.attributes.position, col = [];
-  const top = new THREE.Color(0x0b0f18), hor = new THREE.Color(0x5d6b82), lo = new THREE.Color(0xe9eff6), deep = new THREE.Color(0xb7c3d2), c = new THREE.Color();
-  for (let i = 0; i < pos.count; i++) { const y = pos.getY(i) / 100; if (y >= 0) c.lerpColors(hor, top, Math.pow(y, 0.45)); else c.lerpColors(lo, deep, Math.pow(-y, 0.6)); col.push(c.r, c.g, c.b); }
+const scene = new THREE.Scene(), pmrem = new THREE.PMREMGenerator(renderer);
+const camera = new THREE.PerspectiveCamera(30, 1, 1, 20000);
+const controls = new OrbitControls(camera, renderer.domElement);
+controls.enableDamping = true; controls.minDistance = 40; controls.maxDistance = 900; controls.maxPolarAngle = 1.55;
+
+// studio: black room with large softboxes (like the render) · rink: arena lights over ice
+function envScene(kind) {
+  const s = new THREE.Scene(), geo = new THREE.SphereGeometry(100, 64, 32), pos = geo.attributes.position, col = [], c = new THREE.Color();
+  const [top, hor, lo] = kind === 'studio' ? [0x15171b, 0x50545c, 0x16171a] : [0x0b0f18, 0x5d6b82, 0xe9eff6];
+  for (let i = 0; i < pos.count; i++) { const y = pos.getY(i) / 100; c.lerpColors(new THREE.Color(hor), new THREE.Color(y >= 0 ? top : lo), Math.pow(Math.abs(y), 0.5)); col.push(c.r, c.g, c.b); }
   geo.setAttribute('color', new THREE.Float32BufferAttribute(col, 3));
   s.add(new THREE.Mesh(geo, new THREE.MeshBasicMaterial({ vertexColors: true, side: THREE.BackSide })));
-  const hot = new THREE.MeshBasicMaterial({ color: new THREE.Color(9, 9, 9.4) });
-  for (let row = -2; row <= 2; row++) for (let k = -3; k <= 3; k++) { const m = new THREE.Mesh(new THREE.BoxGeometry(9, 0.6, 2.2), hot); m.position.set(k * 13, 70, row * 16); m.rotation.x = Math.PI / 2; s.add(m); }
-  const key = new THREE.Mesh(new THREE.PlaneGeometry(46, 26), new THREE.MeshBasicMaterial({ color: new THREE.Color(5, 4.8, 4.5), side: THREE.DoubleSide })); key.position.set(45, 40, 60); key.lookAt(0, 0, 0); s.add(key);
-  const fill = new THREE.Mesh(new THREE.PlaneGeometry(60, 20), new THREE.MeshBasicMaterial({ color: new THREE.Color(1.3, 1.4, 1.6), side: THREE.DoubleSide })); fill.position.set(-70, 20, 40); fill.lookAt(0, 10, 0); s.add(fill);
-  const boards = new THREE.Mesh(new THREE.CylinderGeometry(88, 88, 7, 64, 1, true), new THREE.MeshBasicMaterial({ color: new THREE.Color(0.25, 0.55, 2.4), side: THREE.BackSide })); boards.position.y = 4; s.add(boards);
-  return s;
+  const panel = (w, h, k, x, y, z, tint = [1, 1, 1]) => { const m = new THREE.Mesh(new THREE.PlaneGeometry(w, h), new THREE.MeshBasicMaterial({ color: new THREE.Color(k * tint[0], k * tint[1], k * tint[2]), side: THREE.DoubleSide })); m.position.set(x, y, z); m.lookAt(0, 20, 0); s.add(m); };
+  if (kind === 'studio') {
+    panel(110, 70, 6, 0, 88, 0);                        // large overhead softbox
+    panel(34, 110, 5.5, -70, 30, 25); panel(34, 110, 5.5, 70, 30, 25);   // tall strip softboxes left / right (vertical highlights in the chrome)
+    panel(26, 90, 3, -45, 30, -60); panel(26, 90, 3, 45, 30, -60);       // rear kickers
+    panel(90, 50, 2.6, 0, 30, 85);                       // front fill
+    panel(90, 10, 0.9, 0, 4, -80, [0.4, 0.6, 1.4]);    // faint blue kicker behind
+  } else {
+    const hot = new THREE.MeshBasicMaterial({ color: new THREE.Color(9, 9, 9.4) });
+    for (let row = -2; row <= 2; row++) for (let k = -3; k <= 3; k++) { const m = new THREE.Mesh(new THREE.BoxGeometry(9, 0.6, 2.2), hot); m.position.set(k * 13, 70, row * 16); m.rotation.x = Math.PI / 2; s.add(m); }
+    panel(46, 26, 5, 45, 40, 60); panel(60, 20, 1.4, -70, 20, 40);
+    const boards = new THREE.Mesh(new THREE.CylinderGeometry(88, 88, 7, 64, 1, true), new THREE.MeshBasicMaterial({ color: new THREE.Color(0.25, 0.55, 2.4), side: THREE.BackSide })); boards.position.y = 4; s.add(boards);
+  }
+  return pmrem.fromScene(s, 0.015).texture;
 }
-scene.environment = pmrem.fromScene(arenaEnv(), 0.015).texture;
-// dot-grid stage backdrop, rendered in the scene so post-processing can work on an opaque frame
-function stageBackdrop(w, h) {
-  const k = renderer.getPixelRatio(), c = document.createElement('canvas'); c.width = Math.max(2, Math.round(w * k)); c.height = Math.max(2, Math.round(h * k)); const x = c.getContext('2d');
-  x.fillStyle = '#15181c'; x.fillRect(0, 0, c.width, c.height); x.fillStyle = 'rgba(110,118,136,.42)';
-  const step = 22 * k; for (let yy = step / 2; yy < c.height; yy += step) for (let xx = step / 2; xx < c.width; xx += step) { x.beginPath(); x.arc(xx, yy, 0.85 * k, 0, 6.283); x.fill(); }
-  const t = new THREE.CanvasTexture(c); t.colorSpace = THREE.SRGBColorSpace; return t;
-}
-const camera = new THREE.PerspectiveCamera(34, 1, 1, 20000);
-const controls = new OrbitControls(camera, renderer.domElement);
-controls.enableDamping = true; controls.minDistance = 40; controls.maxDistance = 700; controls.maxPolarAngle = 1.53;
+const ENV = { studio: envScene('studio'), rink: envScene('rink') };
+const hemi = new THREE.HemisphereLight(0xdfe9ff, 0x20242c, 0.25); scene.add(hemi);
+const key = new THREE.DirectionalLight(0xfff5ea, 2.4); key.position.set(30, 220, 80); key.castShadow = true;
+Object.assign(key.shadow.camera, { left: -70, right: 70, top: 110, bottom: -40, near: 40, far: 500 });
+key.shadow.mapSize.set(2048, 2048); key.shadow.bias = -0.0006; key.shadow.normalBias = 0.25; key.shadow.radius = 10; key.shadow.blurSamples = 20; scene.add(key);
+const rimL = new THREE.DirectionalLight(0xbcd2ff, 1.3); rimL.position.set(-160, 90, -60); scene.add(rimL);
+const rimR = new THREE.DirectionalLight(0xffffff, 0.9); rimR.position.set(160, 70, -40); scene.add(rimR);
+const front = new THREE.DirectionalLight(0xffffff, 0.55); front.position.set(0, 50, 200); scene.add(front);
 
-scene.add(new THREE.HemisphereLight(0xdfe9ff, 0x262b36, 0.35));
-const sun = new THREE.DirectionalLight(0xfff3e4, 2.3);
-sun.position.set(70, 170, 95); sun.castShadow = true;
-Object.assign(sun.shadow.camera, { left: -70, right: 70, top: 95, bottom: -35, near: 20, far: 420 });
-sun.shadow.mapSize.set(2048, 2048); sun.shadow.bias = -0.0006; sun.shadow.normalBias = 0.25; sun.shadow.radius = 9; sun.shadow.blurSamples = 20;
-scene.add(sun);
-const rim = new THREE.DirectionalLight(0x9cc0ff, 1.5); rim.position.set(-120, 70, -110); scene.add(rim);
-const kick = new THREE.DirectionalLight(0xffffff, 0.45); kick.position.set(-40, 20, 140); scene.add(kick);
-// post-processing: MSAA render target → ground-truth ambient occlusion → tone mapping / sRGB
+// floors: glossy black studio floor with a soft reflection, or a rink disc
+const floor = new THREE.Group(); scene.add(floor);
+const mirror = new Reflector(new THREE.CircleGeometry(260, 96), { textureWidth: 1024, textureHeight: 1024, color: 0x3a3e46 });
+mirror.rotation.x = -Math.PI / 2; mirror.position.y = -0.02; floor.add(mirror);
+function radial(stops) { const c = mk(1024, 1024), x = c.getContext('2d'), g = x.createRadialGradient(512, 512, 0, 512, 512, 512); stops.forEach(([o, s]) => g.addColorStop(o, s)); x.fillStyle = g; x.fillRect(0, 0, 1024, 1024); const t = new THREE.CanvasTexture(c); t.colorSpace = THREE.SRGBColorSpace; return t; }
+const studioFloor = new THREE.Mesh(new THREE.CircleGeometry(262, 96), new THREE.MeshBasicMaterial({ color: 0x020203, transparent: true, alphaMap: radial([[0, '#c8c8c8'], [0.2, '#d6d6d6'], [0.5, '#ffffff'], [1, '#ffffff']]), toneMapped: false }));
+studioFloor.rotation.x = -Math.PI / 2; studioFloor.position.y = 0.01; floor.add(studioFloor);
+function iceTexture() {
+  const N = 2048, R = 170, c = mk(N, N), x = c.getContext('2d'), k = N / (2 * R);
+  x.fillStyle = '#8f9cab'; x.fillRect(0, 0, N, N);
+  const line = (z, col, w) => { x.fillStyle = col; x.fillRect(0, N / 2 + z * k - w * k / 2, N, w * k); }; line(-75, '#c8102e', 8); line(130, '#1a49b8', 8);
+  x.strokeStyle = '#c8102e'; x.lineWidth = 2 * k; x.beginPath(); x.arc(N / 2, N / 2, 110 * k, 0, 6.283); x.stroke();
+  x.globalCompositeOperation = 'destination-in'; const g = x.createRadialGradient(N / 2, N / 2, N * 0.18, N / 2, N / 2, N / 2); g.addColorStop(0, 'rgba(0,0,0,.85)'); g.addColorStop(1, 'rgba(0,0,0,0)'); x.fillStyle = g; x.fillRect(0, 0, N, N);
+  const t = new THREE.CanvasTexture(c); t.colorSpace = THREE.SRGBColorSpace; t.anisotropy = 8; return t;
+}
+const rink = new THREE.Mesh(new THREE.PlaneGeometry(340, 340), new THREE.MeshPhysicalMaterial({ map: iceTexture(), transparent: true, depthWrite: false, roughness: 0.55, clearcoat: 0.55 }));
+rink.rotation.x = -Math.PI / 2; rink.position.y = 0.01; rink.receiveShadow = true; scene.add(rink);
+const contact = new THREE.Mesh(new THREE.PlaneGeometry(1, 1), new THREE.MeshBasicMaterial({ map: radial([[0, 'rgba(0,0,0,.7)'], [0.5, 'rgba(0,0,0,.4)'], [1, 'rgba(0,0,0,0)']]), transparent: true, depthWrite: false, toneMapped: false }));
+contact.rotation.x = -Math.PI / 2; contact.position.y = 0.05; contact.renderOrder = 2; scene.add(contact);
+function applyEnv() {
+  const studio = V.env === 'studio';
+  scene.environment = ENV[V.env]; floor.visible = studio; rink.visible = !studio;
+  scene.background = studio ? new THREE.Color(0x020203) : backdrop || new THREE.Color(0x15181c);
+  document.querySelectorAll('#env button').forEach((b) => b.classList.toggle('active', b.dataset.v === V.env));
+  view.style.backgroundColor = studio ? '#020203' : '#15181c';
+}
+let backdrop = null;
+function stageBackdrop(w, h) { const k = renderer.getPixelRatio(), c = mk(Math.max(2, Math.round(w * k)), Math.max(2, Math.round(h * k))), x = c.getContext('2d'); x.fillStyle = '#15181c'; x.fillRect(0, 0, c.width, c.height); x.fillStyle = 'rgba(110,118,136,.42)'; const st = 22 * k; for (let yy = st / 2; yy < c.height; yy += st) for (let xx = st / 2; xx < c.width; xx += st) { x.beginPath(); x.arc(xx, yy, 0.85 * k, 0, 6.283); x.fill(); } const t = new THREE.CanvasTexture(c); t.colorSpace = THREE.SRGBColorSpace; return t; }
+
 const composer = new EffectComposer(renderer, new THREE.WebGLRenderTarget(4, 4, { type: THREE.HalfFloatType, samples: 4 }));
 composer.addPass(new RenderPass(scene, camera));
 const gtao = new GTAOPass(scene, camera, 4, 4);
 gtao.updateGtaoMaterial({ radius: 6, distanceExponent: 1.6, thickness: 3, scale: 1.1, samples: 16, distanceFallOff: 1, screenSpaceRadius: false });
-gtao.updatePdMaterial({ lumaPhi: 10, depthPhi: 2, normalPhi: 3, radius: 6, rings: 2, samples: 16 });
-gtao.blendIntensity = 0.85; composer.addPass(gtao);
+gtao.updatePdMaterial({ lumaPhi: 10, depthPhi: 2, normalPhi: 3, radius: 6, rings: 2, samples: 16 }); gtao.blendIntensity = 0.8; composer.addPass(gtao);
 composer.addPass(new OutputPass());
-let HQ = true; try { HQ = localStorage.getItem('trophy-cooler-hq') !== '0'; } catch {}
 const renderFrame = () => (HQ ? composer.render() : renderer.render(scene, camera));
-// soft contact shadow under the trophy (ambient occlusion on the ice)
-function contactTexture() {
-  const c = document.createElement('canvas'); c.width = c.height = 256; const x = c.getContext('2d'), g = x.createRadialGradient(128, 128, 0, 128, 128, 128);
-  g.addColorStop(0, 'rgba(0,0,0,.62)'); g.addColorStop(0.45, 'rgba(0,0,0,.38)'); g.addColorStop(1, 'rgba(0,0,0,0)'); x.fillStyle = g; x.fillRect(0, 0, 256, 256);
-  return new THREE.CanvasTexture(c);
-}
-const contact = new THREE.Mesh(new THREE.PlaneGeometry(1, 1), new THREE.MeshBasicMaterial({ map: contactTexture(), transparent: true, depthWrite: false, toneMapped: false }));
-contact.rotation.x = -Math.PI / 2; contact.position.y = 0.06; contact.renderOrder = 1; scene.add(contact);
 
-// ---------- rink: an ice disc that fades into the dot-grid stage ----------
-function iceTexture(markings) {
-  const N = 2048, R = 170, c = document.createElement('canvas'); c.width = c.height = N; const x = c.getContext('2d'), k = N / (2 * R);
-  x.fillStyle = '#8f9cab'; x.fillRect(0, 0, N, N);
-  if (markings) {
-    const line = (z, col, w = 12) => { x.fillStyle = col; x.fillRect(0, N / 2 + z * k - w * k / 2, N, w * k); };
-    line(-62, '#c8102e', 8); line(118, '#1a49b8', 8);
-    x.strokeStyle = '#c8102e'; x.lineWidth = 2 * k; x.beginPath(); x.arc(N / 2, N / 2, 92 * k, 0, Math.PI * 2); x.stroke();
-  }
-  x.globalCompositeOperation = 'destination-in';
-  const g = x.createRadialGradient(N / 2, N / 2, N * 0.18, N / 2, N / 2, N / 2); g.addColorStop(0, 'rgba(0,0,0,.82)'); g.addColorStop(0.5, 'rgba(0,0,0,.42)'); g.addColorStop(1, 'rgba(0,0,0,0)');
-  x.fillStyle = g; x.fillRect(0, 0, N, N);
+// ---------- brand textures ----------
+const BLUE = '#0b2d82';
+function keyBackground(c) { const x = c.getContext('2d'), id = x.getImageData(0, 0, c.width, c.height), d = id.data; let a = false; for (let i = 3; i < d.length; i += 28) if (d[i] < 245) { a = true; break; } if (a) return c; const [br, bg, bb] = [d[0], d[1], d[2]]; for (let i = 0; i < d.length; i += 4) { const dist = Math.hypot(d[i] - br, d[i + 1] - bg, d[i + 2] - bb); d[i + 3] = Math.max(0, Math.min(255, (dist - 28) * 10)); } x.putImageData(id, 0, 0); return c; }
+function tint(src, color) { const c = mk(src.width, src.height), x = c.getContext('2d'); x.drawImage(src, 0, 0); x.globalCompositeOperation = 'source-in'; x.fillStyle = color; x.fillRect(0, 0, c.width, c.height); return c; }
+function lockup(x, cx, cy, w, color, sub = true) { // placeholder wordmark: script "Michelob" over a wide "ULTRA"
+  x.fillStyle = color; x.textAlign = 'center'; x.textBaseline = 'alphabetic';
+  let f1 = w * 0.17; x.font = `italic 700 ${f1}px "Playfair Display", Georgia, serif`; try { x.letterSpacing = '0px'; } catch {}
+  x.fillText('Michelob', cx, cy - w * 0.02);
+  let f2 = w * 0.21; x.font = `600 ${f2}px Montserrat, Arial, sans-serif`; try { x.letterSpacing = f2 * 0.12 + 'px'; } catch {}
+  const tw = x.measureText('ULTRA').width; if (tw > w * 0.92) { f2 *= (w * 0.92) / tw; x.font = `600 ${f2}px Montserrat, Arial, sans-serif`; }
+  x.fillText('ULTRA', cx + f2 * 0.06, cy + f2 * 1.05);
+  return cy + f2 * 1.05;
+}
+function frontLogo() {
+  const c = mk(1600, 992), x = c.getContext('2d');
+  if (B.logo) { const L = tint(B.logo, '#ffffff'); let w = 1500, h = w * L.height / L.width; if (h > 940) { h = 940; w = h * L.width / L.height; } x.drawImage(L, (1600 - w) / 2, (992 - h) / 2, w, h); }
+  else lockup(x, 800, 470, 1500, '#ffffff');
   const t = new THREE.CanvasTexture(c); t.colorSpace = THREE.SRGBColorSpace; t.anisotropy = 8; return t;
 }
-const iceTex = { on: iceTexture(true), off: iceTexture(false) };
-const ice = new THREE.Mesh(new THREE.PlaneGeometry(340, 340), new THREE.MeshPhysicalMaterial({ map: iceTex.on, transparent: true, depthWrite: false, roughness: 0.55, clearcoat: 0.55, clearcoatRoughness: 0.18, specularIntensity: 0.5 }));
-ice.rotation.x = -Math.PI / 2; ice.receiveShadow = true; scene.add(ice);
-
-// ---------- labels ----------
-function makeLabel(text, { aspect = 4, repeat = 1, fg = '#ffffff', bg = null }) {
-  let W = 2048, H = Math.round(W / aspect);
-  if (H < 96) { H = 96; W = Math.min(8192, Math.round(H * aspect)); }
-  if (H > 1024) { H = 1024; W = Math.round(H * aspect); }
-  const c = document.createElement('canvas'); c.width = W; c.height = H; const x = c.getContext('2d');
-  if (bg) { x.fillStyle = bg; x.fillRect(0, 0, W, H); }
-  const seg = W / repeat, logo = B.logo && B.use ? logoVariant(fg) : null, fam = B.font ? `"${B.font}", "Barlow Condensed"` : '"Barlow Condensed"';
-  if (logo) {
-    for (let i = 0; i < repeat; i++) {
-      let h = H * 0.92, w = h * logo.width / logo.height; if (w > seg * 0.94) { w = seg * 0.94; h = w * logo.height / logo.width; }
-      x.drawImage(logo, seg * (i + 0.5) - w / 2, H / 2 - h / 2, w, h);
-    }
-    const t = new THREE.CanvasTexture(c); t.colorSpace = THREE.SRGBColorSpace; t.anisotropy = renderer.capabilities.getMaxAnisotropy(); return t;
-  }
-  for (let i = 0; i < repeat; i++) {
-    let fs = H * 0.8; x.font = `700 ${fs}px ${fam}, sans-serif`;
-    try { x.letterSpacing = (fs * 0.14) + 'px'; } catch {}
-    const tw = x.measureText(text).width; if (tw > seg * 0.93) { fs *= seg * 0.93 / tw; x.font = `700 ${fs}px ${fam}, sans-serif`; try { x.letterSpacing = (fs * 0.14) + 'px'; } catch {} }
-    x.fillStyle = fg; x.textAlign = 'center'; x.textBaseline = 'middle';
-    x.fillText(text, seg * (i + 0.5) + fs * 0.07, H * 0.53);
-  }
-  const t = new THREE.CanvasTexture(c); t.colorSpace = THREE.SRGBColorSpace; t.anisotropy = renderer.capabilities.getMaxAnisotropy(); return t;
+function bottleLabel() { // one face; repeated twice around the bottle
+  const c = mk(1024, 680), x = c.getContext('2d'), g = x.createLinearGradient(0, 0, 1024, 0);
+  g.addColorStop(0, '#e6eaf1'); g.addColorStop(0.5, '#ffffff'); g.addColorStop(1, '#e6eaf1'); x.fillStyle = g; x.fillRect(0, 0, 1024, 680);
+  x.fillStyle = BLUE; x.fillRect(0, 26, 1024, 22); x.fillRect(0, 632, 1024, 22);
+  if (B.logo) { const L = tint(B.logo, BLUE); let w = 820, h = w * L.height / L.width; if (h > 470) { h = 470; w = h * L.width / L.height; } x.drawImage(L, (1024 - w) / 2, (680 - h) / 2, w, h); }
+  else lockup(x, 512, 300, 840, BLUE);
+  x.fillStyle = '#c8102e'; x.fillRect(496, 520, 32, 64);
+  const t = new THREE.CanvasTexture(c); t.colorSpace = THREE.SRGBColorSpace; t.wrapS = THREE.RepeatWrapping; t.repeat.set(2, 1); t.offset.x = 0.25; t.anisotropy = 8; return t;
 }
+function neckLabel() { const c = mk(512, 128), x = c.getContext('2d'); x.fillStyle = '#ffffff'; x.fillRect(0, 0, 512, 128); x.fillStyle = BLUE; x.fillRect(0, 44, 512, 40); x.fillStyle = '#c8102e'; x.fillRect(0, 84, 512, 6); const t = new THREE.CanvasTexture(c); t.colorSpace = THREE.SRGBColorSpace; return t; }
 
 // ---------- build ----------
-let root = null, parts = {}, skinTex = null, skinTexCup = null, skinTexBase = null, beerTex = null;
-const ghost = new THREE.MeshStandardMaterial({ color: 0x9cc4ff, transparent: true, opacity: 0.1, depthWrite: false, roughness: 0.2 });
-const ghostEdge = new THREE.LineBasicMaterial({ color: 0x9cc4ff, transparent: true, opacity: 0.35 });
-
-function dispose(o) { o.traverse((m) => { if (m.geometry) m.geometry.dispose(); const ms = m.userData.orig ? [m.userData.orig] : [m.material]; ms.flat().forEach((mt) => { if (mt && mt !== ghost && mt !== ghostEdge) { mt.map && mt.map.dispose(); mt.dispose(); } }); }); }
-
-function makeTex(E) {
-  return { enc: makeSkin(E.skin), cup: makeSkin(E.skinCup), base: makeSkin(E.skinBase), beer: makeBottleLabel(E.beerType) };
-}
-function baseScale(E) { // the sled grows (never shrinks below its design) to carry the enclosure on ice
-  const b = D.byId(D.BASES, E.base), e = D.byId(D.ENCLOSURES, E.enc);
-  const need = Math.max((e.outer[0] * E.encP.width + 1) / b.footprint[0], (e.outer[1] * E.encP.depth + 1) / b.footprint[1]);
-  return { s: Math.min(1.6, Math.max(E.baseP.footprint, need)), auto: need > E.baseP.footprint + 1e-6 };
-}
-function makeSectionParts(E, tex) {
-  const o = { ...E, makeLabel, skinTexture: tex.enc, skinTextureCup: tex.cup, skinTextureBase: tex.base }, M = D.makeMaterials(o), out = {};
-  const bs = baseScale(E); out.baseAuto = bs;
-  out.base = D.byId(D.BASES, E.base).build(M, o); out.base.scale.set(bs.s, 1, bs.s); D.setLeds(out.base, E.baseP.led !== false);
-  out.enc = D.byId(D.ENCLOSURES, E.enc).build(M, o); out.enc.scale.set(E.encP.width, 1, E.encP.depth); D.setLeds(out.enc, E.encP.led !== false);
-  out.fridge = D.buildFridge(M);
-  out.cupGroup = new THREE.Group(); out.cup = D.byId(D.CUPS, E.cup).build(M, o); D.shapeCup(out.cup, E.cupP); out.cupGroup.add(out.cup);
-  out.contents = D.buildContents(M, out.cup.userData.bowl, { o, beer: { type: E.beerType, profile: E.beerProfile, labelTexture: tex.beer }, arrangement: E.cupP.arrangement, tilt: E.cupP.tilt, heap: E.cupP.heap });
-  out.cupGroup.add(out.contents);
-  return out;
-}
-let texList = [], flashUntil = 0;
-function flashSection() { flashUntil = performance.now() + 1400; if (parts.highlight) parts.highlight.visible = !S.isolate; setTimeout(() => { if (parts.highlight && performance.now() >= flashUntil) parts.highlight.visible = false; }, 1450); }
-const sectionObj = (sec, p = parts) => (sec === 'cup' ? p.cupGroup : sec === 'enc' ? p.enc : p.base);
+let root = null, parts = {}, texs = [];
+const ghost = new THREE.MeshStandardMaterial({ color: 0x9cc4ff, transparent: true, opacity: 0.12, depthWrite: false });
+function dispose(o) { o.traverse((m) => { if (m.geometry) m.geometry.dispose(); const mm = m.userData.orig || m.material; if (mm && mm !== ghost) [mm].flat().forEach((x) => x.dispose && x.dispose()); }); }
 function build() {
-  commitLook();
-  if (root) { scene.remove(root); dispose(root); }
-  for (const t of texList) if (t) t.dispose(); texList = [];
-  root = new THREE.Group(); scene.add(root);
-  if (S.previewIter && !findIter(S.previewIter)[1]) S.previewIter = null;
-  const E = effState(), tex = makeTex(E); texList.push(...Object.values(tex));
-  Object.assign(parts, makeSectionParts(E, tex)); parts.E = E;
-  root.add(parts.base, parts.fridge, parts.enc, parts.cupGroup);
+  if (root) { scene.remove(root); dispose(root); } texs.forEach((t) => t.dispose());
+  if (lock) { const k = P.W / 61; P.bowlD = Math.round(P.W * 2) / 2; P.bowlH = +(20.4 * k).toFixed(1); P.pedH = +(22.9 * k).toFixed(1); }
+  const tx = { logo: frontLogo(), bottleLabel: bottleLabel(), neckLabel: neckLabel() }; texs = Object.values(tx);
+  const M = T.makeMaterials(P, tx); root = new THREE.Group(); scene.add(root);
+  parts.base = T.buildBase(P, M); parts.enc = T.buildEnclosure(P, M); parts.fridge = T.buildFridge(P);
+  parts.cupGroup = new THREE.Group(); parts.cup = T.buildCup(P, M); parts.contents = T.buildContents(P, M, parts.cup.userData.bowl); parts.cupGroup.add(parts.cup, parts.contents);
+  root.add(parts.base, parts.enc, parts.fridge, parts.cupGroup);
   parts.enc.traverse((m) => { if (m.isMesh) m.userData.orig = m.material; });
-  parts.meta = { base: D.byId(D.BASES, E.base), enc: D.byId(D.ENCLOSURES, E.enc), cup: D.byId(D.CUPS, E.cup) };
-  parts.compare = null;
-  if (S.compareIter) { // side-by-side: the applied section on the left, the iteration on the right
-    const [sec, it] = findIter(S.compareIter);
-    if (it && sec === S.sel) {
-      const E2 = { ...S, ...clone(it.snap) }, t2 = makeTex(E2); texList.push(...Object.values(t2));
-      const p2 = makeSectionParts(E2, t2), g = new THREE.Group();
-      if (sec === 'cup') { p2.cupGroup.position.y = D.CUP_Y; g.add(p2.cupGroup); } else if (sec === 'enc') g.add(p2.enc, p2.fridge); else g.add(p2.base);
-      for (const k of ['base', 'enc', 'fridge', 'cupGroup']) if (!g.children.includes(p2[k])) dispose(p2[k]);
-      parts.compare = g; root.add(g);
-    } else S.compareIter = null;
-  }
-  parts.highlight = new THREE.Box3Helper(new THREE.Box3(), 0x4d7dff);
-  Object.assign(parts.highlight.material, { depthTest: false, transparent: true, opacity: 0.35, toneMapped: false }); parts.highlight.renderOrder = 10; root.add(parts.highlight);
-  applyView(); specs(); syncUI();
-  const warns = [parts.cup.userData.warn, ...D.checkCup(parts.cup.userData.bowl, parts.contents)].filter(Boolean);
-  $('cup-warn').style.display = warns.length ? 'block' : 'none'; $('cup-warn').textContent = warns.join(' ');
-  saveSoon();
+  applyView(); specs(); syncUI(); save();
 }
 function applyView() {
   if (!root) return;
-  parts.enc.traverse((m) => { if (m.isMesh) { m.material = S.xray ? ghost : m.userData.orig; m.castShadow = !S.xray; } });
-  ice.material.map = S.rink ? iceTex.on : iceTex.off;
-  const V = S.vis, only = S.isolate || parts.compare ? S.sel : null;
-  parts.cup.visible = only ? only === 'cup' : V.cup;
-  parts.contents.visible = (only ? only === 'cup' : true) && S.contents && V.contents;
-  parts.enc.visible = only ? only === 'enc' : V.enc;
-  parts.fridge.visible = only ? only === 'enc' && V.fridge : V.fridge;
-  parts.base.visible = only ? only === 'base' : V.base;
-  parts.enc.userData.setDoor && parts.enc.userData.setDoor(S.door);
-  const ex = only ? 0 : S.explode;
-  parts.enc.position.y = ex * 40;
-  parts.cupGroup.position.y = D.CUP_Y + ex * 64;
-  root.updateMatrixWorld(true);
-  const box = new THREE.Box3().setFromObject(sectionObj(S.sel)), size = box.getSize(new THREE.Vector3());
-  if (parts.compare) parts.compare.position.set(size.x + 16, 0, 0);
-  parts.highlight.box.copy(box.expandByScalar(1.2)); parts.highlight.visible = !only && performance.now() < flashUntil;
-  const fp = parts.meta.base.footprint, k = parts.baseAuto.s * 1.55; contact.scale.set(fp[0] * k, fp[1] * k, 1); contact.visible = parts.base.visible || parts.enc.visible;
+  const top = T.casterH(P) + P.H, only = V.isolate ? V.sel : null, vis = V.vis;
+  parts.cup.visible = only ? only === 'cup' : vis.cup;
+  parts.contents.visible = only ? only === 'cup' || only === 'contents' : vis.contents;
+  parts.enc.visible = only ? only === 'enc' : vis.enc;
+  parts.fridge.visible = only ? only === 'enc' || only === 'fridge' : vis.fridge;
+  parts.base.visible = only ? only === 'base' : vis.base;
+  parts.enc.traverse((m) => { if (m.isMesh) { m.material = V.xray ? ghost : m.userData.orig; m.castShadow = !V.xray; } });
+  parts.enc.userData.setPanel(V.panel);
+  const ex = only ? 0 : V.explode;
+  parts.base.position.y = -ex * 10; parts.enc.position.y = 0; parts.cupGroup.position.y = top + ex * 40;
+  contact.scale.set(P.W * 1.5, P.D * 2.6, 1); contact.visible = parts.base.visible || parts.enc.visible;
 }
 
 // ---------- specs ----------
 const ftin = (i) => { const f = Math.floor(i / 12), r = Math.round(i - f * 12); return r === 12 ? `${f + 1}′0″` : `${f}′${r}″`; };
 function specs() {
-  const E = parts.E, m = parts.meta, bowl = parts.cup.userData.bowl, bs = parts.baseAuto.s;
-  const base = { ...m.base, lb: Math.round(m.base.lb * bs * bs), footprint: m.base.footprint.map((v) => Math.round(v * bs)) };
-  const enc = { ...m.enc, lb: Math.round(m.enc.lb * E.encP.width * E.encP.depth) }, cup = { ...m.cup, lb: Math.round(m.cup.lb * E.cupP.width * E.cupP.width * E.cupP.height) };
-  const top = D.CUP_Y + Math.max(bowl.rim, parts.contents.userData.top || 0);
-  const bt = D.BEERS.find((b) => b.id === E.beerType) || D.BEERS[0], beer = D.BEER.count * bt.lbEach, iceLb = Math.round((bowl.iceLb + 6) * E.cupP.width * E.cupP.width * (0.8 + E.cupP.heap * 0.2)), fr = D.FRIDGE.weight;
-  const total = base.lb + enc.lb + cup.lb + fr + beer + iceLb;
-  $('s-h').textContent = `${ftin(top)}`;
-  $('s-f').textContent = `${base.footprint[0]}″ × ${base.footprint[1]}″`;
-  $('s-w').textContent = `≈ ${Math.round(total)} lb`;
-  const c = enc.clear, gx = (m.enc.outer[0] * (E.encP.width - 1)) / 2, gz = (m.enc.outer[1] * (E.encP.depth - 1)) / 2;
-  $('s-c').textContent = `${(c.side + gx).toFixed(1)} / ${(c.back + gz).toFixed(1)} / ${(c.front + gz).toFixed(1)} / ${c.top}″`;
-  $('wt').innerHTML = [
-    ['01 · ' + base.name + ' (UHMW + frame)', base.lb], ['02 · ' + enc.name + ' sleeve', enc.lb], ['03 · ' + cup.name + ' (empty)', cup.lb],
-    ['Meling DW-XL90 (listed gross wt)', fr], ['12 × ' + bt.name.replace('★ ', ''), beer], ['Ice (est.)', iceLb],
-  ].map(([k, v]) => `<tr><td>${k}</td><td>${v.toFixed(v % 1 ? 1 : 0)} lb</td></tr>`).join('') + `<tr class="tot"><td>Fully loaded</td><td>${Math.round(total)} lb</td></tr>`;
-  const lim = 51, scale = 140;
-  const lifts = [
-    ['One-piece carry, 2 people', total / 2, 'Not recommended'],
-    ['Freezer + sled, on cart → slide', (fr + base.lb) / 4, '4-person lift at the boards'],
-    ['Enclosure sleeve, 2 people', enc.lb / 2, ''],
-    ['Empty cup, 1 person', cup.lb, 'Load beer + ice on the ice'],
-  ];
-  $('lift').innerHTML = lifts.map(([k, v, n]) => {
-    const cls = v <= lim * 0.8 ? 'ok' : v <= lim ? 'warn' : 'bad', col = getComputedStyle(document.documentElement).getPropertyValue('--' + cls);
-    return `<div class="l"><span>${k}${n ? ` <small>· ${n}</small>` : ''}</span><b class="${cls}">${Math.round(v)} lb/person</b><div class="bar"><i style="width:${Math.min(100, v / scale * 100)}%;background:${col}"></i><em style="left:${lim / scale * 100}%"></em></div></div>`;
-  }).join('');
-  const pn = D.PRESETS.find((p) => p.id === S.preset);
-  $('study-sub').textContent = `· ${pn.name.replace('·', '')}${isEdited(S.preset) ? ' (edited)' : ''} — ${cup.name} + ${enc.name} + ${base.name}`;
-  const nit = SECTIONS.reduce((a, s) => a + C[S.preset].iters[s].length, 0);
-  $('pill-txt').textContent = `Concept ${pn.name.slice(0, 2)} of 05 · ${nit} iteration${nit === 1 ? '' : 's'}`;
-  $('dims-readout').textContent = `Overall ${ftin(top)} · footprint ${base.footprint[0]}″ × ${base.footprint[1]}″ · freezer 23.6 × 32.0 × 24.6″`;
+  const top = T.casterH(P) + P.H, overall = top + Math.max(parts.cup.userData.bowl.rim + 0.3, parts.contents.userData.top), cl = T.clearances(P), w = T.weights(P);
+  const total = Object.values(w).reduce((a, b) => a + b, 0), wide = Math.max(P.W, P.bowlD + 0.9);
+  $('s-h').textContent = ftin(overall); $('s-f').textContent = `${Math.round(wide)}″ × ${Math.round(Math.max(P.D, P.bowlD))}″`; $('s-w').textContent = `≈ ${Math.round(total)} lb`;
+  $('s-c').textContent = `${cl.side.toFixed(1)} / ${cl.back.toFixed(1)} / ${cl.front.toFixed(1)} / ${cl.top.toFixed(1)}″`;
+  $('fit').className = 'fit' + (cl.fits ? '' : ' bad');
+  $('fit').innerHTML = cl.fits ? `✓ Meling DW-XL90 fits: ${cl.side.toFixed(1)}″ each side, ${cl.back.toFixed(1)}″ behind, ${cl.top.toFixed(1)}″ above. The vent band lines up with its bottom-front vent.` : '✕ The freezer does not fit at this size.';
+  $('wt').innerHTML = [['Cup bowl (spun aluminum, chrome)', w.cup], ['Pedestal', w.pedestal], ['Enclosure (ACM / aluminum)', w.enclosure], [P.base === 'skids' ? 'UHMW ice skids' : 'Casters', w.base], ['Meling DW-XL90 (listed gross)', w.fridge], [`${P.bottles} × Michelob ULTRA`, w.bottles], ['Ice (top layer over a false floor)', w.ice]]
+    .map(([k, v]) => `<tr><td>${k}</td><td>${Math.round(v)} lb</td></tr>`).join('') + `<tr class="tot"><td>Fully loaded</td><td>${Math.round(total)} lb</td></tr>`;
+  $('s-note').textContent = `At the render's proportions the trophy stands ${ftin(overall)} and the bowl is ${Math.round(P.bowlD)}″ across. Plan on moving it in three pieces (cup, enclosure with freezer, base) and check door heights at the venue. A false floor in the bowl keeps the ice to a top layer; a full bowl of ice would weigh several hundred pounds.`;
+  $('dims-readout').textContent = `Enclosure ${P.W}″ × ${P.D}″ × ${P.H}″ · bowl ${P.bowlD}″ · overall ${ftin(overall)}`;
+  $('scene-label').textContent = `Freezer enclosed · ${P.bottles} Michelob ULTRA on ice · ${ftin(overall)} tall`;
 }
 
 // ---------- UI ----------
-// Three independently designed sections. Each concept keeps, per section: its references,
-// its applied design, its prompt and its iteration history.
-const SECTIONS = ['base', 'enc', 'cup'];
-const MODS = {
-  cup: { n: '03', label: 'Cup', long: 'Cup · bowl, rim, finish, bottles + ice', list: D.CUPS.filter((c) => c.id !== 'custom'), key: 'cup', ref: 'refCup', skin: 'skinCup', P: 'cupP', fin: 'cupFinish' },
-  enc: { n: '02', label: 'Enclosure', long: 'Enclosure · freezer sleeve + branding', list: D.ENCLOSURES, key: 'enc', ref: 'refEnc', skin: 'skin', P: 'encP', fin: 'encFinish' },
-  base: { n: '01', label: 'Sliding base', long: 'Sliding base · UHMW rink sled', list: D.BASES, key: 'base', ref: 'refBase', skin: 'skinBase', P: 'baseP', fin: 'baseFinish' },
-};
-const SECTION_KEYS = {
-  cup: ['cup', 'cupP', 'cupFinish', 'skinCup', 'cupProfile', 'profileSrc', 'facets', 'refCup', 'beerType', 'beerLabel', 'beerProfile', 'refBeer'],
-  enc: ['enc', 'encP', 'encFinish', 'skin', 'palette', 'paletteSrc', 'paletteRef', 'refEnc'],
-  base: ['base', 'baseP', 'baseFinish', 'skinBase', 'refBase'],
-};
-const PARAM_LABELS = { width: 'Width', height: 'Height', flare: 'Rim flare', neck: 'Stem height', tilt: 'Bottle lean', heap: 'Ice heap above rim', depth: 'Depth', tile: 'Mosaic tile size', footprint: 'Footprint' };
-const FIN_LABELS = { concept: 'Concept default', chrome: 'Mirror chrome', gold: 'Polished gold', satin: 'Satin metal', lacquer: 'Primary lacquer', white: 'Gloss white', iridescent: 'Iridescent' };
-const EL_NAMES = { cup: 'Cup', enc: 'Enclosure', base: 'Base', beer: 'Bottles' };
-const clone = (o) => JSON.parse(JSON.stringify(o ?? null));
-const snapSection = (sec, src = S) => clone(Object.fromEntries(SECTION_KEYS[sec].map((k) => [k, src[k] ?? null])));
-const sameSnap = (a, b) => JSON.stringify(a) === JSON.stringify(b);
-const secRefs = (sec, cid = S.preset) => C[cid].secRefs[sec];
-const iters = (sec = S.sel, cid = S.preset) => C[cid].iters[sec];
-const conceptName = (id = S.preset) => D.byId(D.PRESETS, id).name.replace(' · ', ' ');
-function findIter(id) { for (const sec of SECTIONS) { const it = iters(sec).find((x) => x.id === id); if (it) return [sec, it]; } return [null, null]; }
-function effState() { if (!S.previewIter) return S; const [, it] = findIter(S.previewIter); return it ? { ...S, ...clone(it.snap) } : S; }
-function toast(msg) { const t = $('toast'); t.textContent = msg; t.classList.add('show'); clearTimeout(toast.t); toast.t = setTimeout(() => t.classList.remove('show'), 2600); }
-function markCustom() { /* edits belong to the active concept (see C) */ }
-async function switchConcept(id) {
-  commitLook(); S.preset = id; S.previewIter = S.compareIter = null; Object.assign(S, pickLook(C[id])); build(); saveSoon();
-}
-function renderPresets() {
-  $('presets').innerHTML = D.PRESETS.map((p) => {
-    const c = C[p.id], cm = c.metal === 'gold' ? '#d9b45b' : '#dfe4ea', it = SECTIONS.reduce((a, s) => a + c.iters[s].length, 0);
-    return `<div class="layer ${S.preset === p.id ? 'selected' : ''}"><button class="select" data-id="${p.id}"><span class="sw" style="background:linear-gradient(135deg,${c.primary} 0 45%,${c.accent} 45% 72%,${cm} 72%)"></span>${p.name.replace(' · ', ' ')}${isEdited(p.id) ? '<i class="edot" title="Edited"></i>' : ''}<small>${it ? `<span class="rc">${it} iteration${it === 1 ? '' : 's'}</span>` : D.byId(D.CUPS, c.cup).name}</small></button></div>`;
-  }).join('');
-}
-$('presets').onclick = (e) => { const b = e.target.closest('[data-id]'); if (!b || b.dataset.id === S.preset) return; switchConcept(b.dataset.id); toast(`${conceptName(b.dataset.id)} restored · sections + iterations`); };
-
-// ---------- scene objects ----------
+const LAYERS = [['cup', 'Cup', 'Fluted bowl + pedestal'], ['contents', '↳ Bottles + ice', ''], ['enc', 'Enclosure', 'Lift-off front panel'], ['fridge', '↳ Freezer · Meling DW-XL90', ''], ['base', 'Base', '']];
 function renderLayers() {
-  const V = S.vis, row = (name, sub, eyeKey, selKey, cls = '') =>
-    `<div class="layer ${cls} ${S.sel === selKey && !cls ? 'selected' : ''}"><button class="select" data-sel="${selKey}">${cls ? '↳ ' : `<span class="num">${MODS[selKey].n}</span>`}${name}${sub ? `<small>${sub}</small>` : ''}</button><button class="eye ${V[eyeKey] ? '' : 'off'}" data-eye="${eyeKey}" aria-label="Toggle ${name}">◉</button></div>`;
-  const m = parts.meta;
-  $('layers').innerHTML =
-    row('Cup', m.cup.name, 'cup', 'cup') + row('12 bottles + ice', D.BEERS.find((b) => b.id === parts.E.beerType).name.replace('★ ', ''), 'contents', 'cup', 'sub') +
-    row('Enclosure', m.enc.name, 'enc', 'enc') + row('Freezer · Meling DW-XL90', '', 'fridge', 'enc', 'sub') +
-    row('Sliding base', m.base.name, 'base', 'base');
-  $('isolate').textContent = S.isolate ? 'Show all objects' : 'Isolate selected';
-  $('isolate').classList.toggle('active', S.isolate);
+  $('layers').innerHTML = LAYERS.map(([k, name, sub]) => `<div class="layer ${name.startsWith('↳') ? 'sub' : ''} ${V.sel === k ? 'selected' : ''}"><button class="select" data-sel="${k}">${name.replace('↳ ', '↳ ')}${sub || k === 'base' ? `<small>${k === 'base' ? (P.base === 'skids' ? 'UHMW ice skids' : 'Swivel casters') : sub}</small>` : ''}</button><button class="eye ${V.vis[k] ? '' : 'off'}" data-eye="${k}">◉</button></div>`).join('');
+  $('isolate').textContent = V.isolate ? 'Show all objects' : 'Isolate selected'; $('isolate').classList.toggle('active', V.isolate);
 }
-function selectSection(sec, scroll) { setTimeout(flashSection, 30); if (S.sel === sec) { if (scroll) $('workshop').scrollIntoView({ behavior: 'smooth', block: 'start' }); return; } S.sel = sec; S.compareIter = null; if (parts.compare) build(); else { applyView(); renderLayers(); renderWorkshop(); syncSkin(); renderChips(); } if (scroll) $('workshop').scrollIntoView({ behavior: 'smooth', block: 'start' }); }
-$('layers').onclick = (e) => {
-  const eye = e.target.closest('[data-eye]'); if (eye) { const k = eye.dataset.eye; S.vis[k] = !S.vis[k]; if (k === 'contents') S.contents = S.vis.contents; applyView(); renderLayers(); syncToggles(); return; }
-  const s = e.target.closest('[data-sel]'); if (s) selectSection(s.dataset.sel, true);
-};
-$('isolate').onclick = () => { S.isolate = !S.isolate; applyView(); renderLayers(); renderChips(); };
-
-// ---------- workshop ----------
-function renderWorkshop() {
-  const sec = S.sel, md = MODS[sec], v = D.byId(md.list, S[md.key]);
-  document.querySelectorAll('#ws-tabs button').forEach((b) => b.classList.toggle('active', b.dataset.sec === sec));
-  $('ws-concept').textContent = conceptName();
-  $('ws-title').textContent = `${md.n} · ${md.label}`;
-  $('ws-sub').textContent = `${md.long} — ${v.name}`;
-  $('ws-isolate').classList.toggle('active', S.isolate);
-  // prompt + engine
-  if (document.activeElement !== $('ws-prompt')) $('ws-prompt').value = C[S.preset].prompts[sec] || '';
-  $('ws-prompt').placeholder = { cup: 'e.g. Taller bowl with a flared rim, gold finish, bottles in a bouquet, more ice heaped above the rim', enc: 'e.g. Wider sleeve with finer stained-glass tiles and the LEDs off', base: 'e.g. Bigger round puck footprint with a glowing underside' }[sec];
-  $('ws-engine-badge').textContent = engineLabel(true);
-  $('ws-generate').textContent = `Generate ${md.label.toLowerCase()} iteration`;
-  renderIters(); renderParams();
-  // variants
-  $('variants').innerHTML = md.list.map((x) => `<button class="variant ${S[md.key] === x.id ? 'active' : ''}" data-v="${x.id}">${x.name}<small>≈ ${x.lb} lb</small></button>`).join('');
-  $('v-blurb').textContent = v.blurb;
-  $('mod-cup').style.display = sec === 'cup' ? '' : 'none';
-  $('mod-enc').style.display = sec === 'enc' ? '' : 'none';
-  $('mod-base').style.display = sec === 'base' ? '' : 'none';
-  if (sec === 'cup') renderBottles();
-  if (sec === 'base' && parts.baseAuto) $('base-note').textContent = `Ice contact is always UHMW-PE. The deck stays at 3″.${parts.baseAuto.auto ? ` Footprint auto-enlarged to ×${parts.baseAuto.s.toFixed(2)} to carry this enclosure.` : ''}`;
-}
-function renderParams() {
-  const sec = S.sel, md = MODS[sec], P = S[md.P], ranges = D.SECTION_PARAMS[sec];
-  let h = `<div class="input-row"><label>Finish</label><select data-fin>${D.FINISHES.map((f) => `<option value="${f}" ${S[md.fin] === f ? 'selected' : ''}>${FIN_LABELS[f]}</option>`).join('')}</select></div>`;
-  if (sec === 'cup') h += `<div class="input-row"><label>Bottle arrangement</label><select data-arr>${D.ARRANGEMENTS.map((a) => `<option value="${a}" ${P.arrangement === a ? 'selected' : ''}>${{ ring: 'Single ring of 12', double: 'Double ring · 8 + 4 raised', bouquet: 'Staggered bouquet' }[a]}</option>`).join('')}</select></div>`;
-  if (sec !== 'cup') h += `<label class="toggle-row"><input type="checkbox" data-led ${P.led !== false ? 'checked' : ''}>LED accents on</label>`;
-  for (const [k, [lo, hi]] of Object.entries(ranges)) {
-    const val = P[k], fmt = k === 'tilt' ? Math.round(val * 57.3) + '°' : k === 'heap' ? val.toFixed(1) + '″' : k === 'flare' ? (val >= 0 ? '+' : '') + Math.round(val * 100) + '%' : '×' + val.toFixed(2);
-    h += `<div class="pslider"><div class="slider-head"><label>${PARAM_LABELS[k]}</label><output>${fmt}</output></div><input class="range" type="range" data-p="${k}" min="${lo}" max="${hi}" step="0.01" value="${val}"></div>`;
-  }
-  $('ws-params').innerHTML = h;
-}
-let paramT;
-$('ws-params').oninput = (e) => {
-  const md = MODS[S.sel], t = e.target;
-  if (t.dataset.p) { S[md.P][t.dataset.p] = +t.value; const k = t.dataset.p, v = +t.value; t.previousElementSibling.querySelector('output').textContent = k === 'tilt' ? Math.round(v * 57.3) + '°' : k === 'heap' ? v.toFixed(1) + '″' : k === 'flare' ? (v >= 0 ? '+' : '') + Math.round(v * 100) + '%' : '×' + v.toFixed(2); clearTimeout(paramT); paramT = setTimeout(build, 140); }
-};
-$('ws-params').onchange = (e) => {
-  const md = MODS[S.sel], t = e.target;
-  if (t.dataset.fin !== undefined) { S[md.fin] = t.value; build(); }
-  if (t.dataset.arr !== undefined) { S.cupP.arrangement = t.value; build(); }
-  if (t.dataset.led !== undefined) { S[md.P].led = t.checked; build(); }
-};
-function renderBottles() {
-  $('beer-type').innerHTML = D.BEERS.filter((b) => b.id !== 'custom').map((b) => `<option value="${b.id}" ${S.beerType === b.id ? 'selected' : ''}>${b.name}</option>`).join('');
-}
-$('beer-type').onchange = (e) => { S.beerType = e.target.value; build(); };
-$('ws-tabs').onclick = (e) => { const b = e.target.closest('[data-sec]'); if (b) selectSection(b.dataset.sec); };
-$('ws-isolate').onclick = () => { S.isolate = !S.isolate; applyView(); renderLayers(); renderWorkshop(); renderChips(); goCam(S.isolate ? S.sel === 'cup' ? 'bottles' : 'hero' : 'hero'); if (S.isolate) setTimeout(() => $('fit').click(), 60); };
-$('ws-assembled').onclick = () => { S.isolate = false; S.previewIter = null; S.compareIter = null; build(); goCam('hero'); };
-$('ws-prompt').oninput = (e) => { C[S.preset].prompts[S.sel] = e.target.value; saveSoon(); };
-$('variants').onclick = (e) => { const b = e.target.closest('[data-v]'); if (!b) return; S[MODS[S.sel].key] = b.dataset.v; if (S.sel === 'cup' && b.dataset.v !== 'custom') { S.profileSrc = null; } build(); };
-
-// ---------- iterations: review · name · compare · save · restore · apply ----------
-function renderIters() {
-  const sec = S.sel, list = iters(sec), cur = snapSection(sec);
-  $('ws-itcount').textContent = list.length ? `${list.length} saved` : 'none yet';
-  $('ws-iters').innerHTML = list.length ? list.slice().reverse().map((it) => {
-    const applied = sameSnap(it.snap, cur), pv = S.previewIter === it.id, cmp = S.compareIter === it.id, d = new Date(it.created);
-    return `<div class="iter ${applied ? 'applied' : ''}" data-it="${it.id}">
-      <img src="${it.thumb || ''}" alt="">
-      <div><input value="${(it.name || '').replace(/"/g, '&quot;')}" data-name aria-label="Iteration name">
-        <div class="im">${it.engine}${applied ? '<span class="tag">applied</span>' : ''}${pv ? '<span class="tag">previewing</span>' : ''} · ${d.toLocaleDateString([], { month: 'short', day: 'numeric' })} ${d.toLocaleTimeString([], { hour: 'numeric', minute: '2-digit' })}</div>
-        ${it.prompt ? `<div class="ip">“${it.prompt.replace(/</g, '&lt;')}”</div>` : ''}${it.notes ? `<div class="im" style="margin-top:2px">${it.notes.replace(/</g, '&lt;')}</div>` : ''}</div>
-      <div class="ia"><button data-a="preview" class="${pv ? 'on' : ''}">${pv ? 'Exit preview' : 'Preview'}</button><button data-a="apply">${applied ? 'Applied ✓' : 'Apply to trophy'}</button><button data-a="compare" class="${cmp ? 'on' : ''}">${cmp ? 'Exit compare' : 'Compare'}</button><button data-a="del" title="Delete">Delete</button></div></div>`;
-  }).join('') : `<p class="muted">Generate an iteration from a prompt, or tune the parameters below and press <b>Save current</b>. Each iteration only changes the ${MODS[sec].label.toLowerCase()}.</p>`;
-}
-function addIteration(sec, snap, meta) {
-  const it = { id: 'it' + Date.now().toString(36) + Math.random().toString(36).slice(2, 5), created: Date.now(), snap: clone(snap), thumb: '', ...meta };
-  const list = iters(sec); list.push(it); while (list.length > 20) list.shift();
-  return it;
-}
-function captureThumb(it) { // grab the viewport two frames after the iteration is shown
-  requestAnimationFrame(() => requestAnimationFrame(() => {
-    try { const src = renderer.domElement, c = mk(192, 128), x = c.getContext('2d'), k = Math.max(192 / src.width, 128 / src.height) * 1.35;
-      const w = 192 / k, h = 128 / k; x.fillStyle = '#111315'; x.fillRect(0, 0, 192, 128); x.drawImage(src, (src.width - w) / 2, (src.height - h) / 2, w, h, 0, 0, 192, 128);
-      it.thumb = c.toDataURL('image/jpeg', 0.72); renderIters(); saveSoon(); } catch {}
-  }));
-}
-$('ws-save').onclick = () => {
-  const sec = S.sel, n = iters(sec).length + 1, it = addIteration(sec, snapSection(sec), { name: `Manual edit ${n}`, prompt: '', engine: 'Manual parameters' });
-  renderIters(); captureThumb(it); toast(`Saved “${it.name}” for the ${MODS[sec].label.toLowerCase()}`);
-};
-$('ws-iters').onclick = (e) => {
-  const b = e.target.closest('[data-a]'), row = e.target.closest('[data-it]'); if (!b || !row) return;
-  const sec = S.sel, it = iters(sec).find((x) => x.id === row.dataset.it); if (!it) return;
-  const a = b.dataset.a;
-  if (a === 'preview') { S.previewIter = S.previewIter === it.id ? null : it.id; S.compareIter = null; }
-  if (a === 'apply') { Object.assign(S, clone(it.snap)); S.previewIter = null; S.compareIter = null; $('gen-status').textContent = `“${it.name}” is applied to the ${MODS[sec].label.toLowerCase()}. The other sections are unchanged.`; toast(`Applied “${it.name}” to the ${MODS[sec].label.toLowerCase()}`); }
-  if (a === 'compare') { S.compareIter = S.compareIter === it.id ? null : it.id; S.previewIter = null; }
-  if (a === 'del') { C[S.preset].iters[sec] = iters(sec).filter((x) => x !== it); if (S.previewIter === it.id) S.previewIter = null; if (S.compareIter === it.id) S.compareIter = null; }
-  build(); if (a === 'compare' && S.compareIter) setTimeout(() => $('fit').click(), 60);
-};
-$('ws-iters').onchange = (e) => { const inp = e.target.closest('[data-name]'), row = e.target.closest('[data-it]'); if (!inp || !row) return; const it = iters().find((x) => x.id === row.dataset.it); if (it) { it.name = inp.value.trim() || it.name; saveSoon(); renderChips(); } };
-
-// ---------- viewport chips: which section is being edited, preview + compare ----------
-function renderChips() {
-  const md = MODS[S.sel], [, pit] = S.previewIter ? findIter(S.previewIter) : [], [, cit] = S.compareIter ? findIter(S.compareIter) : [];
-  let h = '';
-  if (pit) h += `<div class="vchip pv"><span class="dotb"></span>Previewing <b>“${pit.name}”</b><button data-c="apply">Apply</button><button class="ghost" data-c="exit">Exit</button></div>`;
-  if (cit) h += `<div class="vchip"><span class="dotb"></span>Left: <b>applied design</b> · Right: <b>“${cit.name}”</b><button class="ghost" data-c="exit">Exit compare</button></div>`;
-  $('vchips').innerHTML = h;
-}
-$('vchips').onclick = (e) => {
-  const b = e.target.closest('[data-c]'); if (!b) return; const c = b.dataset.c;
-  if (c === 'iso') return $('ws-isolate').click();
-  if (c === 'asm') return $('ws-assembled').click();
-  if (c === 'apply') { const [sec, it] = findIter(S.previewIter); if (it) { Object.assign(S, clone(it.snap)); toast(`Applied “${it.name}”`); } }
-  S.previewIter = null; S.compareIter = null; build();
-};
-
-// ---------- local generation ----------
-const GEN = { engine: 'procedural', url: 'http://localhost:11434', model: '', vision: false, ok: null, models: [] };
-try { Object.assign(GEN, JSON.parse(localStorage.getItem('trophy-cooler-gen') || '{}'), { ok: null, models: [] }); } catch {}
-const saveGen = () => { try { const { engine, url, model, vision } = GEN; localStorage.setItem('trophy-cooler-gen', JSON.stringify({ engine, url, model, vision })); } catch {} };
-const ENGINE_NAMES = { procedural: 'Built-in procedural', ollama: 'Ollama', openai: 'Local OpenAI-compatible' };
-function engineLabel(short) { return GEN.engine === 'procedural' ? (short ? 'procedural · no model' : 'Built-in procedural engine (no model)') : `${short ? GEN.engine === 'ollama' ? 'ollama' : 'local llm' : ENGINE_NAMES[GEN.engine]}${GEN.model ? ' · ' + GEN.model : ''}${GEN.ok === false ? ' · offline' : ''}`; }
-function isLocalURL(u) {
-  try { const h = new URL(u).hostname.replace(/^\[|\]$/g, '');
-    return h === 'localhost' || h === '::1' || h === '0.0.0.0' || h.endsWith('.local') || /^127\./.test(h) || /^10\./.test(h) || /^192\.168\./.test(h) || /^172\.(1[6-9]|2\d|3[01])\./.test(h); } catch { return false; }
-}
-function genState(msg, bad) { $('gen-state').innerHTML = msg; $('gen-state').style.color = bad ? '#ffb4b4' : ''; }
-function renderGen() {
-  $('gen-engine').value = GEN.engine; $('gen-llm').style.display = GEN.engine === 'procedural' ? 'none' : '';
-  if (document.activeElement !== $('gen-url')) $('gen-url').value = GEN.url;
-  $('gen-model').innerHTML = (GEN.models.length ? GEN.models : GEN.model ? [GEN.model] : []).map((m) => `<option ${m === GEN.model ? 'selected' : ''}>${m}</option>`).join('') || '<option value="">— test connection —</option>';
-  if (GEN.engine === 'procedural') genState('Runs entirely in this page: it interprets your prompt with design rules and explores variations around the current section. No model, no network.');
-  else if (GEN.ok === null) genState(`Not tested yet. Start ${GEN.engine === 'ollama' ? 'Ollama' : 'your local server'} and press <b>Test connection</b>.`);
-  $('ws-engine-badge') && ($('ws-engine-badge').textContent = engineLabel(true));
-}
-$('gen-engine').onchange = (e) => { GEN.engine = e.target.value; if (GEN.engine === 'openai' && /11434/.test(GEN.url)) GEN.url = 'http://localhost:1234'; if (GEN.engine === 'ollama' && !/11434/.test(GEN.url)) GEN.url = 'http://localhost:11434'; GEN.ok = null; GEN.models = []; saveGen(); renderGen(); };
-$('gen-url').onchange = (e) => { GEN.url = e.target.value.trim().replace(/\/+$/, ''); GEN.ok = null; saveGen(); renderGen(); };
-$('gen-model').onchange = (e) => { GEN.model = e.target.value; saveGen(); renderGen(); };
-async function testGen() {
-  if (!isLocalURL(GEN.url)) { GEN.ok = false; genState('Only local addresses are allowed (localhost, 127.0.0.1, or your private network). Cloud endpoints are blocked by design.', true); return false; }
-  genState('Connecting…');
-  try {
-    const r = await fetch(GEN.url + (GEN.engine === 'ollama' ? '/api/tags' : '/v1/models'), { signal: AbortSignal.timeout(6000) });
-    if (!r.ok) throw new Error('HTTP ' + r.status);
-    const j = await r.json(); GEN.models = GEN.engine === 'ollama' ? (j.models || []).map((m) => m.name) : (j.data || []).map((m) => m.id);
-    if (!GEN.models.length) { GEN.ok = false; genState(GEN.engine === 'ollama' ? 'Connected, but no models are installed. Run <code>ollama pull qwen2.5:7b</code>.' : 'Connected, but no model is loaded in the local server.', true); renderGen(); return false; }
-    if (!GEN.models.includes(GEN.model)) GEN.model = GEN.models[0];
-    GEN.ok = true; saveGen(); renderGen(); genState(`● Connected to ${ENGINE_NAMES[GEN.engine]} at ${GEN.url} · ${GEN.models.length} model${GEN.models.length > 1 ? 's' : ''}. Generation stays on this computer.`); return true;
-  } catch (err) {
-    GEN.ok = false; renderGen();
-    genState(`Couldn’t reach ${GEN.url}. Is ${GEN.engine === 'ollama' ? 'Ollama' : 'the server'} running${GEN.engine === 'ollama' ? ' with <code>OLLAMA_ORIGINS</code> allowing this page' : ' with CORS enabled'}? (${String(err.message || err).slice(0, 60)})`, true); return false;
-  }
-}
-$('gen-test').onclick = testGen;
-
-// procedural engine: prompt → targeted parameter changes for ONE section (no model)
-function rng(seed) { let s = (seed >>> 0) || 1; return () => { s ^= s << 13; s >>>= 0; s ^= s >>> 17; s ^= s << 5; s >>>= 0; return s / 4294967296; }; }
-function hash(s) { let h = 2166136261; for (const ch of s) h = Math.imul(h ^ ch.charCodeAt(0), 16777619); return h >>> 0; }
-function proceduralGen(sec, prompt, cur) {
-  const p = prompt.toLowerCase(), has = (...w) => w.some((x) => p.includes(x)), notes = [], n = clone(cur), P = n[MODS[sec].P];
-  const rnd = rng(hash(prompt + iters(sec).length)), jit = (k, amt) => { const [lo, hi] = D.SECTION_PARAMS[sec][k]; P[k] = Math.min(hi, Math.max(lo, P[k] + (rnd() * 2 - 1) * amt * (hi - lo))); };
-  const bump = (k, d, label) => { const [lo, hi] = D.SECTION_PARAMS[sec][k]; P[k] = Math.min(hi, Math.max(lo, P[k] + d)); notes.push(label); };
-  const strong = has('much', 'very', 'way', 'dramatic', 'extreme') ? 1.8 : has('slightly', 'a bit', 'subtle', 'little') ? 0.5 : 1;
-  const finishWord = () => { for (const [f, ws] of Object.entries({ gold: ['gold', 'brass', 'warm metal'], chrome: ['chrome', 'mirror', 'silver'], satin: ['satin', 'brushed', 'matte metal'], white: ['white', 'porcelain'], iridescent: ['iridescent', 'pearl', 'holographic', 'opal'], lacquer: ['lacquer', 'navy', 'painted', 'colored'] })) if (has(...ws)) return f; return null; };
-  const f = finishWord(); if (f) { n[MODS[sec].fin] = f; notes.push(FIN_LABELS[f].toLowerCase() + ' finish'); }
-  if (sec === 'cup') {
-    if (has('taller', 'tall ', 'deeper', 'elongat')) bump('height', 0.12 * strong, 'taller bowl');
-    if (has('shorter', 'squat', 'shallow', 'lower')) bump('height', -0.1 * strong, 'shorter bowl');
-    if (has('wider', 'wide', 'broad', 'bigger', 'larger', 'generous')) bump('width', 0.08 * strong, 'wider bowl');
-    if (has('narrow', 'slim', 'slender', 'smaller')) bump('width', -0.07 * strong, 'slimmer bowl');
-    if (has('flare', 'flared', 'trumpet', 'open rim', 'lip')) bump('flare', 0.14 * strong, 'flared rim');
-    if (has('tulip', 'closed', 'inward', 'cinched')) bump('flare', -0.1 * strong, 'inward rim');
-    if (has('long stem', 'taller stem', 'tall stem', 'elevated', 'pedestal')) bump('neck', 0.3 * strong, 'longer stem');
-    if (has('short stem', 'no stem', 'low stem', 'stubby')) bump('neck', -0.25 * strong, 'shorter stem');
-    if (has('crowded', 'packed', 'abundant', 'overflow', 'more ice', 'heaped', 'full')) { bump('heap', 0.8 * strong, 'more ice heaped'); if (!has('ring')) { n.cupP.arrangement = 'double'; notes.push('double ring of bottles'); } }
-    if (has('less ice', 'minimal ice')) bump('heap', -0.7, 'less ice');
-    if (has('bouquet', 'stagger', 'varied', 'playful', 'dynamic')) { n.cupP.arrangement = 'bouquet'; notes.push('staggered bouquet'); }
-    if (has('single ring', 'one ring', 'tidy', 'orderly')) { n.cupP.arrangement = 'ring'; notes.push('single ring'); }
-    if (has('upright', 'straight', 'vertical')) bump('tilt', -0.08, 'bottles more upright');
-    if (has('splay', 'lean', 'fan out', 'spread')) bump('tilt', 0.08, 'bottles fanned out');
-    if (has('facet', 'crystal', 'geometric', 'angular', 'cut')) { if (n.cup !== 'custom' && n.cup !== 'chalice') { n.cup = 'chalice'; } n.facets = n.cup === 'custom' ? 10 : n.facets; notes.push('faceted'); }
-    if (has('smooth', 'soft', 'organic')) { n.facets = 0; if (n.cup === 'chalice') n.cup = 'champion'; notes.push('smooth surfaces'); }
-    for (const [id, ws] of Object.entries({ champion: ['champion', 'handles', 'classic trophy', 'loving cup'], hex: ['hex', 'hexagon'], puckstack: ['puck'], torch: ['torch', 'cone', 'flame'], chalice: ['chalice', 'goblet'] })) if (has(...ws)) { n.cup = id; notes.push(D.byId(D.CUPS, id).name); }
-    if (has('can')) { n.beerType = 'can'; notes.push('cans'); } if (has('aluminum', 'aluminium')) { n.beerType = 'alubottle'; notes.push('aluminum bottles'); }
-  }
-  if (sec === 'enc') {
-    if (has('wider', 'wide', 'broad', 'bigger', 'larger', 'chunky')) bump('width', 0.08 * strong, 'wider sleeve');
-    if (has('deeper', 'deep')) bump('depth', 0.08 * strong, 'deeper sleeve');
-    if (has('slim', 'tight', 'compact', 'narrow')) { bump('width', -0.1, 'tighter sleeve'); bump('depth', -0.1, ''); }
-    if (has('bigger tiles', 'coarse', 'bold tiles', 'large tiles', 'chunkier')) bump('tile', 0.35 * strong, 'larger glass tiles');
-    if (has('finer', 'smaller tiles', 'detailed', 'intricate', 'mosaic')) bump('tile', -0.25 * strong, 'finer mosaic');
-    if (has('no led', 'leds off', 'lights off', 'no lights', 'no glow')) { n.encP.led = false; notes.push('LEDs off'); } else if (has('led', 'glow', 'light', 'neon')) { n.encP.led = true; notes.push('LED accents'); }
-    for (const [id, ws] of Object.entries({ halo: ['round', 'cylinder', 'column', 'halo'], prism: ['octagon', 'prism', 'tapered'], pucktower: ['stripe', 'jersey', 'hockey'], monolith: ['minimal', 'clean', 'monolith', 'box'], cathedral: ['stained', 'cathedral', 'church'] })) if (has(...ws)) { n.enc = id; notes.push(D.byId(D.ENCLOSURES, id).name); }
-  }
-  if (sec === 'base') {
-    if (has('bigger', 'larger', 'wider', 'stable', 'broad')) bump('footprint', 0.1 * strong, 'larger footprint');
-    if (has('compact', 'smaller', 'tight')) bump('footprint', -0.1, 'compact footprint');
-    if (has('no led', 'lights off', 'no glow')) { n.baseP.led = false; notes.push('no underglow'); } else if (has('glow', 'led', 'light', 'hover', 'float')) { n.baseP.led = true; notes.push('LED glow'); }
-    for (const [id, ws] of Object.entries({ puck: ['puck', 'round', 'disc'], ski: ['ski', 'runner'], octa: ['octagon', 'octa'], float: ['float', 'hover', 'levitat'], rink: ['sled', 'rink', 'plate'] })) if (has(...ws)) { n.base = id; notes.push(D.byId(D.BASES, id).name); }
-  }
-  if (!notes.length) { for (const k of Object.keys(D.SECTION_PARAMS[sec])) jit(k, 0.12); notes.push('exploratory variation around the current design'); }
-  const words = prompt.replace(/[^\w\s'-]/g, ' ').trim().split(/\s+/).filter((w) => w.length > 2).slice(0, 4);
-  return { patch: n, name: words.length ? words.map((w) => w[0].toUpperCase() + w.slice(1)).join(' ') : 'Variation', notes: notes.filter(Boolean).join(', ') };
-}
-
-// local LLM engine (Ollama / OpenAI-compatible): prompt → JSON section parameters
-function llmSchema(sec) {
-  const md = MODS[sec], ranges = Object.entries(D.SECTION_PARAMS[sec]).map(([k, [lo, hi]]) => `"${k}": number ${lo}..${hi}`).join(', ');
-  const extra = sec === 'cup' ? `, "arrangement": "ring"|"double"|"bouquet", "bottleType": ${D.BEERS.filter((b) => b.id !== 'custom').map((b) => `"${b.id}"`).join('|')}, "facets": integer 0..16 (0 = smooth; only used by variant "custom")` : sec === 'enc' ? `, "led": boolean` : `, "led": boolean`;
-  return `{"name": short iteration name (max 4 words), "variant": one of ${md.list.map((v) => `"${v.id}"`).join('|')}, "finish": one of ${D.FINISHES.map((f) => `"${f}"`).join('|')}, "params": {${ranges}}${extra}, "notes": one short sentence describing the change}`;
-}
-async function llmGen(sec, prompt, cur) {
-  if (!isLocalURL(GEN.url)) throw new Error('Only local endpoints are allowed.');
-  if (!GEN.model && !(await testGen())) throw new Error('No local model available.');
-  const md = MODS[sec], refs = [];
-  const curDesc = { variant: cur[md.key], finish: cur[md.fin], params: cur[md.P], ...(sec === 'cup' ? { bottleType: cur.beerType, facets: cur.facets } : {}) };
-  const sys = `You are a parametric product-design assistant for an oversize trophy-shaped beer cooler used on an NHL rink. It has three sections stacked vertically: sliding base (UHMW rink sled, deck 3in high), enclosure (36in tall sleeve that houses a fixed Meling DW-XL90 freezer 23.6x32.0x24.6in), and cup (bowl on top holding exactly 12 bottles in ice).
-You edit ONLY the ${md.label.toUpperCase()} section. Never change other sections. Keep everything the request doesn't mention close to the current design.
-Constraints: the freezer size is fixed; the cup must still hold 12 bottles plus ice; the base touches the ice only through UHMW.
-Variants: ${md.list.map((v) => `${v.id} = ${v.name}: ${v.blurb}`).join(' | ')}
-Reply with JSON only, matching: ${llmSchema(sec)}`;
-  const user = `Current ${md.label} design: ${JSON.stringify(curDesc)}\n\nDesign request: ${prompt}`;
-  const imgs = [];
-  let text;
-  if (GEN.engine === 'ollama') {
-    const r = await fetch(GEN.url + '/api/chat', { method: 'POST', headers: { 'Content-Type': 'application/json' }, signal: AbortSignal.timeout(180000),
-      body: JSON.stringify({ model: GEN.model, stream: false, format: 'json', options: { temperature: 0.7 }, messages: [{ role: 'system', content: sys }, { role: 'user', content: user, ...(imgs.length ? { images: imgs } : {}) }] }) });
-    if (!r.ok) throw new Error('Ollama HTTP ' + r.status + ' ' + (await r.text()).slice(0, 120));
-    text = (await r.json()).message?.content;
-  } else {
-    const content = imgs.length ? [{ type: 'text', text: user }, ...imgs.map((b) => ({ type: 'image_url', image_url: { url: 'data:image/jpeg;base64,' + b } }))] : user;
-    const r = await fetch(GEN.url + '/v1/chat/completions', { method: 'POST', headers: { 'Content-Type': 'application/json' }, signal: AbortSignal.timeout(180000),
-      body: JSON.stringify({ model: GEN.model, temperature: 0.7, messages: [{ role: 'system', content: sys }, { role: 'user', content }] }) });
-    if (!r.ok) throw new Error('Local server HTTP ' + r.status);
-    text = (await r.json()).choices?.[0]?.message?.content;
-  }
-  const m = String(text || '').match(/\{[\s\S]*\}/); if (!m) throw new Error('The model did not return JSON.');
-  const j = JSON.parse(m[0]), n = clone(cur), P = n[md.P];
-  if (md.list.some((v) => v.id === j.variant)) n[md.key] = j.variant;
-  if (D.FINISHES.includes(j.finish)) n[md.fin] = j.finish;
-  for (const k of Object.keys(D.SECTION_PARAMS[sec])) if (typeof j.params?.[k] === 'number') P[k] = j.params[k];
-  if (typeof j.led === 'boolean' && sec !== 'cup') P.led = j.led;
-  if (sec === 'cup') {
-    if (D.ARRANGEMENTS.includes(j.arrangement)) P.arrangement = j.arrangement;
-    if (D.BEERS.some((b) => b.id === j.bottleType && b.id !== 'custom')) n.beerType = j.bottleType;
-    if (Number.isInteger(j.facets)) n.facets = j.facets;
-  }
-  return { patch: n, name: String(j.name || 'Iteration').slice(0, 40), notes: String(j.notes || '').slice(0, 160) };
-}
-function clampSection(sec, n) { // enforce ranges + fit constraints before anything is shown
-  const md = MODS[sec], P = n[md.P];
-  for (const [k, [lo, hi]] of Object.entries(D.SECTION_PARAMS[sec])) P[k] = Math.round(Math.min(hi, Math.max(lo, +P[k] || 0)) * 100) / 100;
-  if (!md.list.some((v) => v.id === n[md.key])) n[md.key] = md.list[0].id;
-  if (!D.FINISHES.includes(n[md.fin])) n[md.fin] = 'concept';
-  if (sec === 'cup') { n.facets = Math.max(0, Math.min(16, Math.round(n.facets || 0))); if (!D.ARRANGEMENTS.includes(P.arrangement)) P.arrangement = 'ring'; if (n.cup === 'custom' && !n.cupProfile) n.cup = 'champion'; }
-  return n;
-}
-$('ws-generate').onclick = async () => {
-  const sec = S.sel, prompt = $('ws-prompt').value.trim(), btn = $('ws-generate');
-  if (!prompt) { $('gen-status').textContent = 'Describe the change you want first.'; $('ws-prompt').focus(); return; }
-  btn.classList.add('busy'); const label = btn.textContent; btn.textContent = GEN.engine === 'procedural' ? 'Generating…' : 'Generating locally…';
-  $('gen-status').style.color = ''; $('gen-status').textContent = GEN.engine === 'procedural' ? 'Interpreting the prompt…' : `Asking ${GEN.model || 'the local model'} on this computer…`;
-  try {
-    const cur = snapSection(sec), res = GEN.engine === 'procedural' ? proceduralGen(sec, prompt, cur) : await llmGen(sec, prompt, cur);
-    const snap = clampSection(sec, res.patch);
-    if (sameSnap(snap, cur)) { $('gen-status').textContent = 'That request didn’t change any parameters. Try naming a shape, proportion, finish or arrangement.'; return; }
-    const it = addIteration(sec, snap, { name: res.name, prompt, engine: GEN.engine === 'procedural' ? 'Procedural' : `${ENGINE_NAMES[GEN.engine]} · ${GEN.model}`, notes: res.notes });
-    S.previewIter = it.id; S.compareIter = null; build(); captureThumb(it);
-    $('gen-status').textContent = `“${it.name}” is previewing in the viewport: ${res.notes}. Apply it, compare it, or keep exploring.`;
-  } catch (err) {
-    $('gen-status').style.color = '#ffb4b4';
-    $('gen-status').innerHTML = `Local generation failed: ${String(err.message || err).replace(/</g, '&lt;').replace(/\.$/, '').slice(0, 140)}. Nothing was sent to the cloud. <button class="linkbtn" id="gen-fallback" style="padding:0">Use the built-in procedural engine instead</button> or edit the parameters manually.`;
-    const fb = $('gen-fallback'); if (fb) fb.onclick = () => { GEN.engine = 'procedural'; saveGen(); renderGen(); renderWorkshop(); $('ws-generate').click(); };
-  } finally { btn.classList.remove('busy'); btn.textContent = label; }
-};
-
-// ---------- remaining controls ----------
-$('metal').onclick = (e) => { const b = e.target.closest('button'); if (!b) return; S.metal = b.dataset.v; build(); };
-let colorT; for (const k of ['primary', 'accent']) $(k).oninput = (e) => { S[k] = e.target.value; $(k + '-v').textContent = S[k]; clearTimeout(colorT); colorT = setTimeout(build, 120); };
-let brandT; $('brand').oninput = (e) => { S.brand = e.target.value || ' '; clearTimeout(brandT); brandT = setTimeout(build, 250); };
-$('wordmark').oninput = (e) => { S.wordmark = e.target.value; $('wordmark-out').textContent = S.wordmark || ' '; saveSoon(); };
-for (const k of ['xray', 'contents', 'rink', 'spin']) $(k).onchange = (e) => { S[k] = e.target.checked; if (k === 'contents') S.vis.contents = S[k]; controls.autoRotate = S.spin; applyView(); renderLayers(); };
-$('door').oninput = (e) => { S.door = +e.target.value; $('door-v').textContent = S.door < 0.02 ? 'Closed' : Math.round(S.door * 100) + '%'; applyView(); };
-$('explode').oninput = (e) => { S.explode = +e.target.value; $('explode-v').textContent = Math.round(S.explode * 100) + '%'; applyView(); };
-$('reset').onclick = () => { const p = D.byId(D.PRESETS, S.preset); Object.assign(S, lookDefaults(p), { door: 0, explode: 0, xray: false, isolate: false, previewIter: null, compareIter: null, vis: { cup: true, contents: true, enc: true, fridge: true, base: true }, contents: true }); build(); toast('Concept look reset · references + iterations kept'); };
-$('copy').onclick = async () => {
-  commitLook();
-  const cfg = { activeConcept: S.preset, brand: { labelText: S.brand, logo: !!B.logo, colors: B.colors, appliesTo: 'all concepts' },
-    concepts: Object.fromEntries(D.PRESETS.map((p) => { const c = C[p.id]; return [p.id, { name: p.name, edited: isEdited(p.id),
-      sections: Object.fromEntries(SECTIONS.map((sec) => [sec, { design: snapSection(sec, c), iterations: c.iters[sec].map(({ name, prompt, engine, created, notes, snap }) => ({ name, prompt, engine, created: new Date(created).toISOString(), notes, design: snap })) }])) }]; })) };
-  try { await navigator.clipboard.writeText(JSON.stringify(cfg, null, 2)); toast('Config copied to clipboard'); }
-  catch { $('copied').style.display = ''; $('copied').textContent = JSON.stringify(cfg); }
-};
+$('layers').onclick = (e) => { const eye = e.target.closest('[data-eye]'); if (eye) { V.vis[eye.dataset.eye] = !V.vis[eye.dataset.eye]; applyView(); renderLayers(); return; } const s = e.target.closest('[data-sel]'); if (s) { V.sel = s.dataset.sel; if (V.isolate) applyView(); renderLayers(); } };
+$('isolate').onclick = () => { V.isolate = !V.isolate; applyView(); renderLayers(); setTimeout(fit, 30); };
+const SL = { W: [() => T.MIN.W + 0.5, 72, (v) => `${v}″`], D: [() => Math.ceil(T.MIN.D), 40, (v) => `${v}″`], H: [() => Math.ceil(T.MIN.H * 4) / 4, 44, (v) => `${v}″`],
+  bowlD: [36, 72, (v) => `${v}″`], bowlH: [12, 30, (v) => `${v}″`], pedH: [12, 34, (v) => `${v}″`], flutes: [12, 48, (v) => `${v}`], twist: [0, 2, (v) => v.toFixed(2)], fluteDepth: [0, 1.6, (v) => `${v.toFixed(2)}″`],
+  bottles: [12, 36, (v) => `${v}`], heap: [0, 5, (v) => `${v.toFixed(1)}″`], lean: [0, 0.4, (v) => `${Math.round(v * 57.3)}°`] };
+let bt;
+for (const [k, [lo, hi, fmt]] of Object.entries(SL)) { const el = $(k); el.min = typeof lo === 'function' ? lo() : lo; el.max = hi;
+  el.oninput = () => { P[k] = +el.value; if (['bowlD', 'bowlH', 'pedH'].includes(k)) { lock = false; $('lock').checked = false; } $(k + '-v').textContent = fmt(P[k]); clearTimeout(bt); bt = setTimeout(build, 120); }; }
+const seg = (id, key) => { $(id).onclick = (e) => { const b = e.target.closest('button'); if (!b) return; P[key] = b.dataset.v; build(); }; };
+seg('base', 'base'); seg('metal', 'metal'); seg('glass', 'glass');
+$('env').onclick = (e) => { const b = e.target.closest('button'); if (!b) return; V.env = b.dataset.v; applyEnv(); save(); };
+$('lock').onchange = (e) => { lock = e.target.checked; build(); };
+$('color').oninput = (e) => { P.color = e.target.value; $('color-v').textContent = P.color; clearTimeout(bt); bt = setTimeout(build, 120); };
+$('xray').onchange = (e) => { V.xray = e.target.checked; applyView(); };
+$('panel-open').oninput = (e) => { V.panel = +e.target.value; $('panel-open-v').textContent = V.panel < 0.02 ? 'On' : V.panel > 0.98 ? 'Lifted off' : 'Lifting…'; applyView(); };
+$('explode').oninput = (e) => { V.explode = +e.target.value; $('explode-v').textContent = Math.round(V.explode * 100) + '%'; applyView(); };
+$('spin').onchange = (e) => { controls.autoRotate = e.target.checked; };
 $('hq').onchange = (e) => { HQ = e.target.checked; try { localStorage.setItem('trophy-cooler-hq', HQ ? '1' : '0'); } catch {} };
+$('reset').onclick = () => { P = { ...T.DEFAULTS }; lock = true; V.panel = 0; V.explode = 0; V.xray = false; build(); goCam('front'); toast('Reset to the render'); };
 $('mobileToggle').onclick = () => { const o = $('panel').classList.toggle('open'); $('mobileToggle').setAttribute('aria-expanded', o); };
-function syncToggles() { $('hq').checked = HQ; $('xray').checked = S.xray; $('contents').checked = S.contents; $('rink').checked = S.rink; $('spin').checked = S.spin; }
-function syncSkin() {
-  const md = MODS[S.sel], skKey = md.skin;
-  $('skin').innerHTML = [['default', 'Section default'], ...(B.logo ? [['logo', 'Logo monogram (brand)']] : [])].map(([v, l]) => `<option value="${v}">${l}</option>`).join('');
-  if (![...$('skin').options].some((o) => o.value === S[skKey])) S[skKey] = 'default';
-  $('skin').value = S[skKey];
-}
 function syncUI() {
-  renderPresets(); renderLayers(); renderWorkshop(); syncToggles(); syncSkin(); renderChips(); renderGen();
-  document.querySelectorAll('#metal button').forEach((b) => b.classList.toggle('active', b.dataset.v === S.metal));
-  $('primary').value = S.primary; $('accent').value = S.accent; $('primary-v').textContent = S.primary; $('accent-v').textContent = S.accent;
-  if (document.activeElement !== $('brand')) $('brand').value = S.brand;
-  if (document.activeElement !== $('wordmark')) $('wordmark').value = S.wordmark; $('wordmark-out').textContent = S.wordmark || ' ';
-  $('door').value = S.door; $('door-v').textContent = S.door < 0.02 ? 'Closed' : Math.round(S.door * 100) + '%';
-  $('explode').value = S.explode; $('explode-v').textContent = Math.round(S.explode * 100) + '%';
-  $('skin-scale').value = S.skinScale; $('skin-scale-v').textContent = S.skinScale.toFixed(1) + '×';
-  $('pal-src').textContent = S.palette ? S.paletteSrc : 'Auto from accent'; $('pal-reset').style.display = S.palette ? '' : 'none';
-  document.querySelectorAll('#logo-mode button').forEach((b) => b.classList.toggle('active', b.dataset.v === B.mode));
-  renderBrand();
-}
-
-// =====================================================================
-// INPUTS · brand assets + design references
-// =====================================================================
-const mk = (w, h) => { const c = document.createElement('canvas'); c.width = w; c.height = h; return c; };
-const hex = (r, g, b) => '#' + [r, g, b].map((v) => Math.round(v).toString(16).padStart(2, '0')).join('');
-const loadImg = (src) => new Promise((res, rej) => { const im = new Image(); if (/^https?:|^\//.test(src)) im.crossOrigin = 'anonymous'; im.onload = () => res(im); im.onerror = rej; im.src = src; });
-const readURL = (file) => new Promise((res) => { const r = new FileReader(); r.onload = () => res(r.result); r.readAsDataURL(file); });
-function toCanvas(im, max = 1024) {
-  let w = im.naturalWidth || im.width || 1024, h = im.naturalHeight || im.height || 1024;
-  const k = Math.min(1, max / Math.max(w, h)); w = Math.max(1, Math.round(w * k)); h = Math.max(1, Math.round(h * k));
-  const c = mk(w, h); c.getContext('2d').drawImage(im, 0, 0, w, h); return c;
-}
-function hasAlpha(c) { const d = c.getContext('2d').getImageData(0, 0, c.width, c.height).data; for (let i = 3; i < d.length; i += 4 * 7) if (d[i] < 245) return true; return false; }
-function borderColor(d, w, h) {
-  let r = 0, g = 0, b = 0, n = 0; const add = (x, y) => { const i = (y * w + x) * 4; r += d[i]; g += d[i + 1]; b += d[i + 2]; n++; };
-  for (let x = 0; x < w; x += 2) { add(x, 0); add(x, h - 1); } for (let y = 0; y < h; y += 2) { add(0, y); add(w - 1, y); }
-  return [r / n, g / n, b / n];
-}
-// remove a flat background from JPG logos so they can sit on any panel
-function keyBackground(c) {
-  if (hasAlpha(c)) return c;
-  const ctx = c.getContext('2d'), id = ctx.getImageData(0, 0, c.width, c.height), d = id.data, [br, bg, bb] = borderColor(d, c.width, c.height);
-  for (let i = 0; i < d.length; i += 4) { const dist = Math.hypot(d[i] - br, d[i + 1] - bg, d[i + 2] - bb); d[i + 3] = Math.max(0, Math.min(255, (dist - 28) * 10)); }
-  ctx.putImageData(id, 0, 0); return c;
-}
-function logoVariant(fg) {
-  if (B.mode === 'original') return B.logo;
-  if (!B.tints[fg]) { const c = mk(B.logo.width, B.logo.height), x = c.getContext('2d'); x.drawImage(B.logo, 0, 0); x.globalCompositeOperation = 'source-in'; x.fillStyle = fg; x.fillRect(0, 0, c.width, c.height); B.tints[fg] = c; }
-  return B.tints[fg];
-}
-// k-means palette (by pixel share)
-function extractPalette(src, k = 6) {
-  const n = 64, c = mk(n, n), x = c.getContext('2d'); x.drawImage(src, 0, 0, n, n);
-  const d = x.getImageData(0, 0, n, n).data, px = [];
-  for (let i = 0; i < d.length; i += 4) if (d[i + 3] > 128) px.push([d[i], d[i + 1], d[i + 2]]);
-  if (px.length < k) return [];
-  const d2 = (a, b) => (a[0] - b[0]) ** 2 + (a[1] - b[1]) ** 2 + (a[2] - b[2]) ** 2;
-  const cent = [px[Math.floor(px.length / 2)].slice()];
-  while (cent.length < k) { let best = px[0], bd = -1; for (const p of px) { let m = Infinity; for (const q of cent) m = Math.min(m, d2(p, q)); if (m > bd) { bd = m; best = p; } } cent.push(best.slice()); }
-  let cnt = [];
-  for (let it = 0; it < 10; it++) {
-    const sum = cent.map(() => [0, 0, 0]); cnt = cent.map(() => 0);
-    for (const p of px) { let bi = 0, bd = Infinity; cent.forEach((q, i) => { const v = d2(p, q); if (v < bd) { bd = v; bi = i; } }); sum[bi][0] += p[0]; sum[bi][1] += p[1]; sum[bi][2] += p[2]; cnt[bi]++; }
-    cent.forEach((q, i) => { if (cnt[i]) for (let j = 0; j < 3; j++) q[j] = sum[i][j] / cnt[i]; });
-  }
-  return cent.map((q, i) => ({ c: hex(...q), n: cnt[i] })).filter((e) => e.n > px.length * 0.02).sort((a, b) => b.n - a.n).map((e) => e.c);
-}
-// finish analysis: edge crispness + warm-metal share
-function analyze(src) {
-  const n = 128, c = mk(n, n), x = c.getContext('2d'); x.drawImage(src, 0, 0, n, n);
-  const d = x.getImageData(0, 0, n, n).data, gray = new Float32Array(n * n); let warm = 0, tot = 0;
-  for (let i = 0; i < n * n; i++) {
-    const r = d[i * 4] / 255, g = d[i * 4 + 1] / 255, b = d[i * 4 + 2] / 255; gray[i] = 0.299 * r + 0.587 * g + 0.114 * b;
-    if (d[i * 4 + 3] < 128) continue; tot++;
-    const mx = Math.max(r, g, b), mn = Math.min(r, g, b), l = (mx + mn) / 2, s = mx === mn ? 0 : (mx - mn) / (1 - Math.abs(2 * l - 1));
-    let h = 0; if (mx !== mn) { h = mx === r ? ((g - b) / (mx - mn)) % 6 : mx === g ? (b - r) / (mx - mn) + 2 : (r - g) / (mx - mn) + 4; h *= 60; if (h < 0) h += 360; }
-    if (s > 0.25 && h >= 25 && h <= 62 && l > 0.25 && l < 0.85) warm++;
-  }
-  let e = 0, strong = 0;
-  for (let y = 1; y < n - 1; y++) for (let xx = 1; xx < n - 1; xx++) {
-    const i = y * n + xx, gx = gray[i + 1] - gray[i - 1], gy = gray[i + n] - gray[i - n], m = Math.hypot(gx, gy); e += m; if (m > 0.25) strong++;
-  }
-  const edge = strong / ((n - 2) * (n - 2)), warmth = tot ? warm / tot : 0;
-  return { edge, warmth, metal: warmth > 0.16 ? 'gold' : 'chrome', facets: edge > 0.14 ? 8 : edge > 0.08 ? 12 : 0, crisp: edge > 0.08 };
-}
-// silhouette → lathe profile [[r_in, y_in]] (bottom → top)
-function extractProfile(src, { trim = true } = {}) {
-  const H = 200, W = Math.max(8, Math.round(src.width * H / src.height)), c = mk(W, H), x = c.getContext('2d'); x.drawImage(src, 0, 0, W, H);
-  const d = x.getImageData(0, 0, W, H).data, alpha = hasAlpha(c), [br, bg, bb] = borderColor(d, W, H);
-  const on = (i) => alpha ? d[i + 3] > 60 : Math.hypot(d[i] - br, d[i + 1] - bg, d[i + 2] - bb) > 46;
-  const rows = [];
-  for (let y = 0; y < H; y++) { let l = -1, r = -1, k = 0; for (let xx = 0; xx < W; xx++) if (on((y * W + xx) * 4)) { k++; if (l < 0) l = xx; r = xx; } rows.push(k >= 3 ? [l, r] : null); }
-  const idx = rows.map((r, i) => (r ? i : -1)).filter((i) => i >= 0); if (idx.length < 24) return null;
-  if (idx.filter((i) => rows[i][0] <= 2 && rows[i][1] >= W - 3).length > idx.length * 0.4) return null; // full-bleed texture, not an object
-  const top = idx[0], bot = idx[idx.length - 1];
-  let last = null; const hw = []; for (let y = top; y <= bot; y++) { if (rows[y]) last = rows[y]; hw.push((last[1] - last[0]) / 2); }
-  const N = 34, samp = [];
-  for (let i = 0; i < N; i++) { const t = Math.round((hw.length - 1) * (1 - i / (N - 1))); const a = hw[Math.max(0, t - 1)], b = hw[t], cc = hw[Math.min(hw.length - 1, t + 1)]; samp.push((a + b + cc) / 3); }
-  const sm = samp.map((v, i) => (samp[Math.max(0, i - 1)] + v * 2 + samp[Math.min(N - 1, i + 1)]) / 4);
-  const max = Math.max(...sm); let end = N - 1;                   // trim narrow lids/finials so the bowl opens at the top
-  if (trim) while (end > N * 0.6 && sm[end] < max * 0.55) end--;
-  const keep = sm.slice(0, end + 1), hpx = (bot - top) * (end / (N - 1)), rs = 15 / max, hIn = Math.min(28, Math.max(14, hpx * rs));
-  let L = W, R = 0; for (let y = top; y <= bot; y++) if (rows[y]) { L = Math.min(L, rows[y][0]); R = Math.max(R, rows[y][1]); }
-  const k = src.height / H;
-  return { pts: keep.map((v, i) => [Math.max(1.6, v * rs), +(i / end * hIn).toFixed(3)]), height: hIn, trimmed: end < N - 1, aspect: hpx / (2 * max),
-    bbox: { x: L * k, y: top * k, w: (R - L + 1) * k, h: (bot - top + 1) * k } };
-}
-function drawProfile(cv, pts, color) {
-  const x = cv.getContext('2d'), W = cv.width, H = cv.height, mr = 16, mh = pts[pts.length - 1][1]; x.clearRect(0, 0, W, H);
-  x.fillStyle = color; x.beginPath();
-  pts.forEach(([r, y], i) => { const px = W / 2 + r / mr * W / 2 * 0.95, py = H - y / mh * H; i ? x.lineTo(px, py) : x.moveTo(W / 2, H) || x.lineTo(px, py); });
-  for (let i = pts.length - 1; i >= 0; i--) { const [r, y] = pts[i]; x.lineTo(W / 2 - r / mr * W / 2 * 0.95, H - y / mh * H); }
-  x.closePath(); x.fill();
-}
-function makeSkin(src) {
-  let c = null, rep = S.skinScale;
-  if (!src || src === 'default') return null;
-  if (src === 'logo' && B.logo) {
-    c = mk(512, 512); const x = c.getContext('2d'); x.fillStyle = S.primary; x.fillRect(0, 0, 512, 512);
-    const lg = logoVariant(S.accent), w = 300, h = w * lg.height / lg.width;
-    x.globalAlpha = 0.9; x.drawImage(lg, 256 - w / 2, 256 - h / 2, w, h);
-    x.globalAlpha = 0.35; for (const [cx, cy] of [[0, 0], [512, 0], [0, 512], [512, 512]]) x.drawImage(lg, cx - w / 4, cy - h / 4, w / 2, h / 2);
-    rep = 3 * S.skinScale;
-  } else { const r = REFS.find((r) => r.id === src); if (r) c = r.canvas; }
-  if (!c) return null;
-  const t = new THREE.CanvasTexture(c); t.colorSpace = THREE.SRGBColorSpace; t.wrapS = t.wrapT = THREE.RepeatWrapping; t.repeat.set(rep, rep);
-  t.anisotropy = renderer.capabilities.getMaxAnisotropy(); return t;
-}
-
-// bottle label from a reference: crop the object's label band (or the image centre) into a panel
-// Michelob ULTRA bottle wrap: white label, blue rules, MICHELOB over a large ULTRA (or the uploaded logo, in blue).
-// The texture is applied front + back (repeat 2), so this canvas is one face of the label.
-function makeBottleLabel(type) {
-  const W = 1024, H = type === 'can' ? 1060 : type === 'alubottle' ? 860 : 620, c = mk(W, H), x = c.getContext('2d'), blue = '#0b2d82';
-  const g = x.createLinearGradient(0, 0, W, 0); g.addColorStop(0, '#e9edf3'); g.addColorStop(0.5, '#ffffff'); g.addColorStop(1, '#e9edf3');
-  x.fillStyle = g; x.fillRect(0, 0, W, H);
-  x.fillStyle = blue; x.fillRect(0, H * 0.06, W, H * 0.035); x.fillRect(0, H * 0.905, W, H * 0.035);
-  x.fillStyle = '#9aa7bd'; x.fillRect(0, H * 0.11, W, H * 0.008); x.fillRect(0, H * 0.882, W, H * 0.008);
-  const logo = B.logo && B.use ? logoVariant(blue) : null;
-  if (logo) { let h = H * 0.62, w = h * logo.width / logo.height; if (w > W * 0.8) { w = W * 0.8; h = w * logo.height / logo.width; } x.drawImage(logo, (W - w) / 2, (H - h) / 2, w, h); }
-  else {
-    const fam = B.font ? `"${B.font}", "Barlow Condensed"` : '"Barlow Condensed"';
-    x.fillStyle = blue; x.textAlign = 'center'; x.textBaseline = 'alphabetic';
-    let f1 = H * 0.13; x.font = `600 ${f1}px ${fam}, sans-serif`; try { x.letterSpacing = f1 * 0.35 + 'px'; } catch {}
-    x.fillText('MICHELOB', W / 2 + f1 * 0.17, H * 0.33);
-    let f2 = H * 0.4; x.font = `700 ${f2}px ${fam}, sans-serif`; try { x.letterSpacing = f2 * 0.06 + 'px'; } catch {}
-    const tw = x.measureText('ULTRA').width; if (tw > W * 0.84) { f2 *= W * 0.84 / tw; x.font = `700 ${f2}px ${fam}, sans-serif`; }
-    x.fillText('ULTRA', W / 2 + f2 * 0.03, H * 0.33 + f2 * 0.95);
-    let f3 = H * 0.06; x.font = `600 ${f3}px ${fam}, sans-serif`; try { x.letterSpacing = f3 * 0.3 + 'px'; } catch {}
-    x.fillStyle = '#5b6b86'; x.fillText('SUPERIOR LIGHT BEER', W / 2 + f3 * 0.15, H * 0.84);
-  }
-  const t = new THREE.CanvasTexture(c); t.colorSpace = THREE.SRGBColorSpace; t.anisotropy = 8; return t;
-}
-
-// ---------- brand UI ----------
-async function setLogo(src, save = true) {
-  const im = await loadImg(src); B.logo = keyBackground(toCanvas(im, 1024)); B.logoSrc = B.logo.toDataURL('image/png'); B.tints = {};
-  const pal = extractPalette(B.logo, 5); for (const c of pal) if (!B.colors.includes(c) && B.colors.length < 10) B.colors.push(c);
-  if (save) { B.use = true; $('use-logo').checked = true; }
-  build();
-}
-function renderBrand() {
+  for (const [k, [, , fmt]] of Object.entries(SL)) { $(k).value = P[k]; $(k + '-v').textContent = fmt(P[k]); }
+  for (const [id, key] of [['base', 'base'], ['metal', 'metal'], ['glass', 'glass']]) document.querySelectorAll(`#${id} button`).forEach((b) => b.classList.toggle('active', b.dataset.v === P[key]));
+  $('lock').checked = lock; $('color').value = P.color; $('color-v').textContent = P.color; $('xray').checked = V.xray; $('hq').checked = HQ;
   $('logo-prev').style.display = B.logo ? 'block' : 'none';
-  $('brand-mark').innerHTML = B.logo && B.use ? `<img alt="Brand" src="${(B.mode === 'original' ? B.logo : logoVariant('#ffffff')).toDataURL('image/png')}">` : `<span class="txt">${(S.brand || '').replace(/[<>&]/g, '')}</span>`;
-  if (B.logo) { const pv = $('logo-pv'); pv.innerHTML = ''; const c = toCanvas(B.mode === 'original' ? B.logo : logoVariant('#ffffff'), 220); pv.appendChild(c); }
-  $('brand-sw').innerHTML = B.colors.map((c, i) => `<div class="swc" data-i="${i}" title="${c}"><div class="c" style="background:${c}"></div><span class="x" data-act="x">×</span><div class="a"><button data-act="p">P</button><button data-act="a">A</button></div></div>`).join('');
-  $('brand-pal-row').style.display = B.colors.length >= 2 ? 'flex' : 'none';
+  $('brand-mark').innerHTML = B.logo ? `<img alt="Brand" src="${tint(B.logo, '#ffffff').toDataURL('image/png')}">` : '<span class="txt">MICHELOB ULTRA</span>';
+  renderLayers();
 }
-$('brand-sw').onclick = (e) => {
-  const b = e.target.closest('[data-act]'), sw = e.target.closest('.swc'); if (!b || !sw) return; const c = B.colors[+sw.dataset.i];
-  if (b.dataset.act === 'x') { B.colors.splice(+sw.dataset.i, 1); renderBrand(); saveSoon(); return; }
-  S[b.dataset.act === 'p' ? 'primary' : 'accent'] = c; markCustom(); build();
-};
-$('c-add-btn').onclick = () => { const c = $('c-add').value; if (!B.colors.includes(c)) B.colors.push(c); renderBrand(); saveSoon(); };
-$('brand-pal').onclick = () => { S.palette = B.colors.slice(0, 6); S.paletteSrc = 'Brand colors'; S.paletteRef = null; build(); };
-$('pal-reset').onclick = () => { S.palette = null; S.paletteSrc = null; S.paletteRef = null; build(); };
-$('use-logo').onchange = (e) => { B.use = e.target.checked; build(); };
-$('logo-mode').onclick = (e) => { const b = e.target.closest('button'); if (!b) return; B.mode = b.dataset.v; B.tints = {}; build(); };
-$('logo-rm').onclick = () => { B.logo = null; B.logoSrc = null; if (S.skin === 'logo') S.skin = 'default'; build(); };
-$('f-font').onchange = async (e) => {
-  const f = e.target.files[0]; if (!f) return;
-  try { const ff = new FontFace('BrandFont', await f.arrayBuffer()); await ff.load(); document.fonts.add(ff); B.font = 'BrandFont'; $('font-name').textContent = f.name.slice(0, 18); build(); }
-  catch { $('font-name').textContent = 'Unreadable font'; }
-};
+function toast(m) { const t = $('toast'); t.textContent = m; t.classList.add('show'); clearTimeout(toast.t); toast.t = setTimeout(() => t.classList.remove('show'), 2400); }
 
-// ---------- surface skin + logo upload ----------
-$('skin').onchange = (e) => { S[MODS[S.sel].skin || 'skin'] = e.target.value; build(); };
-$('skin-scale').oninput = (e) => { S.skinScale = +e.target.value; $('skin-scale-v').textContent = S.skinScale.toFixed(1) + '×'; for (const [t, k] of [[skinTex, S.skin], [skinTexCup, S.skinCup], [skinTexBase, S.skinBase]]) if (t) { const m = k === 'logo' ? 3 : 1; t.repeat.set(m * S.skinScale, m * S.skinScale); } saveSoon(); };
-function wireDrop(zone, input, onFiles) {
-  input.onchange = (e) => { onFiles([...e.target.files]); input.value = ''; };
-  zone.addEventListener('dragover', (e) => { e.preventDefault(); zone.classList.add('over'); });
-  zone.addEventListener('dragleave', () => zone.classList.remove('over'));
-  zone.addEventListener('drop', (e) => { e.preventDefault(); zone.classList.remove('over'); onFiles([...e.dataTransfer.files].filter((f) => f.type.startsWith('image/'))); });
-}
-wireDrop($('drop-logo'), $('f-logo'), async (fs) => { if (fs[0]) await setLogo(await readURL(fs[0])); });
+// logo upload (kept in this browser)
+const loadImg = (src) => new Promise((ok, no) => { const im = new Image(); im.onload = () => ok(im); im.onerror = no; im.src = src; });
+async function setLogo(src) { const im = await loadImg(src); let w = im.naturalWidth || 1200, h = im.naturalHeight || 600; const k = Math.min(1, 1400 / Math.max(w, h)); const c = mk(Math.round(w * k), Math.round(h * k)); c.getContext('2d').drawImage(im, 0, 0, c.width, c.height); B.logo = keyBackground(c); B.logoSrc = B.logo.toDataURL('image/png'); build(); toast('Logo applied to the panel, labels and header'); }
+const readURL = (f) => new Promise((ok) => { const r = new FileReader(); r.onload = () => ok(r.result); r.readAsDataURL(f); });
+$('f-logo').onchange = async (e) => { if (e.target.files[0]) await setLogo(await readURL(e.target.files[0])); e.target.value = ''; };
+$('drop-logo').addEventListener('dragover', (e) => { e.preventDefault(); $('drop-logo').classList.add('over'); });
+$('drop-logo').addEventListener('dragleave', () => $('drop-logo').classList.remove('over'));
+$('drop-logo').addEventListener('drop', async (e) => { e.preventDefault(); $('drop-logo').classList.remove('over'); const f = [...e.dataTransfer.files].find((f) => f.type.startsWith('image/')); if (f) await setLogo(await readURL(f)); });
+$('logo-rm').onclick = () => { B.logo = null; B.logoSrc = null; build(); };
 
-// ---------- persistence (this browser only) ----------
-const KEY = 'trophy-cooler-studio-v2'; let saveT;   // v3 payload: per-concept looks + pins
-function saveSoon() { clearTimeout(saveT); saveT = setTimeout(() => {
-  commitLook();
-  const data = { v: 3, blue: 1, active: S.preset, concepts: C, globals: { brand: S.brand, wordmark: S.wordmark }, B: { logo: B.logoSrc, mode: B.mode, use: B.use, colors: B.colors }, refs: [].map((r) => ({ id: r.id, name: r.name, src: r.canvas.width > 640 ? toCanvas(r.canvas, 640).toDataURL('image/jpeg', 0.82) : r.thumb })) };
-  try { localStorage.setItem(KEY, JSON.stringify(data)); } catch { try { data.refs = data.refs.slice(0, 3); localStorage.setItem(KEY, JSON.stringify(data)); } catch {} }
-}, 600); }
-async function restore() {
-  let data; try { data = JSON.parse(localStorage.getItem(KEY) || 'null'); } catch { data = null; } if (!data) return;
-  try {
-    Object.assign(B, { mode: data.B?.mode || 'tint', use: data.B?.use !== false, colors: data.B?.colors || [] });
-    if (data.v === 3) {
-      for (const [id, c] of Object.entries(data.concepts || {})) if (C[id]) {
-        const d = newConcept(D.byId(D.PRESETS, id)); Object.assign(C[id], c);
-        for (const k of ['cupP', 'encP', 'baseP']) C[id][k] = { ...d[k], ...(c[k] || {}) };
-        if (!c.secRefs) C[id].secRefs = { cup: c.refCup ? [c.refCup] : [], enc: c.refEnc ? [c.refEnc] : [], base: c.refBase ? [c.refBase] : [] };
-        C[id].iters = { ...d.iters, ...(c.iters || {}) }; C[id].prompts = { ...d.prompts, ...(c.prompts || {}) };
-      }
-      if (C[data.active]) S.preset = data.active; Object.assign(S, data.globals || {});
-    } else if (data.S) { // migrate v2: one global look + pins → the concept that was active
-      const id = C[data.S.preset] ? data.S.preset : D.PRESETS[0].id;
-      Object.assign(C[id], pickLook({ ...C[id], ...data.S }), { pins: (data.gs?.pins || []).map((x) => 'gs:' + x) });
-      S.preset = id; S.brand = data.S.brand || S.brand; S.wordmark = data.S.wordmark || S.wordmark;
-    }
-    Object.assign(S, pickLook(C[S.preset]));
-    if (data.B?.logo) { const im = await loadImg(data.B.logo); B.logo = toCanvas(im, 1024); B.logoSrc = data.B.logo; }
-    // references were removed: drop any saved reference effects
-    for (const c of Object.values(C)) {
-      Object.assign(c, { pins: [], secRefs: { cup: [], enc: [], base: [] }, refCup: null, refEnc: null, refBase: null, refBeer: null, beerLabel: false, beerProfile: null, paletteRef: null });
-      for (const k of ['skin', 'skinCup', 'skinBase']) if (c[k] !== 'logo') c[k] = 'default';
-      if (c.cup === 'custom') { c.cup = 'champion'; c.cupProfile = null; c.profileSrc = null; } if (c.beerType === 'custom') c.beerType = 'longneck';
-      if (c.paletteSrc && c.paletteSrc.startsWith('Ref')) { c.palette = null; c.paletteSrc = null; }
-    }
-    if (!data.blue) for (const [id, c] of Object.entries(C)) { const p = D.byId(D.PRESETS, id); Object.assign(c, { primary: p.primary, accent: p.accent, metal: p.metal }); } // Michelob blue for every concept
-  } catch {}
-}
-
-// ---------- GLB export of the current design ----------
-let hostDL = null;
-if (window.claude && typeof window.claude.use === 'function') window.claude.use('downloads').then((d) => { hostDL = d; }).catch(() => {});
+// ---------- export ----------
+let hostDL = null; if (window.claude && typeof window.claude.use === 'function') window.claude.use('downloads').then((d) => { hostDL = d; }).catch(() => {});
 const CRC = (() => { const t = new Uint32Array(256); for (let n = 0; n < 256; n++) { let c = n; for (let k = 0; k < 8; k++) c = c & 1 ? 0xedb88320 ^ (c >>> 1) : c >>> 1; t[n] = c >>> 0; } return t; })();
 const crc32 = (u) => { let c = 0xffffffff; for (let i = 0; i < u.length; i++) c = CRC[(c ^ u[i]) & 255] ^ (c >>> 8); return (c ^ 0xffffffff) >>> 0; };
-function makeZip(files) { // store-only zip
-  const parts = [], cd = []; let off = 0;
-  for (const [nm, data] of files) {
-    const n = new TextEncoder().encode(nm), crc = crc32(data), h = new DataView(new ArrayBuffer(30));
-    h.setUint32(0, 0x04034b50, true); h.setUint16(4, 20, true); h.setUint32(14, crc, true); h.setUint32(18, data.length, true); h.setUint32(22, data.length, true); h.setUint16(26, n.length, true);
-    parts.push(new Uint8Array(h.buffer), n, data);
-    const c = new DataView(new ArrayBuffer(46)); c.setUint32(0, 0x02014b50, true); c.setUint16(4, 20, true); c.setUint16(6, 20, true); c.setUint32(16, crc, true); c.setUint32(20, data.length, true); c.setUint32(24, data.length, true); c.setUint16(28, n.length, true); c.setUint32(42, off, true);
-    cd.push(new Uint8Array(c.buffer), n); off += 30 + n.length + data.length;
-  }
-  const cdSize = cd.reduce((a, b) => a + b.length, 0), e = new DataView(new ArrayBuffer(22));
-  e.setUint32(0, 0x06054b50, true); e.setUint16(8, files.length, true); e.setUint16(10, files.length, true); e.setUint32(12, cdSize, true); e.setUint32(16, off, true);
-  return new Blob([...parts, ...cd, new Uint8Array(e.buffer)]);
+function makeZip(files) { const parts = [], cd = []; let off = 0; for (const [nm, data] of files) { const n = new TextEncoder().encode(nm), crc = crc32(data), h = new DataView(new ArrayBuffer(30)); h.setUint32(0, 0x04034b50, true); h.setUint16(4, 20, true); h.setUint32(14, crc, true); h.setUint32(18, data.length, true); h.setUint32(22, data.length, true); h.setUint16(26, n.length, true); parts.push(new Uint8Array(h.buffer), n, data); const c = new DataView(new ArrayBuffer(46)); c.setUint32(0, 0x02014b50, true); c.setUint16(4, 20, true); c.setUint16(6, 20, true); c.setUint32(16, crc, true); c.setUint32(20, data.length, true); c.setUint32(24, data.length, true); c.setUint16(28, n.length, true); c.setUint32(42, off, true); cd.push(new Uint8Array(c.buffer), n); off += 30 + n.length + data.length; } const sz = cd.reduce((a, b) => a + b.length, 0), e = new DataView(new ArrayBuffer(22)); e.setUint32(0, 0x06054b50, true); e.setUint16(8, files.length, true); e.setUint16(10, files.length, true); e.setUint32(12, sz, true); e.setUint32(16, off, true); return new Blob([...parts, ...cd, new Uint8Array(e.buffer)]); }
+async function saveFile(name, blob, zipInner) {
+  if (hostDL) { try { await hostDL.save({ filename: zipInner ? name.replace(/\.\w+$/, '.zip') : name, data: zipInner ? makeZip([[name, new Uint8Array(await blob.arrayBuffer())]]) : blob }); toast('Saved ' + name); } catch (e) { toast(e && e.code === 'declined' ? 'Download cancelled' : 'Download unavailable here'); } return; }
+  const u = URL.createObjectURL(blob), a = document.createElement('a'); a.href = u; a.download = name; document.body.appendChild(a); a.click(); a.remove(); setTimeout(() => URL.revokeObjectURL(u), 4000); toast('Saved ' + name);
 }
 $('glb').onclick = async () => {
-  const what = $('glb-what').value, keep = { xray: S.xray, door: S.door, explode: S.explode };
-  Object.assign(S, { xray: false, door: 0, explode: 0 }); applyView();
-  const src = what === 'all' ? root : what === 'base' ? parts.base : what === 'enc' ? parts.enc : parts.cupGroup;
-  const wrap = new THREE.Group(); const cl = src.clone(true); if (what === 'cup') cl.position.y = 0; wrap.add(cl); wrap.scale.setScalar(D.IN_TO_M); wrap.updateMatrixWorld(true);
-  try {
-    const buf = await new GLTFExporter().parseAsync(wrap, { binary: true });
-    const name = `trophy-cooler_${S.preset}_${what}`, mb = (buf.byteLength / 1048576).toFixed(1);
-    if (hostDL) { // hosted on claude.ai: save through the downloads capability (zip-wrapped GLB)
-      const cfg = JSON.stringify({ preset: S.preset, base: S.base, enclosure: S.enc, cup: S.cup, metal: S.metal, primary: S.primary, accent: S.accent, facets: S.facets, cupProfile: S.cupProfile, units: 'meters, +Y up, +Z front' }, null, 2);
-      try { await hostDL.save({ filename: name + '.zip', data: makeZip([[name + '.glb', new Uint8Array(buf)], ['config.json', new TextEncoder().encode(cfg)]]) }); $('glb-msg').textContent = `Saved ${name}.zip (${mb} MB GLB inside).`; toast('GLB exported'); }
-      catch (e) { $('glb-msg').textContent = e && e.code === 'declined' ? 'Download cancelled.' : 'Download unavailable here — use the standalone HTML file.'; }
-    } else {
-      const url = URL.createObjectURL(new Blob([buf], { type: 'model/gltf-binary' })), a = document.createElement('a');
-      a.href = url; a.download = name + '.glb'; document.body.appendChild(a); a.click(); a.remove(); setTimeout(() => URL.revokeObjectURL(url), 4000);
-      $('glb-msg').textContent = `Exported ${name}.glb (${mb} MB).`; toast('GLB exported');
-    }
-  } catch (err) { $('glb-msg').textContent = 'Export failed: ' + err.message; }
-  Object.assign(S, keep); applyView();
+  const what = $('glb-what').value, keep = { panel: V.panel, explode: V.explode, xray: V.xray }; Object.assign(V, { panel: 0, explode: 0, xray: false }); applyView();
+  const src = what === 'all' ? root : what === 'cup' ? parts.cup : what === 'contents' ? parts.contents : what === 'enc' ? parts.enc : parts.base;
+  const w = new THREE.Group(), c = src.clone(true); if (what === 'cup' || what === 'contents') c.position.y = 0; w.add(c); w.scale.setScalar(T.IN_TO_M); w.updateMatrixWorld(true);
+  try { const buf = await new GLTFExporter().parseAsync(w, { binary: true }); await saveFile(`michelob-ultra-trophy-cooler_${what}.glb`, new Blob([buf], { type: 'model/gltf-binary' }), true); $('glb-msg').textContent = `Exported ${what} (${(buf.byteLength / 1048576).toFixed(1)} MB).`; }
+  catch (err) { $('glb-msg').textContent = 'Export failed: ' + err.message; }
+  Object.assign(V, keep); applyView();
 };
-
-// ---------- header actions ----------
 $('export').onclick = () => { $('glb-what').value = 'all'; $('glb').click(); };
-$('capture').onclick = async () => {
-  controls.update(); renderFrame();
-  const blob = await new Promise((r) => renderer.domElement.toBlob(r, 'image/png')), name = `trophy-cooler_${S.preset}_${S.view}.png`;
-  if (hostDL) { try { await hostDL.save({ filename: name, data: blob }); toast('View captured'); } catch (e) { toast(e && e.code === 'declined' ? 'Capture cancelled' : 'Capture unavailable here'); } }
-  else { const u = URL.createObjectURL(blob), a = document.createElement('a'); a.href = u; a.download = name; document.body.appendChild(a); a.click(); a.remove(); setTimeout(() => URL.revokeObjectURL(u), 4000); toast('View captured'); }
-};
+$('capture').onclick = async () => { controls.update(); renderFrame(); const blob = await new Promise((r) => renderer.domElement.toBlob(r, 'image/png')); await saveFile('michelob-ultra-trophy-cooler.png', blob, false); };
+$('copy').onclick = async () => { const cfg = { units: 'inches', enclosure: { W: P.W, D: P.D, H: P.H, base: P.base, casterOrSkidHeight: T.casterH(P), color: P.color }, cup: { bowlDiameter: P.bowlD, bowlHeight: P.bowlH, pedestalHeight: P.pedH, flutes: P.flutes, twist: P.twist, fluteDepth: P.fluteDepth, metal: P.metal }, bottles: P.bottles, freezer: T.FRIDGE, clearances: T.clearances(P) };
+  try { await navigator.clipboard.writeText(JSON.stringify(cfg, null, 2)); toast('Dimensions copied'); } catch { $('glb-msg').textContent = JSON.stringify(cfg); } };
 
 // ---------- cameras ----------
-const CAMS = { bottles: [[30, 76, 50], [0, 57, 0]], hero: [[100, 66, 128], [0, 31, 0]], front: [[0, 34, 170], [0, 33, 0]], back: [[0, 34, -170], [0, 33, 0]], side: [[170, 34, 0], [0, 33, 0]], top: [[0.1, 190, 30], [0, 20, 0]], rink: [[260, 110, 420], [0, 20, 0]] };
 let tween = null;
-function goCam(k, instant) {
-  S.view = k; document.querySelectorAll('#viewbar button').forEach((b) => b.classList.toggle('active', b.dataset.view === k));
-  const [p, t] = CAMS[k], fromP = camera.position.clone(), fromT = controls.target.clone(), toP = new THREE.Vector3(...p), toT = new THREE.Vector3(...t);
-  if (instant) { camera.position.copy(toP); controls.target.copy(toT); return; }
-  tween = { t0: performance.now(), fromP, fromT, toP, toT };
+function camFor(k) {
+  const top = T.casterH(P) + P.H, h = top + P.pedH + P.bowlH + 8, mid = h * 0.5, d = Math.max(h * 1.12, P.W) * 2.6;
+  return { front: [[0, mid * 1.05, d], [0, mid, 0]], hero: [[d * 0.62, mid * 1.25, d * 0.8], [0, mid, 0]], side: [[d, mid, 0], [0, mid, 0]], back: [[0, mid, -d], [0, mid, 0]], top: [[0.1, d * 1.15, 18], [0, top, 0]],
+    bottles: [[P.bowlD * 0.55, top + P.pedH + P.bowlH + 26, P.bowlD * 0.95], [0, top + P.pedH + P.bowlH, 0]] }[k];
 }
+function goCam(k, instant) { document.querySelectorAll('#viewbar button').forEach((b) => b.classList.toggle('active', b.dataset.view === k)); const [p, t] = camFor(k), toP = new THREE.Vector3(...p), toT = new THREE.Vector3(...t); if (instant) { camera.position.copy(toP); controls.target.copy(toT); return; } tween = { t0: performance.now(), fromP: camera.position.clone(), fromT: controls.target.clone(), toP, toT }; }
+function fit() { const b = new THREE.Box3(); root.traverse((o) => { if (o.isMesh && o.visible && [parts.base, parts.enc, parts.fridge, parts.cupGroup].some((p) => p.visible && p.getObjectById(o.id))) b.expandByObject(o); }); if (b.isEmpty()) return; const c = b.getCenter(new THREE.Vector3()), r = b.getSize(new THREE.Vector3()).length() / 2, dir = camera.position.clone().sub(controls.target).normalize(); tween = { t0: performance.now(), fromP: camera.position.clone(), fromT: controls.target.clone(), toP: c.clone().add(dir.multiplyScalar(r / Math.sin(THREE.MathUtils.degToRad(camera.fov / 2)) * 1.02)), toT: c }; }
 $('viewbar').onclick = (e) => { const b = e.target.closest('button'); if (b) goCam(b.dataset.view); };
-$('fit').onclick = () => { // frame whatever is visible
-  const box = new THREE.Box3(); root.traverse((o) => { if (o.isMesh && o.visible && o.parent && [parts.base, parts.enc, parts.fridge, parts.cupGroup, parts.compare].filter(Boolean).some((p) => p.visible && (p === o || p.getObjectById(o.id)))) box.expandByObject(o); });
-  if (box.isEmpty()) return; const c = box.getCenter(new THREE.Vector3()), r = box.getSize(new THREE.Vector3()).length() / 2;
-  const dir = camera.position.clone().sub(controls.target).normalize(), dist = r / Math.sin(THREE.MathUtils.degToRad(camera.fov / 2)) * 1.05;
-  tween = { t0: performance.now(), fromP: camera.position.clone(), fromT: controls.target.clone(), toP: c.clone().add(dir.multiplyScalar(dist)), toT: c };
-};
-
-function resize() { const w = view.clientWidth, h = view.clientHeight; renderer.setSize(w, h); composer.setSize(w, h); gtao.setSize(w * renderer.getPixelRatio(), h * renderer.getPixelRatio()); camera.aspect = w / h; camera.updateProjectionMatrix(); if (scene.background) scene.background.dispose(); scene.background = stageBackdrop(w, h); }
+$('fit-btn').onclick = fit;
+function resize() { const w = view.clientWidth, h = view.clientHeight; renderer.setSize(w, h); composer.setSize(w, h); gtao.setSize(w * renderer.getPixelRatio(), h * renderer.getPixelRatio()); camera.aspect = w / h; camera.updateProjectionMatrix(); if (backdrop) backdrop.dispose(); backdrop = stageBackdrop(w, h); applyEnv(); mirror.getRenderTarget && mirror.getRenderTarget().setSize(Math.min(1024, w), Math.min(1024, h)); }
 addEventListener('resize', resize);
+function loop(now) { if (tween) { const k = Math.min(1, (now - tween.t0) / 900), e = 1 - Math.pow(1 - k, 3); camera.position.lerpVectors(tween.fromP, tween.toP, e); controls.target.lerpVectors(tween.fromT, tween.toT, e); if (k === 1) tween = null; } controls.update(); renderFrame(); requestAnimationFrame(loop); }
 
-function loop(now) {
-  if (tween) { const k = Math.min(1, (now - tween.t0) / 900), e = 1 - Math.pow(1 - k, 3); camera.position.lerpVectors(tween.fromP, tween.toP, e); controls.target.lerpVectors(tween.fromT, tween.toT, e); if (k === 1) tween = null; }
-  controls.update(); renderFrame(); requestAnimationFrame(loop);
-}
-
-try { await Promise.race([document.fonts.load('700 64px "Barlow Condensed"'), new Promise((r) => setTimeout(r, 2500))]); } catch {}
-await restore();
-resize(); goCam('hero', true); build(); $('loading').remove(); requestAnimationFrame(loop);
-window.__studio = { S, build, applyView, goCam };
+try { await Promise.race([Promise.all([document.fonts.load('italic 700 64px "Playfair Display"'), document.fonts.load('600 64px Montserrat'), document.fonts.load('700 64px "Barlow Condensed"')]), new Promise((r) => setTimeout(r, 2500))]); } catch {}
+if (B.logoSrc) { try { const im = await loadImg(B.logoSrc); const c = mk(im.naturalWidth, im.naturalHeight); c.getContext('2d').drawImage(im, 0, 0); B.logo = c; } catch {} }
+resize(); build(); goCam('front', true); $('loading').remove(); requestAnimationFrame(loop);
 </script>
 </body>
 </html>
