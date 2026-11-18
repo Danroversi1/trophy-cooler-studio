@@ -41,7 +41,7 @@ References live in a Google Slides deck, not in this repo, Vercel or Supabase.
 
 ## Section workshop (Cup · Enclosure · Sliding base)
 Each concept has three independently designed sections. Select one in **Scene objects** or the workshop tabs:
-- **References:** use **Choose reference…** to browse the connected Google Slides treatment (page number + title) and assign one or more slides to this section only. If the deck can't be loaded, import slide images, pasted screenshots or a **PDF export** of the deck instead (File → Download → PDF). The primary reference can drive shape, skin, palette or bottle label, but only when you tick that option.
+- **References:** use **Choose reference…** to browse the connected Google Slides treatment (page number + title) and assign one or more slides to this section only. If the deck can't be loaded, import slide images, pasted screenshots or a **PDF export** of the deck instead (File → Download → PDF). The primary reference can drive shape, skin, palette or bottle label, but only when you tick that option. To use only part of a slide (or of an imported image), hover it, click **✂ Crop** and drag a rectangle. Each crop becomes its own reference, stored as the slide ID plus the crop rectangle, and is rebuilt live from the slide.
 - **Design prompt → Generate iteration:** creates an iteration for this section only. The iteration previews in the viewport.
 - **Iterations:** rename, preview, compare side by side, apply to the trophy, or delete. **Save current** stores manual parameter edits as an iteration.
 - **Design parameters:** variant, finish and section sliders (manual, no generation).

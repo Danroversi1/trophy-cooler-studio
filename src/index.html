@@ -170,7 +170,7 @@ textarea:focus{border-color:#5377ba}
 .pslider .slider-head{margin:12px 0 6px}
 code{font-size:10px;background:#0b0c10;border:1px solid #2a3348;border-radius:4px;padding:1px 4px;color:#cfd6e4}
 /* viewport chips */
-.vchips{position:absolute;left:50%;top:76px;transform:translateX(-50%);z-index:3;display:flex;flex-direction:column;align-items:center;gap:6px;pointer-events:none}
+.vchips{position:absolute;right:20px;bottom:18px;z-index:3;display:flex;flex-direction:column;align-items:flex-end;gap:6px;pointer-events:none}
 .vchip{pointer-events:auto;display:flex;align-items:center;gap:8px;background:#0a0b0ee6;border:1px solid #345496;border-radius:9px;padding:6px 6px 6px 12px;font-size:11px;color:#dfe6f5;backdrop-filter:blur(12px);white-space:nowrap}
 .vchip b{font-weight:500;color:#fff}
 .vchip .dotb{width:7px;height:7px;border-radius:50%;background:#4d7dff;box-shadow:0 0 0 3px #4d7dff33}
@@ -201,6 +201,27 @@ code{font-size:10px;background:#0b0c10;border:1px solid #2a3348;border-radius:4p
 .modal-foot{display:flex;align-items:center;gap:8px;padding:12px 20px;border-top:1px solid #ffffff10;font-size:11px;color:#9aa1ad}
 .modal-foot button{font-size:11.5px;padding:9px 16px}
 .modal-foot button:disabled{opacity:.45;cursor:default}
+/* crop */
+.modal-box{position:relative;min-height:min(640px,calc(100vh - 40px))}
+.cropbtn{position:absolute;right:7px;bottom:58px;font-size:10px;background:#0a0b0ee6;border:1px solid #34405e;color:#dfe6f5;border-radius:6px;padding:4px 8px;opacity:0;transition:opacity .15s}
+.pk-card:hover .cropbtn{opacity:1}
+.cropbtn:hover{border-color:#5d7ab5;background:#0c2254}
+.pk-crop{position:absolute;inset:0;background:#141519;border-radius:14px;z-index:5;display:flex;flex-direction:column;padding:16px 20px}
+.pk-crop[hidden]{display:none}
+.pk-crop-head{display:flex;align-items:center;gap:10px;margin-bottom:10px;font-size:12px}
+.pk-crop-head b{font-weight:500;color:#dfe6f5;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.pk-crop-head button{font-size:11.5px}
+.pk-crop-head button:disabled{opacity:.45;cursor:default}
+.pk-crop-stage{flex:1;min-height:0;display:grid;place-items:center;background:#0b0c10;border:1px solid #2a2d36;border-radius:10px;cursor:crosshair;touch-action:none;user-select:none;padding:10px}
+.pk-crop-wrap{position:relative;max-width:100%;max-height:100%;line-height:0}
+.pk-crop-wrap img{max-width:100%;max-height:min(520px,calc(100vh - 260px));display:block;pointer-events:none}
+.pk-crop-rect{position:absolute;display:none;border:2px solid #6d94ff;background:#4d7dff22;box-shadow:0 0 0 9999px #000a;pointer-events:none}
+.pk-crops{display:flex;align-items:center;gap:5px;max-width:55%;overflow:auto}
+.pk-crops span{font-size:10px;color:#9aa1ad;margin-right:2px}
+.pk-cthumb{position:relative;padding:0;width:44px;height:30px;border-radius:5px;overflow:hidden;border:1px solid #5d7ab5;background:#0b0c10;flex:none}
+.pk-cthumb img{width:100%;height:100%;object-fit:cover;display:block}
+.pk-cthumb i{position:absolute;inset:0;display:none;place-items:center;background:#000a;color:#fff;font-style:normal}
+.pk-cthumb:hover i{display:grid}
 /* specs */
 .stat{display:grid;grid-template-columns:1fr 1fr;gap:6px}
 .stat div{background:#191c24;border:1px solid #2a3348;border-radius:8px;padding:9px 10px}
@@ -464,7 +485,12 @@ details b{color:#d6dbe4;font-weight:600}
       <p class="muted" id="pk-imp-status"></p>
       <div class="pk-grid" id="pk-imp-grid"></div>
     </div>
-    <div class="modal-foot"><span id="pk-count">0 selected</span><span style="flex:1"></span><button class="ghost" id="pk-cancel">Cancel</button><button id="pk-assign" disabled>Assign</button></div>
+    <div class="pk-crop" id="pk-crop" hidden>
+      <div class="pk-crop-head"><button class="ghost" id="pk-crop-back">← Back to slides</button><b id="pk-crop-label"></b><span style="flex:1"></span><button id="pk-crop-add" disabled>Add crop to selection</button></div>
+      <p class="muted" id="pk-crop-hint" style="margin:0 0 10px">Drag a rectangle over the part of the slide you want to use as a reference.</p>
+      <div class="pk-crop-stage" id="pk-crop-stage"><div class="pk-crop-wrap"><img id="pk-crop-img" alt="" draggable="false"><div class="pk-crop-rect" id="pk-crop-rect"></div></div></div>
+    </div>
+    <div class="modal-foot"><div class="pk-crops" id="pk-crops"></div><span id="pk-count">0 selected</span><span style="flex:1"></span><button class="ghost" id="pk-cancel">Cancel</button><button id="pk-assign" disabled>Assign</button></div>
   </div>
 </div>
 <script type="module">
@@ -903,7 +929,7 @@ $('ws-iters').onchange = (e) => { const inp = e.target.closest('[data-name]'), r
 // ---------- viewport chips: which section is being edited, preview + compare ----------
 function renderChips() {
   const md = MODS[S.sel], [, pit] = S.previewIter ? findIter(S.previewIter) : [], [, cit] = S.compareIter ? findIter(S.compareIter) : [];
-  let h = `<div class="vchip"><span class="dotb"></span>Editing <b>${md.n} · ${md.label}</b> · ${conceptName()}<button class="${S.isolate ? 'active' : 'ghost'}" data-c="iso">${S.isolate ? 'Isolated' : 'Isolate'}</button><button class="ghost" data-c="asm">Assembled</button></div>`;
+  let h = '';
   if (pit) h += `<div class="vchip pv"><span class="dotb"></span>Previewing <b>“${pit.name}”</b><button data-c="apply">Apply</button><button class="ghost" data-c="exit">Exit</button></div>`;
   if (cit) h += `<div class="vchip"><span class="dotb"></span>Left: <b>applied design</b> · Right: <b>“${cit.name}”</b><button class="ghost" data-c="exit">Exit compare</button></div>`;
   $('vchips').innerHTML = h;
@@ -1087,34 +1113,76 @@ $('ws-generate').onclick = async () => {
   } finally { btn.classList.remove('busy'); btn.textContent = label; }
 };
 
+// ---------- crops: a reference can be a region of a slide ----------
+const parseRef = (id) => { const [base, c] = String(id).split('#'); return { base, slideId: base.startsWith('gs:') ? base.slice(3) : null, crop: c ? c.split(',').map(Number) : null }; };
+const cropKey = (base, r) => `${base}#${r.map((v) => v.toFixed(4)).join(',')}`;
+async function cropToDataURL(src, crop) {
+  const im = await loadImg(src), W = im.naturalWidth, H = im.naturalHeight, [x, y, w, h] = crop;
+  const c = mk(Math.max(8, Math.round(w * W)), Math.max(8, Math.round(h * H))); c.getContext('2d').drawImage(im, x * W, y * H, w * W, h * H, 0, 0, c.width, c.height);
+  return c.toDataURL('image/jpeg', 0.9);
+}
+async function loadSlideRef(id) { // whole slide or a crop of it, always fetched live by slide ID
+  const { slideId, crop } = parseRef(id), src = slideURL(slideId);
+  return addRef(crop ? await cropToDataURL(src, crop) : src, 'slide', false, { id, source: 'slides', slideId, crop });
+}
+
 // ---------- reference picker (Google Slides treatment · imported images / PDF) ----------
-const PK = { sec: 'cup', tab: 'slides', sel: new Set(), imports: [] };
+const PK = { sec: 'cup', tab: 'slides', sel: new Set(), imports: [], cropThumbs: {}, crop: null };
 function openPicker(sec = S.sel) {
   PK.sec = sec; PK.sel.clear(); $('picker').hidden = false;
   $('pk-title').textContent = `${MODS[sec].n} · ${MODS[sec].label} — ${conceptName()}`;
   $('pk-url').value = GS.url || $('deck-url').value || '';
   setPkTab(GS.deck || !PK.imports.length ? 'slides' : 'import'); renderPicker();
 }
-function closePicker() { $('picker').hidden = true; }
+function closePicker() { $('picker').hidden = true; $('pk-crop').hidden = true; PK.crop = null; }
 function setPkTab(t) { PK.tab = t; PK.sel.clear(); document.querySelectorAll('#pk-tabs button').forEach((b) => b.classList.toggle('active', b.dataset.tab === t)); $('pk-slides').hidden = t !== 'slides'; $('pk-import').hidden = t !== 'import'; renderPicker(); }
 function assignedBadges(refId) { return SECTIONS.filter((s) => secRefs(s).includes(refId)).map((s) => `<i>${EL_NAMES[s]}</i>`).join(''); }
 function renderPicker() {
   if ($('picker').hidden) return;
   if (PK.tab === 'slides') {
     $('pk-grid').innerHTML = GS.deck ? GS.slides.map((s) => { const rid = 'gs:' + s.id, inSec = secRefs(PK.sec).includes(rid);
-      return `<button class="pk-card ${PK.sel.has(rid) ? 'on' : ''}" data-k="${rid}" title="Slide ID ${s.id}"><img loading="lazy" src="${slideURL(s.id)}" alt="Slide ${s.n}"><span class="asg">${assignedBadges(rid)}</span><div class="cap"><b>p.${s.n}</b><span>${(s.title || 'Untitled slide').replace(/</g, '&lt;')}${inSec ? ' · <em style="color:#8fb2ff;font-style:normal">in this section</em>' : ''}</span></div></button>`; }).join('') : '';
+      const crops = SECTIONS.reduce((a, sec) => a + secRefs(sec).filter((x) => x.startsWith(rid + '#')).length, 0);
+      return `<button class="pk-card ${PK.sel.has(rid) ? 'on' : ''}" data-k="${rid}" title="Slide ID ${s.id}"><img loading="lazy" src="${slideURL(s.id)}" alt="Slide ${s.n}"><span class="asg">${assignedBadges(rid)}${crops ? `<i>${crops} crop${crops > 1 ? 's' : ''}</i>` : ''}</span><span class="cropbtn" data-crop="${rid}" title="Select part of this slide">✂ Crop</span><div class="cap"><b>p.${s.n}</b><span>${(s.title || 'Untitled slide').replace(/</g, '&lt;')}${inSec ? ' · <em style="color:#8fb2ff;font-style:normal">in this section</em>' : ''}</span></div></button>`; }).join('') : '';
     if (GS.deck) $('pk-status').textContent = `${GS.title || 'Treatment'} · ${GS.slides.length} slides. Select one or more, then assign them to the ${MODS[PK.sec].label.toLowerCase()}.`;
   } else {
-    $('pk-imp-grid').innerHTML = PK.imports.map((m) => `<button class="pk-card ${PK.sel.has(m.k) ? 'on' : ''}" data-k="${m.k}"><img src="${m.src}" alt=""><div class="cap"><b>${m.page ? 'p.' + m.page : 'img'}</b><span>${m.name.replace(/</g, '&lt;')}</span></div></button>`).join('');
+    $('pk-imp-grid').innerHTML = PK.imports.map((m) => `<button class="pk-card ${PK.sel.has(m.k) ? 'on' : ''}" data-k="${m.k}"><img src="${m.src}" alt=""><span class="cropbtn" data-crop="${m.k}" title="Select part of this image">✂ Crop</span><div class="cap"><b>${m.page ? 'p.' + m.page : 'img'}</b><span>${m.name.replace(/</g, '&lt;')}</span></div></button>`).join('');
   }
-  const n = PK.sel.size; $('pk-count').textContent = `${n} selected`; $('pk-assign').disabled = !n; $('pk-assign').textContent = `Assign${n ? ' ' + n : ''} to ${MODS[PK.sec].label}`;
+  const crops = [...PK.sel].filter((k) => k.includes('#'));
+  $('pk-crops').innerHTML = crops.length ? `<span>Crops</span>` + crops.map((k) => `<button class="pk-cthumb" data-uncrop="${k}" title="Remove this crop"><img src="${PK.cropThumbs[k] || ''}" alt=""><i>×</i></button>`).join('') : '';
+  const n = PK.sel.size; $('pk-count').textContent = `${n} selected${crops.length ? ` · ${crops.length} crop${crops.length > 1 ? 's' : ''}` : ''}`; $('pk-assign').disabled = !n; $('pk-assign').textContent = `Assign${n ? ' ' + n : ''} to ${MODS[PK.sec].label}`;
 }
 $('ws-choose').onclick = () => openPicker();
+// crop editor: drag a rectangle over the slide / image, add it as its own reference
+function openCrop(base) {
+  const src = base.startsWith('gs:') ? slideURL(base.slice(3)) : PK.imports.find((m) => m.k === base).src;
+  const label = base.startsWith('gs:') ? `Slide p.${slidePos(base.slice(3)) || '?'}${GS.slides.find((s) => 'gs:' + s.id === base)?.title ? ' · ' + GS.slides.find((s) => 'gs:' + s.id === base).title : ''}` : PK.imports.find((m) => m.k === base).name;
+  PK.crop = { base, src, rect: null }; $('pk-crop').hidden = false; $('pk-crop-label').textContent = label;
+  const img = $('pk-crop-img'); img.crossOrigin = 'anonymous'; img.src = src; drawCrop(); $('pk-crop-add').disabled = true;
+}
+function drawCrop() {
+  const r = PK.crop && PK.crop.rect, box = $('pk-crop-rect');
+  if (!r || r[2] < 0.005 || r[3] < 0.005) { box.style.display = 'none'; return; }
+  Object.assign(box.style, { display: 'block', left: r[0] * 100 + '%', top: r[1] * 100 + '%', width: r[2] * 100 + '%', height: r[3] * 100 + '%' });
+}
+{ const stage = $('pk-crop-stage'); let start = null;
+  const pt = (e) => { const b = $('pk-crop-img').getBoundingClientRect(); return [Math.min(1, Math.max(0, (e.clientX - b.left) / b.width)), Math.min(1, Math.max(0, (e.clientY - b.top) / b.height))]; };
+  stage.addEventListener('pointerdown', (e) => { if (!PK.crop) return; e.preventDefault(); stage.setPointerCapture(e.pointerId); start = pt(e); PK.crop.rect = [...start, 0, 0]; drawCrop(); });
+  stage.addEventListener('pointermove', (e) => { if (!start) return; const p = pt(e); PK.crop.rect = [Math.min(start[0], p[0]), Math.min(start[1], p[1]), Math.abs(p[0] - start[0]), Math.abs(p[1] - start[1])]; drawCrop(); });
+  stage.addEventListener('pointerup', () => { if (!start) return; start = null; const r = PK.crop.rect; $('pk-crop-add').disabled = !(r && r[2] > 0.02 && r[3] > 0.02); });
+}
+$('pk-crop-back').onclick = () => { $('pk-crop').hidden = true; PK.crop = null; };
+$('pk-crop-add').onclick = async () => {
+  const { base, src, rect } = PK.crop, k = cropKey(base, rect);
+  try { PK.cropThumbs[k] = await cropToDataURL(src, rect); } catch { PK.cropThumbs[k] = ''; }
+  PK.sel.add(k); PK.crop.rect = null; drawCrop(); $('pk-crop-add').disabled = true; renderPicker();
+  $('pk-crop-hint').textContent = 'Crop added to the selection. Drag again to add another, or go back to the slides.';
+};
+$('pk-crops').onclick = (e) => { const b = e.target.closest('[data-uncrop]'); if (b) { PK.sel.delete(b.dataset.uncrop); renderPicker(); } };
 $('pk-close').onclick = closePicker; $('pk-cancel').onclick = closePicker;
 $('picker').onclick = (e) => { if (e.target === $('picker')) closePicker(); };
-document.addEventListener('keydown', (e) => { if (e.key === 'Escape' && !$('picker').hidden) closePicker(); });
+document.addEventListener('keydown', (e) => { if (e.key === 'Escape' && !$('picker').hidden) { if (!$('pk-crop').hidden) $('pk-crop-back').click(); else closePicker(); } });
 $('pk-tabs').onclick = (e) => { const b = e.target.closest('[data-tab]'); if (b) setPkTab(b.dataset.tab); };
-for (const g of ['pk-grid', 'pk-imp-grid']) $(g).onclick = (e) => { const b = e.target.closest('[data-k]'); if (!b) return; const k = b.dataset.k; PK.sel.has(k) ? PK.sel.delete(k) : PK.sel.add(k); renderPicker(); };
+for (const g of ['pk-grid', 'pk-imp-grid']) $(g).onclick = (e) => { const cb = e.target.closest('[data-crop]'); if (cb) { e.stopPropagation(); openCrop(cb.dataset.crop); return; } const b = e.target.closest('[data-k]'); if (!b) return; const k = b.dataset.k; PK.sel.has(k) ? PK.sel.delete(k) : PK.sel.add(k); renderPicker(); };
 $('pk-connect').onclick = async () => { $('pk-status').textContent = 'Reading the treatment…'; await connectDeck($('pk-url').value); renderPicker(); if (!GS.deck) $('pk-status').textContent = $('deck-status').textContent + ' You can also import slide images or a PDF in the other tab.'; };
 $('pk-refresh').onclick = async () => { await connectDeck(GS.url || $('pk-url').value); renderPicker(); };
 $('pk-url').onkeydown = (e) => { if (e.key === 'Enter') $('pk-connect').click(); };
@@ -1123,8 +1191,9 @@ $('pk-assign').onclick = async () => {
   let ok = 0;
   for (const k of keys) {
     try {
-      if (k.startsWith('gs:')) { if (!REFS.some((r) => r.id === k)) await addRef(slideURL(k.slice(3)), 'slide', false, { id: k, source: 'slides', slideId: k.slice(3) }); assignToSection(sec, k); }
-      else { const m = PK.imports.find((x) => x.k === k); const r = await addRef(m.src, m.page ? `${m.name} p.${m.page}` : m.name); assignToSection(sec, r.id); }
+      if (k.startsWith('gs:')) { if (!REFS.some((r) => r.id === k)) await loadSlideRef(k); assignToSection(sec, k); }
+      else { const { base, crop } = parseRef(k), m = PK.imports.find((x) => x.k === base); const nm = (m.page ? `${m.name} p.${m.page}` : m.name) + (crop ? ' (crop)' : '');
+        const r = await addRef(crop ? await cropToDataURL(m.src, crop) : m.src, nm); assignToSection(sec, r.id); }
       ok++;
     } catch {}
   }
@@ -1169,7 +1238,7 @@ $('explode').oninput = (e) => { S.explode = +e.target.value; $('explode-v').text
 $('reset').onclick = () => { const p = D.byId(D.PRESETS, S.preset); Object.assign(S, lookDefaults(p), { door: 0, explode: 0, xray: false, isolate: false, previewIter: null, compareIter: null, vis: { cup: true, contents: true, enc: true, fridge: true, base: true }, contents: true }); build(); toast('Concept look reset · references + iterations kept'); };
 $('copy').onclick = async () => {
   commitLook();
-  const refOut = (id) => { const r = REFS.find((x) => x.id === id); return id.startsWith('gs:') ? { slideId: id.slice(3), page: slidePos(id.slice(3)) } : { local: r ? r.name : id }; };
+  const refOut = (id) => { const r = REFS.find((x) => x.id === id); const pr = parseRef(id); return pr.slideId ? { slideId: pr.slideId, page: slidePos(pr.slideId), crop: pr.crop } : { local: r ? r.name : id }; };
   const cfg = { activeConcept: S.preset, brand: { labelText: S.brand, logo: !!B.logo, colors: B.colors, appliesTo: 'all concepts' },
     referenceDeck: GS.deck ? `https://docs.google.com/presentation/d/${GS.deck}/edit` : null,
     concepts: Object.fromEntries(D.PRESETS.map((p) => { const c = C[p.id]; return [p.id, { name: p.name, edited: isEdited(p.id),
@@ -1354,13 +1423,13 @@ $('f-font').onchange = async (e) => {
 let refSeq = 0;
 async function addRef(src, name, save = true, extra = {}) {
   const im = await loadImg(src), canvas = toCanvas(im, 900);
-  const r = { id: extra.id || 'ref' + (++refSeq), source: extra.source || 'local', slideId: extra.slideId, name: name.replace(/\.[a-z0-9]+$/i, '').slice(0, 40), canvas, thumb: canvas.toDataURL('image/jpeg', 0.8), palette: extractPalette(canvas, 6), ...analyze(canvas), profile: extractProfile(canvas) };
+  const r = { id: extra.id || 'ref' + (++refSeq), source: extra.source || 'local', slideId: extra.slideId, crop: extra.crop || null, name: name.replace(/\.[a-z0-9]+$/i, '').slice(0, 40), canvas, thumb: canvas.toDataURL('image/jpeg', 0.8), palette: extractPalette(canvas, 6), ...analyze(canvas), profile: extractProfile(canvas) };
   { const bp = extractProfile(canvas, { trim: false }); if (bp) { const Hb = Math.min(10, Math.max(4.5, bp.aspect * 2.5)), mx = Math.max(...bp.pts.map((q) => q[0]));
       r.beerProfile = bp.pts.map(([q, y]) => [Math.max(0.35, q / mx * 1.25), +(y / bp.height * Hb).toFixed(3)]); r.bbox = bp.bbox; } }
   const old = REFS.findIndex((x) => x.id === r.id); if (old >= 0) REFS.splice(old, 1, r); else REFS.push(r); if (save) saveSoon(); return r;
 }
 const pinnedRefs = () => pins().map((id) => REFS.find((r) => r.id === id)).filter(Boolean);
-const refLabel = (r) => (r.source === 'slides' ? (slidePos(r.slideId) ? 'Slide p.' + slidePos(r.slideId) : 'Slide (removed)') : r.name);
+const refLabel = (r) => (r.source === 'slides' ? (slidePos(r.slideId) ? 'Slide p.' + slidePos(r.slideId) : 'Slide (removed)') + (r.crop ? ' · crop' : '') : r.name);
 function unpinRef(id) {
   const c = activeC(); c.pins = c.pins.filter((p) => p !== id);
   for (const el of SECTIONS) removeFromSection(el, id);
@@ -1372,8 +1441,8 @@ function pinRef(id) { if (!pins().includes(id)) pins().push(id); }
 async function ensurePinsLoaded(cid) {
   let changed = false;
   for (const id of C[cid].pins) {
-    if (!id.startsWith('gs:') || REFS.some((r) => r.id === id) || !GS.deck || !slidePos(id.slice(3))) continue;
-    try { await addRef(slideURL(id.slice(3)), 'slide', false, { id, source: 'slides', slideId: id.slice(3) }); changed = true; } catch {}
+    if (!id.startsWith('gs:') || REFS.some((r) => r.id === id) || !GS.deck || !slidePos(parseRef(id).slideId)) continue;
+    try { await loadSlideRef(id); changed = true; } catch {}
   }
   return changed;
 }
@@ -1460,12 +1529,12 @@ async function connectDeck(url, quiet) {
   if (changed || !quiet) build();
 }
 function deckSummary() {
-  const mine = pins().filter((id) => id.startsWith('gs:')), gone = mine.filter((id) => !slidePos(id.slice(3))).length;
+  const mine = pins().filter((id) => id.startsWith('gs:')), gone = mine.filter((id) => !slidePos(parseRef(id).slideId)).length;
   return `${GS.slides.length} slides · ${mine.length} used by ${conceptName()} · click a slide to assign it to the ${EL_NAMES[S.sel].toLowerCase()}${gone ? ` · ${gone} no longer in the deck` : ''}`;
 }
 function renderThumbs() {
   $('thumbs').innerHTML = GS.deck ? GS.slides.map((s) => {
-    const rid = 'gs:' + s.id, mine = SECTIONS.filter((sec) => secRefs(sec).includes(rid)).map((sec) => `<i>${EL_NAMES[sec].slice(0, 3)}</i>`).join('');
+    const rid = 'gs:' + s.id, mine = SECTIONS.filter((sec) => secRefs(sec).some((x) => parseRef(x).base === rid)).map((sec) => `<i>${EL_NAMES[sec].slice(0, 3)}</i>`).join('');
     const others = mine + D.PRESETS.filter((p) => p.id !== S.preset && C[p.id].pins.includes(rid)).map((p) => `<i>${p.name.slice(0, 2)}</i>`).join('');
     return `<button class="thumb ${secRefs(S.sel).includes(rid) ? 'on' : ''}" data-id="${s.id}" title="Slide ${s.n}${s.title ? ' · ' + s.title.replace(/"/g, '') : ''} · click to ${secRefs(S.sel).includes(rid) ? 'remove from' : 'assign to'} the ${EL_NAMES[S.sel].toLowerCase()}"><img loading="lazy" alt="Slide ${s.n}" src="${slideURL(s.id)}"><span class="pn">p.${s.n}</span>${others ? `<span class="cb" title="Also pinned by other concepts">${others}</span>` : ''}</button>`;
   }).join('') : '';
