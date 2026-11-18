@@ -354,7 +354,7 @@ const front = new THREE.DirectionalLight(0xffffff, 0.55); front.position.set(0, 
 
 // floors: glossy black studio floor with a soft reflection, or a rink disc
 const floor = new THREE.Group(); scene.add(floor);
-const mirror = new Reflector(new THREE.CircleGeometry(260, 96), { textureWidth: 1024, textureHeight: 1024, color: 0x3a3e46 });
+const mirror = new Reflector(new THREE.CircleGeometry(260, 96), { textureWidth: 1024, textureHeight: 1024, color: 0x1c1e23 });
 mirror.rotation.x = -Math.PI / 2; mirror.position.y = -0.02; floor.add(mirror);
 function radial(stops) { const c = mk(1024, 1024), x = c.getContext('2d'), g = x.createRadialGradient(512, 512, 0, 512, 512, 512); stops.forEach(([o, s]) => g.addColorStop(o, s)); x.fillStyle = g; x.fillRect(0, 0, 1024, 1024); const t = new THREE.CanvasTexture(c); t.colorSpace = THREE.SRGBColorSpace; return t; }
 const studioFloor = new THREE.Mesh(new THREE.CircleGeometry(262, 96), new THREE.MeshBasicMaterial({ color: 0x020203, transparent: true, alphaMap: radial([[0, '#c8c8c8'], [0.2, '#d6d6d6'], [0.5, '#ffffff'], [1, '#ffffff']]), toneMapped: false }));
