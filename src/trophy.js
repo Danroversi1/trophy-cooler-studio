@@ -14,12 +14,13 @@ export const DEFAULTS = {
   W: 32, D: 30, H: 36.5,            // enclosure: snug around the freezer (≈2.5" clear each side)
   bowlD: 32, bowlH: 10.7, pedH: 12,  // cup: as wide as the box (as in the render), sized for 12 bottles
   flutes: 28, twist: 0.9, fluteDepth: 1.5,
-  bottles: 12, heap: 1.6, lean: 0.2,
-  base: 'casters', metal: 'chrome', color: '#0b2a8c', glass: 'amber',
+  bottles: 12, heap: 1.6, lean: 0.1,
+  base: 'sled', metal: 'chrome', color: '#14217f', glass: 'amber',
 };
 // minimum box that still houses the freezer with service clearances
 export const MIN = { W: FRIDGE.w + 2 * WALL + 2 * 1.5, D: FRIDGE.d + WALL + PANEL + 1.5 + 1, H: FRIDGE.h + LID + FLOOR + 1.2 };
-export const casterH = (P) => (P.base === 'skids' ? 2.25 : 4.5);
+export const SLED_H = 3; // ice sled: UHMW skid plate + runners under a low plinth
+export const casterH = () => SLED_H;
 export function clearances(P) {
   const side = (P.W - 2 * WALL - FRIDGE.w) / 2, top = P.H - LID - FLOOR - FRIDGE.h;
   const front = 1.5, back = P.D - WALL - PANEL - front - FRIDGE.d;
@@ -45,7 +46,7 @@ export function makeMaterials(P, o = {}) {
   return {
     metal: new THREE.MeshPhysicalMaterial({ name: 'polished-metal', metalness: 1, ...metal }),
     liner: new THREE.MeshPhysicalMaterial({ name: 'bowl-liner', metalness: 1, color: 0xd9dde3, roughness: 0.18 }),
-    paint: new THREE.MeshPhysicalMaterial({ name: 'enclosure-paint', color: blue, metalness: 0.08, roughness: 0.38, clearcoat: 1, clearcoatRoughness: 0.12, sheen: 0.25, sheenColor: 0x6f8cff }),
+    paint: new THREE.MeshPhysicalMaterial({ name: 'enclosure-paint', color: blue, metalness: 0.05, roughness: 0.42, clearcoat: 1, clearcoatRoughness: 0.08 }),
     paintDark: new THREE.MeshPhysicalMaterial({ name: 'enclosure-paint-dark', color: blue.clone().multiplyScalar(0.62), metalness: 0.08, roughness: 0.45, clearcoat: 0.8 }),
     grille: new THREE.MeshStandardMaterial({ name: 'vent-grille', color: 0x05070d, roughness: 0.6, metalness: 0.4 }),
     rubber: new THREE.MeshStandardMaterial({ name: 'caster-rubber', color: 0x16171a, roughness: 0.75 }),
@@ -54,11 +55,11 @@ export function makeMaterials(P, o = {}) {
     iceBed: new THREE.MeshPhysicalMaterial({ name: 'ice-bed', color: 0xdfe8f2, roughness: 0.45, clearcoat: 0.8, clearcoatRoughness: 0.3, sheen: 0.6, sheenColor: 0xffffff }),
     glass: P.glass === 'clear'
       ? new THREE.MeshPhysicalMaterial({ name: 'bottle-glass-clear', color: 0xffffff, roughness: 0.03, transmission: 0.97, thickness: 0.18, ior: 1.52, attenuationColor: 0xd8f0e4, attenuationDistance: 3, clearcoat: 1 })
-      : new THREE.MeshPhysicalMaterial({ name: 'bottle-glass-amber', color: 0x9a5418, roughness: 0.04, transmission: 0.55, thickness: 0.2, ior: 1.52, attenuationColor: 0x6a3008, attenuationDistance: 0.8, clearcoat: 1, clearcoatRoughness: 0.03 }),
+      : new THREE.MeshPhysicalMaterial({ name: 'bottle-glass-amber', color: 0x8a430e, roughness: 0.04, transmission: 0.5, thickness: 0.2, ior: 1.52, attenuationColor: 0x5a2604, attenuationDistance: 0.55, clearcoat: 1, clearcoatRoughness: 0.03 }),
     beer: new THREE.MeshStandardMaterial({ name: 'beer', color: 0x5a2e08, roughness: 0.3 }),
-    label: o.bottleLabel ? new THREE.MeshPhysicalMaterial({ name: 'bottle-label', map: o.bottleLabel, roughness: 0.38, clearcoat: 0.5 }) : new THREE.MeshStandardMaterial({ name: 'bottle-label', color: 0xffffff, roughness: 0.4 }),
+    label: o.bottleLabel ? new THREE.MeshPhysicalMaterial({ name: 'bottle-label', map: o.bottleLabel, alphaTest: 0.5, roughness: 0.38, clearcoat: 0.5 }) : new THREE.MeshStandardMaterial({ name: 'bottle-label', color: 0xffffff, roughness: 0.4 }),
     neck: o.neckLabel ? new THREE.MeshPhysicalMaterial({ name: 'bottle-neck-label', map: o.neckLabel, roughness: 0.3, clearcoat: 0.6 }) : new THREE.MeshStandardMaterial({ name: 'bottle-neck-label', color: 0xffffff }),
-    cap: new THREE.MeshPhysicalMaterial({ name: 'bottle-cap', color: 0xc9ced6, metalness: 1, roughness: 0.25 }),
+    cap: new THREE.MeshPhysicalMaterial({ name: 'bottle-cap', color: 0xdfe3ea, metalness: 1, roughness: 0.2 }),
     logo: o.logo ? new THREE.MeshStandardMaterial({ name: 'front-logo', map: o.logo, transparent: true, roughness: 0.35 }) : null,
   };
 }
@@ -85,27 +86,21 @@ export function buildEnclosure(P, M) {
     panel.add(rbox(1.5, 6.6, 0.5, 0.35, M.metal, hx, pyc + 0.6, zf + 0.85));
     panel.add(rbox(0.8, 5.4, 0.3, 0.25, M.grille, hx, pyc + 0.6, zf + 1.05));
   }
-  if (M.logo) { const lw = Math.min(pw * 0.46, ph * 1.25), lh = lw * 0.62, l = mesh(new THREE.PlaneGeometry(lw, lh), M.logo, 0, pyc + ph * 0.02, zf + 0.64); l.castShadow = false; panel.add(l); }
+  if (M.logo) { const lw = Math.min(pw * 0.56, ph * 0.9), lh = lw * 0.875, l = mesh(new THREE.PlaneGeometry(lw, lh), M.logo, 0, pyc - ph * 0.02, zf + 0.64); l.castShadow = false; panel.add(l); }
   g.add(panel); g.userData.panel = panel;
   g.userData.setPanel = (t) => { panel.position.set(0, t * 6, t * 26); };
   return g;
 }
 
-// ---------- base: swivel casters (as rendered) or UHMW ice skids ----------
+// ---------- base: ice sled — slides on the rink, nothing metal touches the ice ----------
+// plinth (blue) with a polished kick band, over a UHMW-PE skid plate with beveled leading edges and four runners.
 export function buildBase(P, M) {
-  const g = named(new THREE.Group(), P.base === 'skids' ? 'base-uhmw-skids' : 'base-casters'), { W, D } = P, h = casterH(P);
-  if (P.base === 'skids') {
-    for (const x of [-W / 2 + 4, -W / 6, W / 6, W / 2 - 4]) g.add(rbox(2.4, h, D - 2, 1.0, M.uhmw, x, h / 2, 0));
-    return g;
-  }
-  for (const sx of [-1, 1]) for (const sz of [-1, 1]) {
-    const x = sx * (W / 2 - 3.2), z = sz * (D / 2 - 3.2);
-    g.add(cyl(1.6, 1.6, 0.35, 32, M.metal, x, h - 0.2, z));                     // top plate
-    g.add(cyl(0.45, 0.45, 0.9, 16, M.metal, x, h - 0.8, z));                    // swivel
-    const fork = box(0.25, 1.9, 1.6, M.metal, x - 0.65, h - 2.0, z); g.add(fork); g.add(box(0.25, 1.9, 1.6, M.metal, x + 0.65, h - 2.0, z));
-    const wheel = cyl(1.45, 1.45, 1.0, 40, M.rubber, x, 1.45, z); wheel.rotation.z = Math.PI / 2; g.add(wheel);
-    const hub = cyl(0.55, 0.55, 1.08, 24, M.metal, x, 1.45, z); hub.rotation.z = Math.PI / 2; g.add(hub);
-  }
+  const g = named(new THREE.Group(), 'base-ice-sled'), { W, D } = P, o = 1.2; // sled overhangs the enclosure slightly
+  g.add(rbox(W - 3, 0.7, D - 3, 0.34, M.uhmw, 0, 0.35, 0));                                   // runners carry the load
+  for (const x of [-(W / 2 - 3.2), -(W / 6), W / 6, W / 2 - 3.2]) g.add(rbox(2.2, 0.75, D - 1.2, 0.36, M.uhmw, x, 0.375, 0));
+  const plate = rbox(W + o, 0.9, D + o, 0.44, M.uhmw, 0, 1.15, 0); g.add(plate);              // skid plate, rounded edges
+  g.add(rbox(W + o - 0.2, 0.55, D + o - 0.2, 0.25, M.metal, 0, 1.85, 0));                     // polished kick band
+  g.add(rbox(W + o - 0.6, 0.75, D + o - 0.6, 0.3, M.paintDark, 0, 2.55, 0));                  // plinth top under the box
   return g;
 }
 
@@ -148,7 +143,8 @@ export function buildCup(P, M) {
 }
 
 // ---------- bottles (Michelob ULTRA long-necks) on a heaped ice bed ----------
-const BOTTLE = [[0, 0], [1.16, 0], [1.2, 0.12], [1.2, 5.1], [1.12, 5.75], [0.74, 6.6], [0.56, 7.7], [0.52, 8.55], [0.56, 8.68], [0.56, 9.05], [0, 9.1]];
+// 12 oz longneck: straight body, long gentle shoulder, tapered neck, crown lip
+const BOTTLE = [[0, 0], [1.14, 0], [1.2, 0.15], [1.2, 4.9], [1.16, 5.5], [1.0, 6.2], [0.74, 6.9], [0.61, 7.4], [0.55, 8.5], [0.6, 8.62], [0.6, 8.92], [0, 8.97]];
 const rBottle = (y) => { for (let i = 1; i < BOTTLE.length; i++) if (y <= BOTTLE[i][1]) { const [r0, y0] = BOTTLE[i - 1], [r1, y1] = BOTTLE[i]; return r0 + (r1 - r0) * (y - y0) / Math.max(1e-6, y1 - y0); } return 0.5; };
 export function buildContents(P, M, bowl, { instanced = true, seed = 7 } = {}) {
   const g = named(new THREE.Group(), 'bottles-and-ice'), r = rng(seed), Ri = bowl.rAt(bowl.rim) - 0.4, heap = P.heap;
@@ -157,16 +153,24 @@ export function buildContents(P, M, bowl, { instanced = true, seed = 7 } = {}) {
   const bed = new THREE.CircleGeometry(Ri, 96, 0, Math.PI * 2); bed.rotateX(-Math.PI / 2);
   const bp = bed.attributes.position; for (let i = 0; i < bp.count; i++) bp.setY(i, surf(bp.getX(i), bp.getZ(i)) - 0.6); bed.computeVertexNormals();
   g.add(named(mesh(bed, M.iceBed), 'ice-bed'));
-  // bottles: a ring near the rim, leaning out, alternating heights; labels face outward
-  const n = Math.round(P.bottles), ringR = Math.max(5.6, Math.min(Ri - 2.4, Ri * 0.74 + (n - 12) * 0.35)), slots = [];
-  for (let i = 0; i < n; i++) { const a = (i / n) * Math.PI * 2 + 0.13, x = ringR * Math.cos(a), z = ringR * Math.sin(a), lift = i % 2 ? 1.0 : 0; slots.push([a, x, z, Math.max(surf(x, z), bowl.rim) - 1.4 + lift, P.lean * (i % 2 ? 0.75 : 1.2)]); }
+  // bottles: pushed into the ice at different depths, each tilted and turned a little differently, labels mostly facing out
+  const n = Math.round(P.bottles), nIn = n >= 10 ? Math.round(n / 4) : 0, nOut = n - nIn, slots = [], jit = (k) => (r() * 2 - 1) * k;
+  const ringR = Math.max(5.6, Math.min(Ri - 2.6, Ri * 0.72 + (n - 12) * 0.3)), innerR = ringR * 0.38;
+  for (let i = 0; i < n; i++) {
+    const inner = i >= nOut, k = inner ? i - nOut : i, m = inner ? nIn : nOut;
+    const a = (k / m) * Math.PI * 2 + (inner ? 0.6 : 0.13) + jit(0.12), rr = (inner ? innerR : ringR) + jit(0.8), x = rr * Math.cos(a), z = rr * Math.sin(a);
+    const bury = inner ? 0.2 + r() * 0.6 : 0.5 + r() * 0.8;                      // how deep it sits in the ice
+    const yaw = Math.PI / 2 - a + jit(inner ? 1.2 : 0.55);                        // label roughly outward, never in lockstep
+    const lean = inner ? 0.04 + r() * (P.lean + 0.08) : 0.1 + r() * (P.lean * 2 + 0.12), side = jit(0.16);
+    slots.push([a, x, z, surf(x, z) - bury, yaw, lean, side]);
+  }
   const lathe32 = new THREE.LatheGeometry(BOTTLE.map(([q, y]) => new THREE.Vector2(q, y)), 40);
   const beer = new THREE.LatheGeometry(BOTTLE.filter(([, y]) => y < 7.2).map(([q, y]) => new THREE.Vector2(Math.max(0, q - 0.12), y + 0.05)), 24);
-  const lab = new THREE.CylinderGeometry(1.225, 1.225, 3.0, 48, 1, true); lab.translate(0, 3.2, 0);
-  const nk = new THREE.CylinderGeometry(rBottle(7.75) + 0.02, rBottle(6.4) + 0.02, 1.35, 32, 1, true); nk.translate(0, 7.07, 0);
-  const cp = new THREE.CylinderGeometry(0.58, 0.58, 0.42, 24); cp.translate(0, 8.9, 0);
+  const lab = new THREE.CylinderGeometry(1.222, 1.222, 3.9, 64, 1, true); lab.translate(0, 2.65, 0);
+  const nk = new THREE.CylinderGeometry(rBottle(8.5) + 0.02, rBottle(7.0) + 0.02, 1.5, 40, 1, true); nk.translate(0, 7.75, 0);
+  const cp = new THREE.CylinderGeometry(0.6, 0.64, 0.36, 24); cp.translate(0, 8.86, 0);
   const parts = [[lathe32, M.glass], [beer, M.beer], [lab, M.label], [nk, M.neck], [cp, M.cap]], mats = [];
-  for (const [a, x, z, y, lean] of slots) { const o = new THREE.Object3D(); o.position.set(x, y, z); o.rotation.set(0, Math.PI / 2 - a, 0); o.rotateX(lean); o.updateMatrix(); mats.push(o.matrix.clone()); }
+  for (const [a, x, z, y, yaw, lean, side] of slots) { const o = new THREE.Object3D(); o.position.set(x, y, z); o.rotation.set(0, yaw, 0); o.rotateX(lean); o.rotateZ(side); o.updateMatrix(); mats.push(o.matrix.clone()); }
   for (const [geo, mat] of parts) {
     if (instanced) { const im = new THREE.InstancedMesh(geo, mat, mats.length); mats.forEach((m, i) => im.setMatrixAt(i, m)); im.castShadow = true; g.add(im); }
     else mats.forEach((m) => { const me = mesh(geo, mat); me.applyMatrix4(m); g.add(me); });
@@ -175,7 +179,7 @@ export function buildContents(P, M, bowl, { instanced = true, seed = 7 } = {}) {
   const cubes = [], cell = new Map(), key = (x, z) => `${Math.floor(x / 2)},${Math.floor(z / 2)}`;
   for (let t = 0; t < 9000 && cubes.length < Math.round(Ri * Ri * 0.5); t++) {
     const rr = Math.sqrt(r()) * (Ri - 1.2), a = r() * Math.PI * 2, x = rr * Math.cos(a), z = rr * Math.sin(a);
-    if (slots.some(([, bx, bz]) => Math.hypot(x - bx, z - bz) < 2.4)) continue;
+    if (slots.some(([, bx, bz]) => Math.hypot(x - bx, z - bz) < 2.0)) continue;
     const k = key(x, z), near = [-1, 0, 1].flatMap((i) => [-1, 0, 1].map((j) => cell.get(`${Math.floor(x / 2) + i},${Math.floor(z / 2) + j}`) || [])).flat();
     if (near.some(([cx, cz]) => Math.hypot(x - cx, z - cz) < 1.7)) continue;
     cubes.push([x, z]); (cell.get(k) || cell.set(k, []).get(k)).push([x, z]);
@@ -201,6 +205,6 @@ export function buildFridge(P) {
 // ---------- weights (lb, estimates for spun aluminum cup + ACM/aluminum enclosure) ----------
 export function weights(P) {
   const s = P.bowlD / 61, area = (P.W * P.D) / (61 * 30);
-  return { enclosure: Math.round(115 * Math.max(0.55, area) * (P.H / 36)), cup: Math.round(78 * s * s * (P.bowlH / 20.4)), pedestal: Math.round(46 * s * s * (P.pedH / 22.9)), base: P.base === 'skids' ? 22 : 18,
+  return { enclosure: Math.round(115 * Math.max(0.55, area) * (P.H / 36)), cup: Math.round(78 * s * s * (P.bowlH / 20.4)), pedestal: Math.round(46 * s * s * (P.pedH / 22.9)), base: Math.round(30 * Math.max(0.55, area)),
     bottles: Math.round(P.bottles * 1.2), ice: Math.round(0.9 * Math.PI * Math.pow(P.bowlD / 2 - 1.7, 2) * 0.55 / 28), fridge: FRIDGE.weight };
 }

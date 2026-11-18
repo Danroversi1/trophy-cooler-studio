@@ -18,15 +18,8 @@ async function save(obj, name) {
   fs.writeFileSync(path.join(OUT, 'glb', name + '.glb'), Buffer.from(await gltf.parseAsync(m, { binary: true })));
   console.log('ok', name);
 }
-for (const base of ['casters', 'skids']) {
-  const P = { ...T.DEFAULTS, base }, M = T.makeMaterials(P), top = T.casterH(P) + P.H;
-  const build = () => { const cup = T.buildCup(P, M), c = T.buildContents(P, M, cup.userData.bowl, { instanced: false }); return { cup, c }; };
-  if (base === 'casters') {
-    const { cup, c } = build(); await save(cup, '2-cup-bowl-and-pedestal'); await save(c, '3-bottles-and-ice');
-    await save(T.buildEnclosure(P, M), '1-enclosure'); await save(T.buildFridge(P), 'REF-meling-DW-XL90');
-  }
-  await save(T.buildBase(P, M), `0-base-${base}`);
-  const { cup, c } = build(); cup.position.y = top; c.position.y = top;
-  const asm = new THREE.Group(); asm.add(T.buildBase(P, M), T.buildEnclosure(P, M), T.buildFridge(P), cup, c);
-  await save(asm, `ASSEMBLY-${base}`);
-}
+const P = { ...T.DEFAULTS }, M = T.makeMaterials(P), top = T.casterH(P) + P.H;
+const make = () => { const cup = T.buildCup(P, M), c = T.buildContents(P, M, cup.userData.bowl, { instanced: false }); return { cup, c }; };
+{ const { cup, c } = make(); await save(cup, '2-cup-bowl-and-pedestal'); await save(c, '3-bottles-and-ice'); }
+await save(T.buildEnclosure(P, M), '1-enclosure'); await save(T.buildFridge(P), 'REF-meling-DW-XL90'); await save(T.buildBase(P, M), '0-base-ice-sled');
+{ const { cup, c } = make(); cup.position.y = top; c.position.y = top; const asm = new THREE.Group(); asm.add(T.buildBase(P, M), T.buildEnclosure(P, M), T.buildFridge(P), cup, c); await save(asm, 'ASSEMBLY'); }

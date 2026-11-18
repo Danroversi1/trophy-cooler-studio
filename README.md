@@ -5,14 +5,18 @@ An interactive 3D model of the trophy cooler, built from the reference render. A
 **Live:** https://trophy-cooler-studio.vercel.app
 
 ## The model
-- **Enclosure:** 32 × 30 × 36.5 in body on 4.5 in casters, snug around the freezer (23.6 × 32.0 × 24.6 in).
+- **Enclosure:** 32 × 30 × 36.5 in body on a 3 in ice sled, snug around the freezer (23.6 × 32.0 × 24.6 in).
   - About 3.4 in clear on each side, 2.2 in behind and 1.5 in above.
   - The front panel lifts off by its two handles.
   - The bottom vent band lines up with the freezer's front vent.
-  - Optional UHMW ice skids replace the casters for on-ice use.
+  - No wheels: a UHMW-PE skid plate with four runners slides on the rink, and no metal touches the ice.
 - **Cup:** 32 in bowl (as wide as the box, as in the render), sized for 12 bottles plus ice. It has 28 twisted flutes and a polished rim band, on a five-step 12 in pedestal.
 - **Bottles + ice:** 12 Michelob ULTRA long-necks leaning out of a heaped ice bed (adjustable to 36).
 - **Overall:** about 6′ tall and about 255 lb loaded (130 lb of that is the freezer).
+
+- **Bottles:** 12 oz amber longnecks with an oval wrap label and a neck foil, pushed into the ice at varied depths and angles.
+
+**Rendering:** **Photoreal** mode path-traces the scene with a studio HDRI and softbox area lights, and refines whenever the view is still. On by default in the studio view. Orbiting uses the real-time renderer.
 
 All dimensions are parametric. **Keep the render's proportions** scales the cup with the enclosure width. The freezer fit is checked live, and the box can't be made smaller than the freezer.
 
