@@ -128,6 +128,14 @@ select{background:var(--field);border:1px solid #34363e;border-radius:7px;color:
 .deck-head a{color:#a8bce6;font-size:10px}
 .ref .src{display:inline-block;font-size:8.5px;letter-spacing:.4px;color:#b8ceff;background:#092368;border-radius:3px;padding:2px 4px;margin-right:5px;vertical-align:1px}
 .ref.missing{opacity:.6}
+.mthumbs{display:grid;grid-template-columns:repeat(4,1fr);gap:5px;margin-top:10px}
+.mthumbs button{position:relative;padding:0;border:1px solid #34363e;background:#0b0c10;border-radius:6px;overflow:hidden;aspect-ratio:4/3;font-size:9.5px;color:#8f95a1}
+.mthumbs button img{width:100%;height:100%;object-fit:cover;display:block}
+.mthumbs button.on{border-color:#5d7ab5;box-shadow:0 0 0 2px #2c57b8 inset}
+.mthumbs button.on::after{content:"✓";position:absolute;right:3px;top:3px;width:14px;height:14px;border-radius:50%;background:#2a5bc4;color:#fff;font-size:9px;display:grid;place-items:center}
+.mthumbs .none{display:grid;place-items:center}
+.ref .as{display:inline-flex;gap:3px;margin-left:4px}
+.ref .as i{font-style:normal;font-size:8.5px;color:#04101f;background:#8fb2ff;border-radius:3px;padding:1px 4px}
 .thumb .cb{position:absolute;right:4px;bottom:4px;display:flex;gap:2px}
 .thumb .cb i{font-style:normal;font-size:8px;background:#0c2254e6;color:#b8ceff;border:1px solid #345496;border-radius:3px;padding:0 3px;line-height:12px}
 .edot{width:5px;height:5px;border-radius:50%;background:#e0b24a;display:inline-block;margin-left:2px;flex:none}
@@ -215,6 +223,18 @@ details b{color:#d6dbe4;font-weight:600}
     <div class="selected-title" id="mod-title">03 · Cup</div>
     <div id="variants"></div>
     <p class="muted" id="v-blurb"></p>
+    <div class="box" id="mod-ref" style="margin-top:12px">
+      <div class="box-head"><span>Reference for this element</span><span class="badge" id="mref-badge">none</span></div>
+      <div class="mthumbs" id="mref-thumbs"></div>
+      <div id="mref-opts"></div>
+      <p class="muted" id="mref-hint" style="margin-top:8px"></p>
+    </div>
+    <div id="mod-skin">
+      <div class="input-row"><label>Surface skin</label><select id="skin"></select></div>
+      <div class="slider-head"><label for="skin-scale">Skin scale <span style="color:#6b717d">· all skins</span></label><output id="skin-scale-v">1.0×</output></div>
+      <input class="range" id="skin-scale" type="range" min="0.5" max="4" step="0.1" value="1">
+    </div>
+    <div id="mod-beer"><p class="muted">Bottles stand high in a heaped ice bed so the label clears the rim. With no bottle reference, labels carry your brand logo (or label text).</p></div>
     <div id="mod-cup">
       <div class="slider-head"><label for="facets">Cup facets <span style="color:#6b717d">· ★ cup, 0 = smooth</span></label><output id="facets-v">0</output></div>
       <input class="range" id="facets" type="range" min="0" max="16" step="1" value="0">
@@ -232,9 +252,6 @@ details b{color:#d6dbe4;font-weight:600}
     <div class="input-row"><label>Metal</label><div class="seg" id="metal" style="width:150px"><button data-v="chrome">Chrome</button><button data-v="gold">Gold</button></div></div>
     <div class="input-row"><label>Primary lacquer</label><div class="input-wrap"><input type="color" id="primary"><span class="val" id="primary-v"></span></div></div>
     <div class="input-row"><label>Accent · glass · LED</label><div class="input-wrap"><input type="color" id="accent"><span class="val" id="accent-v"></span></div></div>
-    <div class="input-row"><label>Enclosure skin</label><select id="skin"></select></div>
-    <div class="slider-head"><label for="skin-scale">Skin scale</label><output id="skin-scale-v">1.0×</output></div>
-    <input class="range" id="skin-scale" type="range" min="0.5" max="4" step="0.1" value="1">
     <div class="input-row"><label>Glass palette</label><span class="chipsrc"><span id="pal-src">Auto from accent</span><button class="linkbtn" id="pal-reset" style="display:none;padding:0">reset</button></span></div>
     <div class="input-row"><label>Label text</label><div class="input-wrap" style="width:150px"><input type="text" id="brand" maxlength="28"></div></div>
     <div class="input-row"><label>Footer wordmark</label><div class="input-wrap" style="width:150px"><input type="text" id="wordmark" maxlength="22"></div></div>
@@ -319,7 +336,7 @@ details b{color:#d6dbe4;font-weight:600}
 </aside>
 
 <main id="stage" aria-label="Interactive trophy cooler 3D viewer">
-  <div class="viewbar" id="viewbar"><button data-view="hero" class="active">3D</button><button data-view="front">Front</button><button data-view="back">Back</button><button data-view="top">Top</button><button data-view="side">Side</button><button data-view="rink">Rink</button></div>
+  <div class="viewbar" id="viewbar"><button data-view="hero" class="active">3D</button><button data-view="front">Front</button><button data-view="back">Back</button><button data-view="top">Top</button><button data-view="side">Side</button><button data-view="bottles">Bottles</button><button data-view="rink">Rink</button></div>
   <button class="focusbtn" id="fit">Fit view</button>
   <div class="legend" id="legend">Drag the background to explore the model.</div>
   <div class="scene-label" id="scene-label">03 modules · freezer enclosed · 12 beers on ice</div>
@@ -341,8 +358,8 @@ const S = { preset: D.PRESETS[0].id, ...fresh(D.PRESETS[0]), brand: 'MICHELOB UL
   skin: 'default', skinScale: 1, palette: null, paletteSrc: null, cupProfile: null, profileSrc: null, facets: 0, wordmark: 'Trophy Cooler',
   sel: 'cup', isolate: false, view: 'hero', vis: { cup: true, contents: true, enc: true, fridge: true, base: true } };
 // Each concept keeps its own look + its own reference pins; brand assets (B) are shared by all.
-const LOOK = ['base', 'enc', 'cup', 'metal', 'primary', 'accent', 'skin', 'skinScale', 'palette', 'paletteSrc', 'paletteRef', 'cupProfile', 'profileSrc', 'facets'];
-const lookDefaults = (p) => ({ ...fresh(p), skin: 'default', skinScale: 1, palette: null, paletteSrc: null, paletteRef: null, cupProfile: null, profileSrc: null, facets: 0 });
+const LOOK = ['base', 'enc', 'cup', 'metal', 'primary', 'accent', 'skin', 'skinCup', 'skinBase', 'skinScale', 'palette', 'paletteSrc', 'paletteRef', 'cupProfile', 'profileSrc', 'facets', 'refCup', 'refEnc', 'refBase', 'refBeer', 'beerType', 'beerLabel', 'beerProfile'];
+const lookDefaults = (p) => ({ ...fresh(p), skin: 'default', skinCup: 'default', skinBase: 'default', skinScale: 1, palette: null, paletteSrc: null, paletteRef: null, cupProfile: null, profileSrc: null, facets: 0, refCup: null, refEnc: null, refBase: null, refBeer: null, beerType: 'longneck', beerLabel: false, beerProfile: null });
 const pickLook = (o) => Object.fromEntries(LOOK.map((k) => [k, o[k]]));
 const C = Object.fromEntries(D.PRESETS.map((p) => [p.id, { ...lookDefaults(p), pins: [] }]));   // pins: ref ids ('gs:<slideId>' or local 'refN')
 const activeC = () => C[S.preset];
@@ -435,7 +452,7 @@ function makeLabel(text, { aspect = 4, repeat = 1, fg = '#ffffff', bg = null }) 
 }
 
 // ---------- build ----------
-let root = null, parts = {}, skinTex = null;
+let root = null, parts = {}, skinTex = null, skinTexCup = null, skinTexBase = null, beerTex = null;
 const ghost = new THREE.MeshStandardMaterial({ color: 0x9cc4ff, transparent: true, opacity: 0.1, depthWrite: false, roughness: 0.2 });
 const ghostEdge = new THREE.LineBasicMaterial({ color: 0x9cc4ff, transparent: true, opacity: 0.35 });
 
@@ -445,14 +462,14 @@ function build() {
   commitLook();
   if (root) { scene.remove(root); dispose(root); }
   root = new THREE.Group(); scene.add(root);
-  if (skinTex) skinTex.dispose();
-  skinTex = makeSkin();
-  const o = { ...S, makeLabel, skinTexture: skinTex };
+  for (const t of [skinTex, skinTexCup, skinTexBase, beerTex]) if (t) t.dispose();
+  skinTex = makeSkin(S.skin); skinTexCup = makeSkin(S.skinCup); skinTexBase = makeSkin(S.skinBase); beerTex = S.refBeer && S.beerLabel ? makeBeerLabel(REFS.find((r) => r.id === S.refBeer), S.beerType) : null;
+  const o = { ...S, makeLabel, skinTexture: skinTex, skinTextureCup: skinTexCup, skinTextureBase: skinTexBase };
   const M = D.makeMaterials(o);
   const base = D.byId(D.BASES, S.base), enc = D.byId(D.ENCLOSURES, S.enc), cup = D.byId(D.CUPS, S.cup);
   parts.base = base.build(M, o); parts.enc = enc.build(M, o); parts.fridge = D.buildFridge(M);
   parts.cupGroup = new THREE.Group(); parts.cup = cup.build(M, o); parts.cupGroup.add(parts.cup);
-  parts.contents = D.buildContents(M, parts.cup.userData.bowl); parts.cupGroup.add(parts.contents);
+  parts.contents = D.buildContents(M, parts.cup.userData.bowl, { o, beer: { type: S.beerType, profile: S.beerProfile, labelTexture: beerTex } }); parts.cupGroup.add(parts.contents);
   root.add(parts.base, parts.fridge, parts.enc, parts.cupGroup);
   parts.enc.traverse((m) => { if (m.isMesh) { m.userData.orig = m.material; } });
   parts.meta = { base, enc, cup };
@@ -465,8 +482,9 @@ function applyView() {
   parts.enc.traverse((m) => { if (m.isMesh) { m.material = S.xray ? ghost : m.userData.orig; m.castShadow = !S.xray; } });
   ice.material.map = S.rink ? iceTex.on : iceTex.off;
   const V = S.vis, only = S.isolate ? S.sel : null;
-  parts.cupGroup.visible = only ? only === 'cup' : V.cup;
-  parts.contents.visible = S.contents && V.contents;
+  parts.cupGroup.visible = true;
+  parts.cup.visible = only ? only === 'cup' : V.cup;
+  parts.contents.visible = (only ? only === 'cup' || only === 'beer' : true) && S.contents && V.contents;
   parts.enc.visible = only ? only === 'enc' : V.enc;
   parts.fridge.visible = only ? only === 'enc' && V.fridge : V.fridge;
   parts.base.visible = only ? only === 'base' : V.base;
@@ -480,8 +498,8 @@ function applyView() {
 const ftin = (i) => { const f = Math.floor(i / 12), r = Math.round(i - f * 12); return r === 12 ? `${f + 1}′0″` : `${f}′${r}″`; };
 function specs() {
   const { base, enc, cup } = parts.meta, bowl = parts.cup.userData.bowl;
-  const top = D.CUP_Y + Math.max(bowl.rim, bowl.floor + 9 * Math.cos(bowl.tilt));
-  const beer = D.BEER.count * D.BEER.lbEach, iceLb = bowl.iceLb, fr = D.FRIDGE.weight;
+  const top = D.CUP_Y + Math.max(bowl.rim, parts.contents.userData.top || 0);
+  const bt = D.BEERS.find((b) => b.id === S.beerType) || D.BEERS[0], beer = D.BEER.count * bt.lbEach, iceLb = bowl.iceLb + 6, fr = D.FRIDGE.weight;
   const total = base.lb + enc.lb + cup.lb + fr + beer + iceLb;
   $('s-h').textContent = `${ftin(top)}`;
   $('s-f').textContent = `${base.footprint[0]}″ × ${base.footprint[1]}″`;
@@ -489,7 +507,7 @@ function specs() {
   const c = enc.clear; $('s-c').textContent = `${c.side} / ${c.back} / ${c.front} / ${c.top}″`;
   $('wt').innerHTML = [
     ['01 · ' + base.name + ' (UHMW + frame)', base.lb], ['02 · ' + enc.name + ' sleeve', enc.lb], ['03 · ' + cup.name + ' (empty)', cup.lb],
-    ['Meling DW-XL90 (listed gross wt)', fr], ['12 × 12 oz long-necks', beer], ['Ice (est.)', iceLb],
+    ['Meling DW-XL90 (listed gross wt)', fr], ['12 × ' + bt.name.replace('★ ', ''), beer], ['Ice (est.)', iceLb],
   ].map(([k, v]) => `<tr><td>${k}</td><td>${v.toFixed(v % 1 ? 1 : 0)} lb</td></tr>`).join('') + `<tr class="tot"><td>Fully loaded</td><td>${Math.round(total)} lb</td></tr>`;
   const lim = 51, scale = 140;
   const lifts = [
@@ -509,7 +527,7 @@ function specs() {
 }
 
 // ---------- UI ----------
-const MODS = { cup: { n: '03', label: 'Cup · beer cooler', list: D.CUPS, key: 'cup' }, enc: { n: '02', label: 'Enclosure · freezer sleeve', list: D.ENCLOSURES, key: 'enc' }, base: { n: '01', label: 'Sliding base · UHMW', list: D.BASES, key: 'base' } };
+const MODS = { beer: { n: '04', label: 'Bottles · 12 on ice', list: D.BEERS.map((b) => ({ ...b, lb: Math.round(b.lbEach * 12) })), key: 'beerType', ref: 'refBeer' }, cup: { n: '03', label: 'Cup · beer cooler', list: D.CUPS, key: 'cup', ref: 'refCup', skin: 'skinCup' }, enc: { n: '02', label: 'Enclosure · freezer sleeve', list: D.ENCLOSURES, key: 'enc', ref: 'refEnc', skin: 'skin' }, base: { n: '01', label: 'Sliding base · UHMW', list: D.BASES, key: 'base', ref: 'refBase', skin: 'skinBase' } };
 function toast(msg) { const t = $('toast'); t.textContent = msg; t.classList.add('show'); clearTimeout(toast.t); toast.t = setTimeout(() => t.classList.remove('show'), 2600); }
 function markCustom() { /* edits now belong to the active concept (see C) */ }
 async function switchConcept(id) {
@@ -526,10 +544,10 @@ function renderPresets() {
 $('presets').onclick = (e) => { const b = e.target.closest('[data-id]'); if (!b || b.dataset.id === S.preset) return; const p = D.byId(D.PRESETS, b.dataset.id); switchConcept(p.id); toast(`${p.name} · ${C[p.id].pins.length} pinned reference${C[p.id].pins.length === 1 ? '' : 's'}`); };
 function renderLayers() {
   const V = S.vis, row = (id, name, sub, eyeKey, selKey, cls = '') =>
-    `<div class="layer ${cls} ${S.sel === selKey && !cls ? 'selected' : ''}"><button class="select" data-sel="${selKey}">${cls ? '↳ ' : `<span class="num">${MODS[selKey].n}</span>`}${name}${sub ? `<small>${sub}</small>` : ''}</button><button class="eye ${V[eyeKey] ? '' : 'off'}" data-eye="${eyeKey}" aria-label="Toggle ${name}">◉</button></div>`;
+    `<div class="layer ${cls} ${S.sel === selKey && (!cls || selKey === 'beer') ? 'selected' : ''}"><button class="select" data-sel="${selKey}">${cls ? '↳ ' : `<span class="num">${MODS[selKey].n}</span>`}${name}${sub ? `<small>${sub}</small>` : ''}</button><button class="eye ${V[eyeKey] ? '' : 'off'}" data-eye="${eyeKey}" aria-label="Toggle ${name}">◉</button></div>`;
   const m = parts.meta;
   $('layers').innerHTML =
-    row('cup', 'Cup', m.cup.name, 'cup', 'cup') + row('', '12 beers + ice', '', 'contents', 'cup', 'sub') +
+    row('cup', 'Cup', m.cup.name, 'cup', 'cup') + row('', '12 bottles + ice', D.BEERS.find((b) => b.id === S.beerType).name.replace('★ ', ''), 'contents', 'beer', 'sub') +
     row('enc', 'Enclosure', m.enc.name, 'enc', 'enc') + row('', 'Freezer · Meling DW-XL90', '', 'fridge', 'enc', 'sub') +
     row('base', 'Sliding base', m.base.name, 'base', 'base');
   $('isolate').textContent = S.isolate ? 'Show all objects' : 'Isolate selected';
@@ -545,11 +563,55 @@ function renderModule() {
   $('mod-title').textContent = `${md.n} · ${md.label}`;
   $('variants').innerHTML = md.list.map((v) => `<button class="variant ${S[md.key] === v.id ? 'active' : ''}" data-v="${v.id}">${v.name}<small>≈ ${v.lb} lb</small></button>`).join('');
   $('v-blurb').textContent = D.byId(md.list, S[md.key]).blurb;
+  renderModRef();
+  $('mod-skin').style.display = md.skin ? '' : 'none';
+  $('mod-beer').style.display = S.sel === 'beer' ? '' : 'none';
   $('mod-cup').style.display = S.sel === 'cup' ? '' : 'none';
   $('mod-enc').style.display = S.sel === 'enc' ? '' : 'none';
   $('mod-base').style.display = S.sel === 'base' ? '' : 'none';
 }
 $('variants').onclick = (e) => { const b = e.target.closest('[data-v]'); if (!b) return; S[MODS[S.sel].key] = b.dataset.v; markCustom(); build(); };
+// ---- per-element reference (cup · enclosure · base · bottles) ----
+const EL_NAMES = { cup: 'Cup', enc: 'Enclosure', base: 'Base', beer: 'Bottles' };
+const EL_OPTS = {
+  cup: [['shape', 'Shape from its silhouette', (r) => !!r.profile], ['skin', 'Wrap it on the cup as a skin']],
+  enc: [['skin', 'Wrap it on the enclosure as a skin'], ['palette', 'Use its colors for glass + LEDs']],
+  base: [['skin', 'Wrap it on the base as a skin']],
+  beer: [['label', 'Use it as the bottle label art'], ['shape', 'Bottle shape from its silhouette', (r) => !!r.beerProfile]],
+};
+function optOn(el, k, id) {
+  if (k === 'skin') return S[MODS[el].skin] === id;
+  if (k === 'palette') return S.paletteRef === id;
+  if (k === 'shape') return el === 'cup' ? S.cup === 'custom' && S.profileSrc === id : S.beerType === 'custom' && S.refBeer === id;
+  if (k === 'label') return S.beerLabel && S.refBeer === id;
+}
+function setOpt(el, k, id, on) {
+  const r = REFS.find((x) => x.id === id), p = D.byId(D.PRESETS, S.preset), dflt = lookDefaults(p);
+  if (k === 'skin') S[MODS[el].skin] = on ? id : 'default';
+  if (k === 'palette') { if (on) { S.palette = r.palette; S.paletteSrc = 'Ref · ' + refLabel(r); S.paletteRef = id; } else if (S.paletteRef === id) { S.palette = null; S.paletteSrc = null; S.paletteRef = null; } }
+  if (k === 'shape' && el === 'cup') { if (on && r.profile) { S.cup = 'custom'; S.cupProfile = r.profile.pts; S.profileSrc = id; if (!S.facets && r.facets) S.facets = r.facets; } else if (S.profileSrc === id) { S.cup = dflt.cup === 'custom' ? 'champion' : dflt.cup; S.cupProfile = null; S.profileSrc = null; } }
+  if (k === 'shape' && el === 'beer') { if (on && r.beerProfile) { S.beerType = 'custom'; S.beerProfile = r.beerProfile; } else { if (S.beerType === 'custom') S.beerType = 'longneck'; S.beerProfile = null; } }
+  if (k === 'label') S.beerLabel = on;
+}
+function assignRef(el, id) { // pick (or clear) the reference for an element, with sensible defaults
+  const key = MODS[el].ref, prev = S[key];
+  if (prev) for (const [k] of EL_OPTS[el]) if (optOn(el, k, prev)) setOpt(el, k, prev, false);
+  S[key] = id || null;
+  if (id) { const r = REFS.find((x) => x.id === id);
+    if (el === 'cup') setOpt(el, r.profile ? 'shape' : 'skin', id, true);
+    if (el === 'enc' || el === 'base') setOpt(el, 'skin', id, true);
+    if (el === 'beer') setOpt(el, 'label', id, true); }
+}
+function renderModRef() {
+  const el = S.sel, md = MODS[el], cur = S[md.ref], refs = pinnedRefs();
+  $('mref-badge').textContent = cur ? refLabel(REFS.find((r) => r.id === cur) || { name: '…' }) : 'none';
+  $('mref-thumbs').innerHTML = `<button class="none ${cur ? '' : 'on'}" data-ref="">None</button>` + refs.map((r) => `<button class="${cur === r.id ? 'on' : ''}" data-ref="${r.id}" title="${refLabel(r)}"><img src="${r.thumb}" alt=""></button>`).join('');
+  const rr = cur && REFS.find((r) => r.id === cur);
+  $('mref-opts').innerHTML = rr ? EL_OPTS[el].filter(([, , ok]) => !ok || ok(rr)).map(([k, label]) => `<label class="toggle-row"><input type="checkbox" data-opt="${k}" ${optOn(el, k, cur) ? 'checked' : ''}>${label}</label>`).join('') : '';
+  $('mref-hint').textContent = refs.length ? (rr ? '' : `Pick one of ${D.byId(D.PRESETS, S.preset).name.replace(' · ', ' ')}'s pinned references to inform the ${EL_NAMES[el].toLowerCase()}.`) : `Pin references for this concept in Inputs → Design references, then pick one here for the ${EL_NAMES[el].toLowerCase()}.`;
+}
+$('mref-thumbs').onclick = (e) => { const b = e.target.closest('[data-ref]'); if (!b) return; assignRef(S.sel, b.dataset.ref); build(); };
+$('mref-opts').onchange = (e) => { const c = e.target.closest('[data-opt]'); if (!c) return; setOpt(S.sel, c.dataset.opt, S[MODS[S.sel].ref], c.checked); build(); };
 $('metal').onclick = (e) => { const b = e.target.closest('button'); if (!b) return; S.metal = b.dataset.v; markCustom(); build(); };
 let colorT; for (const k of ['primary', 'accent']) $(k).oninput = (e) => { S[k] = e.target.value; $(k + '-v').textContent = S[k]; markCustom(); clearTimeout(colorT); colorT = setTimeout(build, 120); };
 let brandT; $('brand').oninput = (e) => { S.brand = e.target.value || ' '; clearTimeout(brandT); brandT = setTimeout(build, 250); };
@@ -579,9 +641,10 @@ function syncUI() {
   $('explode').value = S.explode; $('explode-v').textContent = Math.round(S.explode * 100) + '%';
   $('facets').value = S.facets; $('facets-v').textContent = S.facets || 'Smooth';
   $('skin-scale').value = S.skinScale; $('skin-scale-v').textContent = S.skinScale.toFixed(1) + '×';
+  const skKey = MODS[S.sel].skin || 'skin';
   $('skin').innerHTML = [['default', 'Concept default'], ...(B.logo ? [['logo', 'Logo monogram (brand)']] : []), ...pinnedRefs().map((r) => [r.id, 'Ref · ' + refLabel(r)])].map(([v, l]) => `<option value="${v}">${l}</option>`).join('');
-  if (![...$('skin').options].some((o) => o.value === S.skin)) $('skin').insertAdjacentHTML('beforeend', `<option value="${S.skin}">Loading reference…</option>`);
-  $('skin').value = S.skin;
+  if (![...$('skin').options].some((o) => o.value === S[skKey])) $('skin').insertAdjacentHTML('beforeend', `<option value="${S[skKey]}">Loading reference…</option>`);
+  $('skin').value = S[skKey];
   $('pal-src').textContent = S.palette ? S.paletteSrc : 'Auto from accent'; $('pal-reset').style.display = S.palette ? '' : 'none';
   document.querySelectorAll('#logo-mode button').forEach((b) => b.classList.toggle('active', b.dataset.v === B.mode));
   renderBrand(); renderRefs();
@@ -653,7 +716,7 @@ function analyze(src) {
   return { edge, warmth, metal: warmth > 0.16 ? 'gold' : 'chrome', facets: edge > 0.14 ? 8 : edge > 0.08 ? 12 : 0, crisp: edge > 0.08 };
 }
 // silhouette → lathe profile [[r_in, y_in]] (bottom → top)
-function extractProfile(src) {
+function extractProfile(src, { trim = true } = {}) {
   const H = 200, W = Math.max(8, Math.round(src.width * H / src.height)), c = mk(W, H), x = c.getContext('2d'); x.drawImage(src, 0, 0, W, H);
   const d = x.getImageData(0, 0, W, H).data, alpha = hasAlpha(c), [br, bg, bb] = borderColor(d, W, H);
   const on = (i) => alpha ? d[i + 3] > 60 : Math.hypot(d[i] - br, d[i + 1] - bg, d[i + 2] - bb) > 46;
@@ -667,9 +730,12 @@ function extractProfile(src) {
   for (let i = 0; i < N; i++) { const t = Math.round((hw.length - 1) * (1 - i / (N - 1))); const a = hw[Math.max(0, t - 1)], b = hw[t], cc = hw[Math.min(hw.length - 1, t + 1)]; samp.push((a + b + cc) / 3); }
   const sm = samp.map((v, i) => (samp[Math.max(0, i - 1)] + v * 2 + samp[Math.min(N - 1, i + 1)]) / 4);
   const max = Math.max(...sm); let end = N - 1;                   // trim narrow lids/finials so the bowl opens at the top
-  while (end > N * 0.6 && sm[end] < max * 0.55) end--;
+  if (trim) while (end > N * 0.6 && sm[end] < max * 0.55) end--;
   const keep = sm.slice(0, end + 1), hpx = (bot - top) * (end / (N - 1)), rs = 15 / max, hIn = Math.min(28, Math.max(14, hpx * rs));
-  return { pts: keep.map((v, i) => [Math.max(1.6, v * rs), +(i / end * hIn).toFixed(3)]), height: hIn, trimmed: end < N - 1 };
+  let L = W, R = 0; for (let y = top; y <= bot; y++) if (rows[y]) { L = Math.min(L, rows[y][0]); R = Math.max(R, rows[y][1]); }
+  const k = src.height / H;
+  return { pts: keep.map((v, i) => [Math.max(1.6, v * rs), +(i / end * hIn).toFixed(3)]), height: hIn, trimmed: end < N - 1, aspect: hpx / (2 * max),
+    bbox: { x: L * k, y: top * k, w: (R - L + 1) * k, h: (bot - top + 1) * k } };
 }
 function drawProfile(cv, pts, color) {
   const x = cv.getContext('2d'), W = cv.width, H = cv.height, mr = 16, mh = pts[pts.length - 1][1]; x.clearRect(0, 0, W, H);
@@ -678,18 +744,29 @@ function drawProfile(cv, pts, color) {
   for (let i = pts.length - 1; i >= 0; i--) { const [r, y] = pts[i]; x.lineTo(W / 2 - r / mr * W / 2 * 0.95, H - y / mh * H); }
   x.closePath(); x.fill();
 }
-function makeSkin() {
+function makeSkin(src) {
   let c = null, rep = S.skinScale;
-  if (S.skin === 'logo' && B.logo) {
+  if (!src || src === 'default') return null;
+  if (src === 'logo' && B.logo) {
     c = mk(512, 512); const x = c.getContext('2d'); x.fillStyle = S.primary; x.fillRect(0, 0, 512, 512);
     const lg = logoVariant(S.accent), w = 300, h = w * lg.height / lg.width;
     x.globalAlpha = 0.9; x.drawImage(lg, 256 - w / 2, 256 - h / 2, w, h);
     x.globalAlpha = 0.35; for (const [cx, cy] of [[0, 0], [512, 0], [0, 512], [512, 512]]) x.drawImage(lg, cx - w / 4, cy - h / 4, w / 2, h / 2);
     rep = 3 * S.skinScale;
-  } else { const r = REFS.find((r) => r.id === S.skin); if (r) c = r.canvas; }
+  } else { const r = REFS.find((r) => r.id === src); if (r) c = r.canvas; }
   if (!c) return null;
   const t = new THREE.CanvasTexture(c); t.colorSpace = THREE.SRGBColorSpace; t.wrapS = t.wrapT = THREE.RepeatWrapping; t.repeat.set(rep, rep);
   t.anisotropy = renderer.capabilities.getMaxAnisotropy(); return t;
+}
+
+// bottle label from a reference: crop the object's label band (or the image centre) into a panel
+function makeBeerLabel(r, type) {
+  if (!r) return null;
+  const src = r.canvas, ob = r.bbox || { x: 0, y: 0, w: src.width, h: src.height };
+  const band = { longneck: [0.47, 0.74], alubottle: [0.42, 0.93], can: [0.08, 0.92], custom: [0.44, 0.72] }[type] || [0.47, 0.74];
+  const sy = r.bbox ? ob.y + ob.h * band[0] : src.height * 0.25, sh = r.bbox ? ob.h * (band[1] - band[0]) : src.height * 0.5;
+  const c = mk(1024, Math.max(64, Math.round(1024 * sh / ob.w))); c.getContext('2d').drawImage(src, ob.x, sy, ob.w, sh, 0, 0, c.width, c.height);
+  const t = new THREE.CanvasTexture(c); t.colorSpace = THREE.SRGBColorSpace; t.anisotropy = 8; return t;
 }
 
 // ---------- brand UI ----------
@@ -728,13 +805,16 @@ let refSeq = 0;
 async function addRef(src, name, save = true, extra = {}) {
   const im = await loadImg(src), canvas = toCanvas(im, 900);
   const r = { id: extra.id || 'ref' + (++refSeq), source: extra.source || 'local', slideId: extra.slideId, name: name.replace(/\.[a-z0-9]+$/i, '').slice(0, 40), canvas, thumb: canvas.toDataURL('image/jpeg', 0.8), palette: extractPalette(canvas, 6), ...analyze(canvas), profile: extractProfile(canvas) };
+  { const bp = extractProfile(canvas, { trim: false }); if (bp) { const Hb = Math.min(10, Math.max(4.5, bp.aspect * 2.5)), mx = Math.max(...bp.pts.map((q) => q[0]));
+      r.beerProfile = bp.pts.map(([q, y]) => [Math.max(0.35, q / mx * 1.25), +(y / bp.height * Hb).toFixed(3)]); r.bbox = bp.bbox; } }
   const old = REFS.findIndex((x) => x.id === r.id); if (old >= 0) REFS.splice(old, 1, r); else REFS.push(r); if (save) saveSoon(); return r;
 }
 const pinnedRefs = () => pins().map((id) => REFS.find((r) => r.id === id)).filter(Boolean);
 const refLabel = (r) => (r.source === 'slides' ? (slidePos(r.slideId) ? 'Slide p.' + slidePos(r.slideId) : 'Slide (removed)') : r.name);
 function unpinRef(id) {
   const c = activeC(); c.pins = c.pins.filter((p) => p !== id);
-  if (S.skin === id) S.skin = 'default'; if (S.profileSrc === id) S.profileSrc = null; if (S.paletteRef === id) { S.palette = null; S.paletteSrc = null; S.paletteRef = null; }
+  for (const el of Object.keys(MODS)) if (S[MODS[el].ref] === id) assignRef(el, null);
+  for (const k of ['skin', 'skinCup', 'skinBase']) if (S[k] === id) S[k] = 'default'; if (S.profileSrc === id) S.profileSrc = null; if (S.paletteRef === id) { S.palette = null; S.paletteSrc = null; S.paletteRef = null; }
   const r = REFS.find((x) => x.id === id);   // drop local images nobody pins any more
   if (r && r.source !== 'slides' && !Object.values(C).some((cc) => cc.pins.includes(id))) REFS.splice(REFS.indexOf(r), 1);
 }
@@ -751,19 +831,18 @@ function renderRefs() {
   const pn = D.byId(D.PRESETS, S.preset).name.replace(' · ', ' ');
   $('refs-for').textContent = pn;
   $('refs').innerHTML = (pins().length && !pinnedRefs().length ? `<p class="muted">Loading ${pins().length} pinned reference${pins().length > 1 ? 's' : ''}…</p>` : '') + pinnedRefs().map((r) => {
-    const pOn = S.paletteRef === r.id, sOn = S.skin === r.id, cOn = S.profileSrc === r.id && S.cup === 'custom';
+    const pOn = S.paletteRef === r.id, as = Object.entries(MODS).filter(([, m]) => S[m.ref] === r.id).map(([k]) => k), sOn = as.length > 0, cOn = false;
     const gs = r.source === 'slides', pos = gs ? slidePos(r.slideId) : null;
     const nm = gs ? `<span class="src">SLIDES</span>${pos ? 'p.' + pos : 'Removed from deck'}${GS.title ? ' · ' + GS.title : ''}` : r.name;
     return `<div class="ref ${pOn || sOn || cOn ? 'on' : ''} ${gs && !pos && GS.slides.length ? 'missing' : ''}" data-id="${r.id}" title="${gs ? 'Slide ID ' + r.slideId : ''}">
-      <img src="${r.thumb}" alt=""><div><div class="nm">${nm}</div>
+      <img src="${r.thumb}" alt=""><div><div class="nm">${nm}${as.length ? `<span class="as">${as.map((k) => `<i>${EL_NAMES[k]}</i>`).join('')}</span>` : ''}</div>
       <div class="pal">${r.palette.map((c) => `<i style="background:${c}"></i>`).join('')}</div>
       <div class="meta">${r.crisp ? 'Crisp, faceted edges' : 'Soft, smooth surfaces'} · ${r.metal === 'gold' ? 'warm → gold' : 'cool → chrome'}${r.profile ? ` · silhouette ${r.profile.height.toFixed(0)}″ tall${r.profile.trimmed ? ' (top trimmed)' : ''}` : ' · no clear silhouette'}</div></div>
       ${r.profile ? '<canvas class="prof" width="68" height="88"></canvas>' : ''}
       <span class="rm" data-act="rm" title="Remove">×</span>
       <div class="acts">
+        ${['cup', 'enc', 'base', 'beer'].map((k) => `<button data-act="as-${k}" class="${as.includes(k) ? 'on' : ''}" title="Use for the ${EL_NAMES[k].toLowerCase()}">→ ${EL_NAMES[k]}</button>`).join('')}
         <button data-act="pal" class="${pOn ? 'on' : ''}">Palette → glass</button>
-        <button data-act="skin" class="${sOn ? 'on' : ''}">Skin</button>
-        ${r.profile ? `<button data-act="cup" class="${cOn ? 'on' : ''}">Cup from silhouette</button>` : ''}
         <button data-act="finish" title="Apply suggested metal + facet count">Finish: ${r.metal}${r.facets ? ' · ' + r.facets + ' facets' : ' · smooth'}</button>
         <button data-act="pa">Colors → P/A</button>
       </div></div>`;
@@ -775,8 +854,7 @@ $('refs').onclick = (e) => {
   const b = e.target.closest('[data-act]'), el = e.target.closest('.ref'); if (!b || !el) return; const r = REFS.find((x) => x.id === el.dataset.id), act = b.dataset.act;
   if (act === 'rm') { unpinRef(r.id); renderThumbs(); }
   if (act === 'pal') { if (S.paletteRef === r.id) { S.palette = null; S.paletteSrc = null; S.paletteRef = null; } else { S.palette = r.palette; S.paletteSrc = 'Ref · ' + refLabel(r); S.paletteRef = r.id; } }
-  if (act === 'skin') S.skin = S.skin === r.id ? 'default' : r.id;
-  if (act === 'cup') { S.cup = 'custom'; S.cupProfile = r.profile.pts; S.profileSrc = r.id; if (!S.facets && r.facets) S.facets = r.facets; markCustom(); }
+  if (act.startsWith('as-')) { const el = act.slice(3); assignRef(el, S[MODS[el].ref] === r.id ? null : r.id); S.sel = el; }
   if (act === 'finish') { S.metal = r.metal; S.facets = r.facets; if (S.cup !== 'custom' && r.profile) { S.cup = 'custom'; S.cupProfile = r.profile.pts; S.profileSrc = r.id; } markCustom(); }
   if (act === 'pa') { const sorted = [...r.palette]; const lum = (h) => { const c = new THREE.Color(h); return c.r * 0.3 + c.g * 0.59 + c.b * 0.11; };
     const dark = sorted.filter((c) => lum(c) < 0.45).sort((a, b) => lum(a) - lum(b))[0] || sorted[0];
@@ -785,8 +863,8 @@ $('refs').onclick = (e) => {
   build();
 };
 $('facets').oninput = (e) => { S.facets = +e.target.value; $('facets-v').textContent = S.facets || 'Smooth'; clearTimeout(colorT); colorT = setTimeout(build, 80); };
-$('skin').onchange = (e) => { S.skin = e.target.value; build(); };
-$('skin-scale').oninput = (e) => { S.skinScale = +e.target.value; $('skin-scale-v').textContent = S.skinScale.toFixed(1) + '×'; if (skinTex) { const k = S.skin === 'logo' ? 3 : 1; skinTex.repeat.set(k * S.skinScale, k * S.skinScale); } saveSoon(); };
+$('skin').onchange = (e) => { S[MODS[S.sel].skin || 'skin'] = e.target.value; build(); };
+$('skin-scale').oninput = (e) => { S.skinScale = +e.target.value; $('skin-scale-v').textContent = S.skinScale.toFixed(1) + '×'; for (const [t, k] of [[skinTex, S.skin], [skinTexCup, S.skinCup], [skinTexBase, S.skinBase]]) if (t) { const m = k === 'logo' ? 3 : 1; t.repeat.set(m * S.skinScale, m * S.skinScale); } saveSoon(); };
 
 // drag & drop + file pickers
 function wireDrop(zone, input, onFiles) {
@@ -931,7 +1009,7 @@ $('capture').onclick = async () => {
 };
 
 // ---------- cameras ----------
-const CAMS = { hero: [[100, 66, 128], [0, 31, 0]], front: [[0, 34, 170], [0, 33, 0]], back: [[0, 34, -170], [0, 33, 0]], side: [[170, 34, 0], [0, 33, 0]], top: [[0.1, 190, 30], [0, 20, 0]], rink: [[260, 110, 420], [0, 20, 0]] };
+const CAMS = { bottles: [[30, 76, 50], [0, 57, 0]], hero: [[100, 66, 128], [0, 31, 0]], front: [[0, 34, 170], [0, 33, 0]], back: [[0, 34, -170], [0, 33, 0]], side: [[170, 34, 0], [0, 33, 0]], top: [[0.1, 190, 30], [0, 20, 0]], rink: [[260, 110, 420], [0, 20, 0]] };
 let tween = null;
 function goCam(k, instant) {
   S.view = k; document.querySelectorAll('#viewbar button').forEach((b) => b.classList.toggle('active', b.dataset.view === k));

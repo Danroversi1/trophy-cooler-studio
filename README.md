@@ -30,6 +30,11 @@ References live in a Google Slides deck, not in this repo, Vercel or Supabase.
 1. Share the deck as **Anyone with the link can view**.
 2. In the studio, paste the deck link → **Connect deck**, select a concept, then click thumbnails to pin them **to that concept**.
 3. Each concept (Cathedral, Halo, Prism, Hat Trick, Monolith) has its own pins and its own look (modules, finish, skin, palette, ★ cup). Brand assets are shared by all concepts. Badges on thumbnails show which other concepts use a slide.
-4. Pins are saved in your browser as slide **object IDs**, so they stay fixed when slides are reordered, inserted or edited. The `p.N` badge only shows the slide's current position.
+4. In **Module**, pick a reference thumbnail for each element of the concept:
+   - **Cup:** shape from its silhouette and/or a skin.
+   - **Enclosure:** a skin and/or glass/LED colors.
+   - **Base:** a skin.
+   - **Bottles:** label art and/or the bottle shape.
+5. Pins are saved in your browser as slide **object IDs**, so they stay fixed when slides are reordered, inserted or edited. The `p.N` badge only shows the slide's current position.
 
 `api/slides.js` is a pass-through. It reads the deck's slide list and streams slide images from Google on request, and stores nothing.

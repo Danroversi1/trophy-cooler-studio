@@ -68,7 +68,11 @@ export function makeMaterials(o) {
     return new THREE.MeshPhysicalMaterial({ name: 'stained-glass-' + i, color: c, roughness: 0.1, transmission: 0.35, thickness: 0.3, ior: 1.52, iridescence: 0.4, emissive: c, emissiveIntensity: 0.35, side: THREE.DoubleSide });
   });
   // "skin" = surface graphic from a design reference or the brand logo pattern
-  M.skin = o.skinTexture ? new THREE.MeshPhysicalMaterial({ name: 'skin-graphic', map: o.skinTexture, roughness: 0.3, clearcoat: 1, clearcoatRoughness: 0.08, metalness: 0.05, side: THREE.DoubleSide }) : null;
+  const skinMat = (tex, name, metal = 0.05) => tex ? new THREE.MeshPhysicalMaterial({ name, map: tex, roughness: 0.3, clearcoat: 1, clearcoatRoughness: 0.08, metalness: metal, side: THREE.DoubleSide }) : null;
+  M.skin = skinMat(o.skinTexture, 'skin-enclosure');
+  M.skinCup = skinMat(o.skinTextureCup, 'skin-cup', 0.35);
+  M.skinBase = skinMat(o.skinTextureBase, 'skin-base');
+  M.alu = new THREE.MeshPhysicalMaterial({ name: 'aluminum', color: 0xdfe6ee, metalness: 1, roughness: 0.22 });
   return M;
 }
 
@@ -131,7 +135,7 @@ function hingedDoor(M, o, { W, H, x, y, z, skin, style }) {
 // ======================================================================
 function baseRink(M) {
   const g = named(new THREE.Group(), 'base-rink-sled');
-  g.add(rbox(34, 1.25, 34, 0.55, M.metal, 0, DECK_Y - 0.625, 0));
+  g.add(rbox(34, 1.25, 34, 0.55, M.skinBase || M.metal, 0, DECK_Y - 0.625, 0));
   for (const x of [-14, -5, 5, 14]) g.add(rbox(1.8, 1.75, 33, 0.8, M.uhmw, x, 0.875, 0)); // UHMW runners, radiused ends
   for (const s of [-1, 1]) g.add(box(8, 0.6, 0.4, M.grille, 0, DECK_Y - 0.65, s * 17.05)); // recessed hand pockets
   return g;
@@ -139,7 +143,7 @@ function baseRink(M) {
 function basePuck(M) {
   const g = named(new THREE.Group(), 'base-puck');
   g.add(cyl(20, 19.2, 0.75, 96, M.uhmw, 0, 0.375, 0));          // beveled UHMW skid disc
-  g.add(cyl(21, 21, 2.25, 96, M.rubber, 0, 0.75 + 1.125, 0));    // puck body (composite core, rubber skin)
+  g.add(cyl(21, 21, 2.25, 96, M.skinBase || M.rubber, 0, 0.75 + 1.125, 0));    // puck body (composite core, rubber skin)
   g.add(torus(21, 0.3, M.metal, DECK_Y - 0.05));
   g.add(torus(21.05, 0.12, M.led, 1.0));
   return g;
@@ -148,7 +152,7 @@ function baseOcta(M) {
   const g = named(new THREE.Group(), 'base-octa-skid');
   const r8 = (m) => { m.rotation.y = Math.PI / 8; return m; };
   g.add(r8(cyl(21.5, 20.8, 1, 8, M.uhmw, 0, 0.5, 0)));
-  g.add(r8(cyl(22, 22, 2, 8, M.primary, 0, 2, 0)));
+  g.add(r8(cyl(22, 22, 2, 8, M.skinBase || M.primary, 0, 2, 0)));
   g.add(r8(cyl(22.4, 22.4, 0.3, 8, M.metal, 0, DECK_Y - 0.15, 0)));
   return g;
 }
@@ -160,14 +164,14 @@ function baseSki(M) {
     for (const z of [-14, 0, 14]) g.add(cyl(0.6, 0.6, 0.6, 16, M.metal, x, 1.55, z));
     g.add(strut([x, 2.5, -19], [x, 2.5, 19], 0.55, M.metal));
   }
-  g.add(rbox(32, 1.25, 32, 0.5, M.primary, 0, DECK_Y - 0.625, 0));
+  g.add(rbox(32, 1.25, 32, 0.5, M.skinBase || M.primary, 0, DECK_Y - 0.625, 0));
   return g;
 }
 function baseFloat(M) {
   const g = named(new THREE.Group(), 'base-floating-plinth');
   g.add(rbox(30, 1, 30, 0.45, M.uhmw, 0, 0.5, 0));                // recessed UHMW pad
   g.add(rbox(31, 0.25, 31, 0.1, M.led, 0, 0.98, 0));              // underglow
-  g.add(rbox(36, 2, 36, 0.9, M.primary, 0, 2, 0));
+  g.add(rbox(36, 2, 36, 0.9, M.skinBase || M.primary, 0, 2, 0));
   g.add(rbox(36.3, 0.35, 36.3, 0.15, M.metal, 0, 2.85, 0));
   return g;
 }
@@ -289,7 +293,7 @@ const interp = (pts) => (y) => { // pts [[r,y]...] ascending y
 };
 function cupChalice(M, o) {
   const g = named(new THREE.Group(), 'cup-faceted-chalice');
-  const mat = M.metal.clone(); mat.flatShading = true;
+  const mat = (M.skinCup || M.metal).clone(); mat.flatShading = true;
   g.add(lathe([[0, 0], [7, 0], [7, 0.8], [4.5, 1.5], [3, 3], [2.6, 7], [3.5, 8], [9, 8.6], [12.5, 11], [14, 15], [14.6, 17.5], [14.6, 18], [13.8, 18], [13.2, 15.5], [11.6, 12], [9, 9.8], [0, 9.8]], 10, mat, true));
   const band = M.glass[0].clone(); band.side = THREE.DoubleSide;
   g.add(lathe([[13.05, 12.2], [13.75, 14.4]], 10, band, true));
@@ -299,7 +303,7 @@ function cupChalice(M, o) {
 }
 function cupChampion(M, o) {
   const g = named(new THREE.Group(), 'cup-champion-bowl');
-  g.add(lathe([[0, 0], [8, 0], [8, 1.2], [6.5, 1.6], [6.5, 3], [5, 3.4], [5, 5], [3.2, 5.6], [2.8, 8], [4, 9], [10, 9.6], [13.5, 12], [15, 16], [15.4, 18.5], [14.6, 18.5], [14.2, 16.2], [12.8, 12.6], [9.5, 10.6], [0, 10.6]], 96, M.metal));
+  g.add(lathe([[0, 0], [8, 0], [8, 1.2], [6.5, 1.6], [6.5, 3], [5, 3.4], [5, 5], [3.2, 5.6], [2.8, 8], [4, 9], [10, 9.6], [13.5, 12], [15, 16], [15.4, 18.5], [14.6, 18.5], [14.2, 16.2], [12.8, 12.6], [9.5, 10.6], [0, 10.6]], 96, M.skinCup || M.metal));
   for (const y of [1.4, 3.2]) g.add(torus(y < 2 ? 7.9 : 6.4, 0.25, M.primary, y));
   for (const s of [-1, 1]) { const h = mesh(new THREE.TorusGeometry(4, 0.7, 16, 40, Math.PI), M.metal, s * 14.6, 14, 0); h.rotation.z = -s * Math.PI / 2; g.add(h); }
   add(g, labelBand(o, 6.58, 1.2, 2.3, 0, Math.PI * 2, { fg: '#ffffff', bg: '#' + M.primary.color.getHexString(), repeat: 2 }));
@@ -311,7 +315,7 @@ function cupHex(M, o) {
   g.add(cyl(8.5, 9, 1, 6, M.metal, 0, 0.5, 0));
   g.add(cyl(3, 4.2, 8, 6, M.metal, 0, 5, 0));
   g.add(cyl(3.05, 3.05, 0.4, 6, M.led, 0, 8.4, 0));
-  g.add(cyl(17, 11, 9.8, 6, M.iridescent, 0, 9 + 4.9, 0, true));
+  g.add(cyl(17, 11, 9.8, 6, M.skinCup || M.iridescent, 0, 9 + 4.9, 0, true));
   g.add(lathe([[0, 9], [9.4, 9], [14.6, 18.6], [14.2, 18.6], [9, 9.9], [0, 9.9]], 64, M.metal)); // stainless liner (holds ice + melt)
   const rim = mesh(new THREE.TorusGeometry(17, 0.35, 12, 6), M.metal, 0, 18.75, 0); rim.rotation.x = Math.PI / 2; rim.rotation.z = Math.PI / 6; g.add(rim);
   g.userData.bowl = { floor: 9.9, rim: 18.6, rAt: interp([[9, 9.9], [14.2, 18.4]]), ringR: 6.4, tilt: 0.22, ice: 5.8, iceLb: 20 };
@@ -321,7 +325,7 @@ function cupPuckStack(M, o) {
   const g = named(new THREE.Group(), 'cup-puck-stack');
   g.add(cyl(9, 9.5, 1, 64, M.metal, 0, 0.5, 0));
   for (let i = 0; i < 3; i++) { g.add(cyl(4, 4, 1.8, 64, M.rubber, 0, 1 + i * 2 + 0.9, 0)); g.add(cyl(3.2, 3.2, 0.2, 48, M.metal, 0, 1 + i * 2 + 1.9, 0)); }
-  g.add(lathe([[0, 7], [6, 7], [15, 7.6], [16.2, 9], [16.4, 16.4], [16.8, 17], [15.4, 17], [15.2, 16], [15, 9.8], [0, 9.8]], 96, M.primary));
+  g.add(lathe([[0, 7], [6, 7], [15, 7.6], [16.2, 9], [16.4, 16.4], [16.8, 17], [15.4, 17], [15.2, 16], [15, 9.8], [0, 9.8]], 96, M.skinCup || M.primary));
   g.add(torus(16.1, 0.45, M.metal, 17));
   g.add(torus(16.25, 0.2, M.metal, 9.2));
   add(g, labelBand(o, 16.45, 3.2, 12.8, 0, Math.PI * 2, { fg: '#ffffff', repeat: 3 }));
@@ -330,7 +334,7 @@ function cupPuckStack(M, o) {
 }
 function cupTorch(M, o) {
   const g = named(new THREE.Group(), 'cup-ultra-torch');
-  g.add(lathe([[0, 0], [6, 0], [6, 0.8], [2.2, 1.6], [1.8, 10], [3, 11], [8, 11.5], [15.5, 19], [16, 20], [15.2, 20], [14.8, 19.2], [7.6, 12.4], [0, 12.4]], 96, M.primary));
+  g.add(lathe([[0, 0], [6, 0], [6, 0.8], [2.2, 1.6], [1.8, 10], [3, 11], [8, 11.5], [15.5, 19], [16, 20], [15.2, 20], [14.8, 19.2], [7.6, 12.4], [0, 12.4]], 96, M.skinCup || M.primary));
   g.add(cyl(2.3, 2.3, 4, 48, M.metal, 0, 6, 0));
   g.add(torus(15.6, 0.4, M.metal, 20));
   g.add(torus(3.05, 0.25, M.led, 11));
@@ -350,7 +354,7 @@ function cupCustom(M, o) {
   const innerFloor = Math.max(0.4, rAt(floor) - wall);
   const inner = prof.filter(([, y]) => y > floor).map(([r, y]) => [Math.max(0.4, r - wall), y]).reverse();
   const pts = [[0, prof[0][1]], ...prof, ...inner, [innerFloor, floor], [0, floor]];
-  let mat = M.metal; if (faceted) { mat = M.metal.clone(); mat.flatShading = true; }
+  let mat = M.skinCup || M.metal; if (faceted) { mat = mat.clone(); mat.flatShading = true; }
   g.add(lathe(pts, faceted ? fac : 96, mat, faceted));
   g.add(cyl(6, 6.4, 0.6, 48, M.metal, 0, 0.3, 0));                 // mount plate (twist-lock)
   const rimT = mesh(new THREE.TorusGeometry(prof[prof.length - 1][0] - wall / 2, 0.42, 12, faceted ? fac : 96), M.metal, 0, top, 0);
@@ -362,39 +366,69 @@ function cupCustom(M, o) {
 }
 
 // ---------- 12 beers + ice ----------
-export function buildContents(M, bowl, { instanced = true, seed = 5 } = {}) {
+// Bottles sit high in a heaped ice bed so their branded labels clear the rim.
+export const BEERS = [
+  { id: 'longneck', name: '12 oz long-neck', lbEach: 1.2, glass: true, label: [2.4, 4.8], blurb: 'Classic glass long-neck; the label band carries the brand (logo or label text).',
+    profile: [[0, 0], [1.2, 0], [1.22, 0.2], [1.22, 5.2], [1.1, 5.9], [0.6, 7], [0.5, 8.3], [0.55, 8.5], [0.55, 8.9], [0, 9]], cap: [0.57, 8.4, 1.2] },
+  { id: 'alubottle', name: '16 oz aluminum bottle', lbEach: 1.15, glass: false, label: [0.5, 4.2], blurb: 'Brushed aluminum bottle with a full-body printed wrap.',
+    profile: [[0, 0], [1.3, 0], [1.32, 0.15], [1.32, 4.3], [1.1, 5.3], [0.62, 6.4], [0.55, 7.0], [0.6, 7.1], [0, 7.25]], cap: [0.6, 6.98, 0.3] },
+  { id: 'can', name: '12 oz can', lbEach: 0.85, glass: false, label: [0.45, 4.4], blurb: 'Standard 12 oz can; the whole body is the brand wrap.',
+    profile: [[0, 0], [1.05, 0], [1.3, 0.35], [1.3, 4.45], [1.08, 4.75], [1.1, 4.83], [0, 4.83]], cap: null },
+  { id: 'custom', name: '★ From reference', lbEach: 1.2, glass: true, label: null, blurb: 'Lathed from a bottle silhouette in your references (default long-neck until you pick one).', profile: null, cap: null },
+];
+export function buildContents(M, bowl, { instanced = true, seed = 5, beer = {}, o = {} } = {}) {
   const g = named(new THREE.Group(), 'contents-12-beers-ice');
-  const bottleGeo = new THREE.LatheGeometry([[0, 0], [1.2, 0], [1.22, 0.2], [1.22, 5.2], [1.1, 5.9], [0.6, 7], [0.5, 8.3], [0.55, 8.5], [0.55, 8.9], [0, 9]].map(([r, y]) => new THREE.Vector2(r, y)), 32);
-  const labelGeo = new THREE.CylinderGeometry(1.24, 1.24, 2.4, 32, 1, true); labelGeo.translate(0, 3.6, 0);
-  const stripeGeo = new THREE.CylinderGeometry(1.245, 1.245, 0.5, 32, 1, true); stripeGeo.translate(0, 3.2, 0);
-  const foilGeo = new THREE.CylinderGeometry(0.57, 0.57, 1.2, 24); foilGeo.translate(0, 8.4, 0);
-  const parts = [[bottleGeo, M.bottle], [labelGeo, M.labelWhite], [stripeGeo, M.labelBlue], [foilGeo, M.foil]];
+  const T = BEERS.find((b) => b.id === beer.type) || BEERS[0];
+  const prof = T.id === 'custom' ? (beer.profile && beer.profile.length > 3 ? beer.profile : BEERS[0].profile) : T.profile;
+  const H = prof[prof.length - 1][1], rP = interp(prof), [l0, l1] = T.label || [H * 0.3, H * 0.56];
+  let lr = 0; for (let y = l0; y <= l1; y += (l1 - l0) / 8) lr = Math.max(lr, rP(y)); lr += 0.025;
+  const parts = [[new THREE.LatheGeometry(prof.map(([r, y]) => new THREE.Vector2(r, y)), 32), T.glass ? M.bottle : M.alu]];
+  const labelGeo = new THREE.CylinderGeometry(lr, lr, l1 - l0, 40, 1, true); labelGeo.translate(0, (l0 + l1) / 2, 0);
+  let lmat = M.labelWhite;
+  if (beer.labelTexture) { // reference art: front + back panels
+    const t = beer.labelTexture; t.wrapS = THREE.RepeatWrapping; t.repeat.set(2, 1); t.offset.set(0, 0);
+    lmat = new THREE.MeshStandardMaterial({ name: 'bottle-label-ref', map: t, roughness: 0.35, metalness: T.glass ? 0 : 0.3 });
+  } else {
+    const m = labelMat(o, (2 * Math.PI * lr) / (l1 - l0), { bg: '#ffffff', fg: '#0b2a6b' });
+    if (m) { m.map.wrapS = THREE.RepeatWrapping; m.map.offset.x = 0.25; m.metalness = T.glass ? 0 : 0.3; m.name = 'bottle-label-brand'; lmat = m; } // label faces outward
+  }
+  parts.push([labelGeo, lmat]);
+  if (T.cap) { const [cr, cy, ch] = T.cap, cg = new THREE.CylinderGeometry(cr, cr, ch, 24); cg.translate(0, cy + ch / 2 - (T.id === 'longneck' ? ch / 2 : 0), 0); parts.push([cg, M.foil]); }
+  // placement: label bottom ~ at the rim, ring as close to the wall as the bowl allows
+  const tilt = 0.2, baseY = Math.max(bowl.floor + 0.05, bowl.rim - (l0 + (l1 - l0) * 0.25));
+  // ring radius: as close to the wall as the bowl allows at every height the bottle is inside it
+  let ringR = 9;
+  for (let h = 0; baseY + h <= bowl.rim && h <= H; h += 0.25) ringR = Math.min(ringR, bowl.rAt(baseY + h) - 0.35 - rP(h) - h * Math.tan(tilt));
+  ringR = Math.max(5.3, ringR); const rimR = bowl.rAt(bowl.rim);
   const mats = [];
   for (let i = 0; i < BEER.count; i++) {
     const a = (i / BEER.count) * Math.PI * 2, o3 = new THREE.Object3D();
-    o3.position.set(bowl.ringR * Math.cos(a), bowl.floor + 0.05, bowl.ringR * Math.sin(a));
-    o3.rotation.set(0, -a, 0); o3.rotateZ(-bowl.tilt); o3.updateMatrix(); mats.push(o3.matrix.clone());
+    o3.position.set(ringR * Math.cos(a), baseY, ringR * Math.sin(a));
+    o3.rotation.set(0, -a, 0); o3.rotateZ(-tilt); o3.updateMatrix(); mats.push(o3.matrix.clone());
   }
   for (const [geo, mat] of parts) {
     if (instanced) { const im = new THREE.InstancedMesh(geo, mat, mats.length); mats.forEach((m, i) => im.setMatrixAt(i, m)); im.castShadow = true; g.add(im); }
     else mats.forEach((m) => { const me = mesh(geo, mat); me.applyMatrix4(m); g.add(me); });
   }
-  // ice cubes, avoiding bottles
-  const r = rng(seed), top = bowl.floor + bowl.ice, cubes = [];
-  for (let t = 0; t < 6000 && cubes.length < 340; t++) {
-    const y = bowl.floor + 0.6 + r() * (top - bowl.floor - 0.6), rmax = bowl.rAt(y) - 0.75;
-    const rr = Math.sqrt(r()) * rmax, a = r() * Math.PI * 2, x = rr * Math.cos(a), z = rr * Math.sin(a);
-    const axR = bowl.ringR + (y - bowl.floor) * Math.tan(bowl.tilt);
-    let ok = true;
-    for (let i = 0; i < BEER.count && ok; i++) { const b = (i / BEER.count) * Math.PI * 2; if (Math.hypot(x - axR * Math.cos(b), z - axR * Math.sin(b)) < 1.85) ok = false; }
-    for (const c of cubes) if (ok && c.distanceTo(new THREE.Vector3(x, y, z)) < 1.05) ok = false;
-    if (ok) cubes.push(new THREE.Vector3(x, y, z));
+  // heaped ice: fills the bowl to the rim and mounds above it
+  const r = rng(seed), yTop = bowl.rim + 1.0, cubes = [], cell = new Map(), key = (x, y, z) => `${Math.floor(x / 1.1)},${Math.floor(y / 1.1)},${Math.floor(z / 1.1)}`;
+  const near = (v) => { const [cx, cy, cz] = key(v.x, v.y, v.z).split(',').map(Number); for (let i = -1; i <= 1; i++) for (let j = -1; j <= 1; j++) for (let k = -1; k <= 1; k++) for (const c of cell.get(`${cx + i},${cy + j},${cz + k}`) || []) if (c.distanceTo(v) < 1.02) return true; return false; };
+  for (let t = 0; t < 30000 && cubes.length < 720; t++) {
+    const y = bowl.floor + 0.6 + r() * (yTop - bowl.floor - 0.6);
+    const rmax = y <= bowl.rim ? bowl.rAt(y) - 0.7 : (rimR - 0.9) * (1 - (y - bowl.rim) / 1.6);
+    if (rmax <= 0.3) continue;
+    const rr = Math.sqrt(r()) * rmax, a = r() * Math.PI * 2, v = new THREE.Vector3(rr * Math.cos(a), y, rr * Math.sin(a));
+    if (y > baseY) { const h = y - baseY, axR = ringR + h * Math.tan(tilt), br = rP(Math.min(H, h)) + 0.55; let hit = false;
+      for (let i = 0; i < BEER.count && !hit; i++) { const b = (i / BEER.count) * Math.PI * 2; if (Math.hypot(v.x - axR * Math.cos(b), v.z - axR * Math.sin(b)) < br) hit = true; } if (hit) continue; }
+    if (near(v)) continue;
+    cubes.push(v); const k2 = key(v.x, v.y, v.z); (cell.get(k2) || cell.set(k2, []).get(k2)).push(v);
   }
   const cubeGeo = instanced ? new RoundedBoxGeometry(1.15, 1.15, 1.15, 2, 0.18) : new THREE.BoxGeometry(1.1, 1.1, 1.1);
   const dummy = new THREE.Object3D(), cm = [];
   for (const c of cubes) { dummy.position.copy(c); dummy.rotation.set(r() * 3, r() * 3, r() * 3); dummy.scale.setScalar(0.85 + r() * 0.4); dummy.updateMatrix(); cm.push(dummy.matrix.clone()); }
-  if (instanced) { const im = new THREE.InstancedMesh(cubeGeo, M.ice, cm.length); cm.forEach((m, i) => im.setMatrixAt(i, m)); g.add(im); }
+  if (instanced) { const im = new THREE.InstancedMesh(cubeGeo, M.ice, cm.length); cm.forEach((m, i) => im.setMatrixAt(i, m)); im.receiveShadow = true; g.add(im); }
   else { const geos = cm.map((m) => cubeGeo.clone().applyMatrix4(m)); g.add(mesh(mergeGeometries(geos), M.ice)); }
+  g.userData.top = baseY + H * Math.cos(tilt); g.userData.lbEach = T.lbEach;
   return g;
 }
 
