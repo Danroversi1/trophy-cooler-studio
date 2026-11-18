@@ -24,3 +24,11 @@ npm run build   # → dist/index.html (what Vercel deploys)
 Deployed on Vercel: `vercel.json` runs `npm run build` and serves `dist/`.
 
 > Visual concept, not a fabrication model or venue-approved installation. Brand marks are placeholders until approved artwork is uploaded.
+
+## Design references (Google Slides)
+References live in a Google Slides deck, not in this repo, Vercel or Supabase.
+1. Share the deck as **Anyone with the link can view**.
+2. In the studio, paste the deck link → **Connect deck** → click thumbnails to pin.
+3. Pins are saved in your browser as slide **object IDs**, so they stay fixed when slides are reordered, inserted or edited. The `p.N` badge only shows the slide's current position.
+
+`api/slides.js` is a pass-through. It reads the deck's slide list and streams slide images from Google on request, and stores nothing.
