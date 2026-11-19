@@ -34,3 +34,12 @@ await save(T.buildEnclosure(P, M), '1-enclosure'); await save(T.buildFridge(P), 
   await save(mk().root, 'COOLER-ASSEMBLY');
   for (const [k, name] of [['enc', 'cooler-1-body-and-door'], ['cup', 'cooler-2-lid'], ['contents', 'cooler-3-bottles-and-ice'], ['base', 'cooler-0-base-ice-runners'], ['fridge', 'cooler-REF-meling-DW-XL90']]) await save(mk().parts[k], name);
 }
+
+// ---------- oversized cooler (no freezer, lid open) ----------
+{
+  const PO = { ...T.DEFAULTS, ...C.DEFAULTS, design: 'oversized' }, MO = T.makeMaterials(PO);
+  const V = { isolate: false, sel: 'enc', vis: { cup: true, contents: true, enc: true, fridge: true, base: true }, panel: 0, explode: 0 };
+  const mk = () => { const m = S.buildModel(PO, MO, { lod: 'high', merged: true }); S.arrange(m.parts, PO, V); m.root.updateMatrixWorld(true); return m; };
+  await save(mk().root, 'OVERSIZED-ASSEMBLY');
+  for (const [k, name] of [['enc', 'oversized-1-body'], ['cup', 'oversized-2-lid'], ['contents', 'oversized-3-bottles-ice-and-puck'], ['base', 'oversized-0-base-and-spilled-ice']]) await save(mk().parts[k], name);
+}

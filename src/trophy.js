@@ -72,7 +72,7 @@ function latheGeo(pts, seg, aoStrength = 0) {
 const lathe = (pts, seg, mat, aoStrength = 0) => mesh(latheGeo(pts, seg, aoStrength), mat);
 // static micro-detail maps (built once): faint roughness variation keeps paint and chrome from looking like plastic
 let DROPS = null;
-function dropletMap() { // condensation beads on cold glass (bump map, built once)
+export function dropletMap() { // condensation beads on cold glass (bump map, built once)
   if (DROPS) return DROPS;
   const N = 256, r = rng(21), h = new Float32Array(N * N);
   for (let k = 0; k < 320; k++) { const cx = r() * N, cy = r() * N, rad = 2.5 + r() * r() * 8;

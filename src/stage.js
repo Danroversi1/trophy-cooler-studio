@@ -75,7 +75,7 @@ export function makeGround(scene) {
 // The model, from cached geometry. lod: 'both' (interactive: high + low, toggled by screen size), 'high', or 'low'.
 // merged: non-instanced bottles/ice (used by the GLB export path).
 export function buildModel(P, M, { lod = 'both', merged = false } = {}) {
-  if (P.design === 'cooler') return C.buildModel(P, M, { lod, merged });
+  if (P.design === 'cooler' || P.design === 'oversized') return C.buildModel(P, M, { lod, merged });
   const root = new THREE.Group(), parts = {};
   parts.base = T.buildBase(P, M); parts.enc = T.buildEnclosure(P, M); parts.fridge = T.buildFridge(P);
   parts.cupGroup = new THREE.Group(); parts.cup = T.buildCup(P, M, { lod });
@@ -85,7 +85,7 @@ export function buildModel(P, M, { lod = 'both', merged = false } = {}) {
 }
 // visibility / exploded view / lifted panel (transforms only; geometry is never rebuilt for these)
 export function arrange(parts, P, V) {
-  if (P.design === 'cooler') return C.arrange(parts, P, V);
+  if (P.design === 'cooler' || P.design === 'oversized') return C.arrange(parts, P, V);
   const top = T.casterH(P) + P.H, only = V.isolate ? V.sel : null, vis = V.vis;
   parts.cup.visible = only ? only === 'cup' : vis.cup;
   parts.cvis = only ? only === 'cup' || only === 'contents' : vis.contents; parts.contents.visible = parts.cvis;

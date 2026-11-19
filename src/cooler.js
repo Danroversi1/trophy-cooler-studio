@@ -23,26 +23,54 @@ function brushedUV(g, k = 1 / 12) {
 const box = (w, h, d, mat, x, y, z) => mesh(geo(K('cbox', w, h, d), () => brushedUV(new THREE.BoxGeometry(w, h, d))), mat, x, y, z);
 const rbox = (w, h, d, r, mat, x, y, z) => mesh(geo(K('crbox', w, h, d, r), () => brushedUV(new RoundedBoxGeometry(w, h, d, 5, Math.min(r, Math.min(w, h, d) / 2 - 0.01)))), mat, x, y, z);
 
-export const DEFAULTS = { cL: 64, cD: 32, cH: 43, cWell: 8, cLid: 105, cTrim: '#1638c8' };
+export const DEFAULTS = { cL: 64, cD: 32, cH: 43, cWell: 8, cLid: 105, cTrim: '#1638c8',
+  // oversized cooler (no freezer): its own size settings; the ice sits on a raised false floor oWell below the rim
+  oL: 44, oD: 24, oH: 22, oWell: 11, oLid: 105, oTrim: '#1638c8', oGlow: '#36c8ff' };
+const isOver = (P) => P.design === 'oversized';
+// the oversized cooler reuses this file with its own numbers mapped onto the cooler's
+const eff = (P) => (isOver(P) ? { ...P, cL: P.oL, cD: P.oD, cH: P.oH, cWell: P.oWell, cLid: P.oLid, cTrim: P.oTrim } : P);
 export const SLED = 1.8, WALL = 1.5, FLOOR = 1.5, LIDT = 3.5, TRAY = 0.75, R = 2.4;
 
 // everything dimensional, from the parameters (used by the model, the fit check and the specs)
-export function info(P) {
+export function info(P0) {
+  const P = eff(P0), over = isOver(P0);
   const L = P.cL, D = P.cD, H = P.cH, well = P.cWell, y0 = SLED, rim = y0 + H;
   const wellBottom = rim - well, fridgeY = y0 + FLOOR, fridgeTop = fridgeY + T.FRIDGE.h;
   const zf = D / 2 - WALL - 1.0; // freezer front face: 1" behind the door
   const side = (L - 2 * WALL - T.FRIDGE.w) / 2, above = wellBottom - TRAY - fridgeTop, back = zf - T.FRIDGE.d - (-D / 2 + WALL);
   const dw = Math.min(L - 2 * R - 8, Math.max(T.FRIDGE.w + 4, L * 0.5)), yd0 = y0 + 2.2, yd1 = Math.min(wellBottom - 0.4, fridgeTop + 0.8);
   const iL = L - 2 * WALL - 1, iD = D - 2 * WALL - 1, cols = Math.max(2, Math.floor(iL / 6.2)), rows = Math.max(1, Math.floor(iD / 6.6));
-  const lid = THREE.MathUtils.degToRad(P.cLid);
-  return { L, D, H, well, y0, rim, wellBottom, fridgeY, fridgeTop, zf, side, above, back, dw, yd0, yd1, iL, iD, cols, rows, n: cols * rows,
-    fits: side >= 1 && above >= 0.5 && back >= 0.75 && yd1 - yd0 >= T.FRIDGE.h * 0.9,
+  const lid = THREE.MathUtils.degToRad(P.cLid), ring = over ? ringSlots(iL, iD) : null;
+  return { over, L, D, H, well, y0, rim, wellBottom, fridgeY, fridgeTop, zf, side, above, back, dw, yd0, yd1, iL, iD, cols, rows, ring, n: over ? ring.length : cols * rows,
+    fits: over || (side >= 1 && above >= 0.5 && back >= 0.75 && yd1 - yd0 >= T.FRIDGE.h * 0.9),
     closedH: rim + LIDT, openH: rim + Math.max(LIDT, Math.sin(lid) * D + Math.cos(lid) * LIDT), footprint: [L + 6.2, D] };
+}
+
+// bottles around the edge of the ice (oversized cooler): walk a rectangle inset from the walls, leave the front middle
+// open so the puck reads from the front
+function ringSlots(iL, iD) {
+  const ix = iL / 2 - 3.2, iz = iD / 2 - 3.0, per = 4 * (ix + iz), n = Math.max(6, Math.round(per / 7)), out = [];
+  for (let i = 0; i < n; i++) {
+    let d = (i / n) * per + 2.2, x, z;
+    if (d < 2 * ix) { x = -ix + d; z = -iz; } else if ((d -= 2 * ix) < 2 * iz) { x = ix; z = -iz + d; } else if ((d -= 2 * iz) < 2 * ix) { x = ix - d; z = iz; } else { d -= 2 * ix; x = -ix; z = iz - d; }
+    if (z > 0 && Math.abs(x) < iL * 0.2) continue;
+    out.push([x, z]);
+  }
+  return out;
+}
+// soft glow under the puck (built once; DataTexture so it works in the worker and in Node too)
+let HALO = null;
+function haloMap() {
+  if (HALO) return HALO;
+  const N = 128, b = new Uint8Array(N * N * 4);
+  for (let y = 0; y < N; y++) for (let x = 0; x < N; x++) { const d = Math.hypot(x - N / 2 + 0.5, y - N / 2 + 0.5) / (N / 2), v = Math.round(255 * Math.pow(Math.max(0, 1 - d), 2.2)), i = (y * N + x) * 4; b[i] = b[i + 1] = b[i + 2] = 255; b[i + 3] = v; }
+  const t = new THREE.DataTexture(b, N, N, THREE.RGBAFormat); t.needsUpdate = true; return (HALO = t);
 }
 
 // ---------- materials ----------
 function materials(P, M) {
   if (M._cooler) return M._cooler;
+  const over = isOver(P);
   const fast = !!M._fast, rough = M.metal.roughnessMap;
   const steel = new THREE.MeshPhysicalMaterial({ name: 'brushed-stainless', color: 0xc4c9d0, metalness: 1, roughness: 0.42, anisotropy: 0.85, roughnessMap: rough });
   const steelIn = new THREE.MeshPhysicalMaterial({ name: 'stainless-liner', color: 0xb5bbc3, metalness: 1, roughness: 0.48, anisotropy: 0.6, roughnessMap: rough });
@@ -54,8 +82,12 @@ function materials(P, M) {
     dark: new THREE.MeshStandardMaterial({ name: 'shadow-gap', color: 0x06070a, roughness: 0.8 }),
     print: M.coolerLogoMap ? new THREE.MeshStandardMaterial({ name: 'logo-print', map: M.coolerLogoMap, transparent: true, roughness: 0.32, metalness: 0.1 }) : null,
     // big clear cubes: glossy and bright (see-through ice over a black studio reads grey, and costs an extra render pass)
-    ice: new THREE.MeshPhysicalMaterial({ name: 'ice-cubes', color: 0xf1f7ff, roughness: 0.04, metalness: 0, clearcoat: 1, clearcoatRoughness: 0.02, transparent: true, opacity: 0.86, envMapIntensity: 2.2, specularIntensity: 1 }),
-    iceBed: new THREE.MeshPhysicalMaterial({ name: 'ice-bed', color: 0xe3ebf4, roughness: 0.25, clearcoat: 1, clearcoatRoughness: 0.1 }), uhmw: M.uhmw };
+    rubber: new THREE.MeshPhysicalMaterial({ name: 'puck-rubber', color: 0x0d0e10, roughness: 0.62, clearcoat: 0.35, clearcoatRoughness: 0.5 }),
+    glow: new THREE.MeshBasicMaterial({ name: 'puck-light', color: new THREE.Color(P.oGlow || '#36c8ff').multiplyScalar(2.2), toneMapped: false }),
+    halo: new THREE.MeshBasicMaterial({ name: 'puck-halo', color: new THREE.Color(P.oGlow || '#36c8ff').multiplyScalar(1.4), map: haloMap(), transparent: true, depthWrite: false, blending: THREE.AdditiveBlending, toneMapped: false }),
+    ice: new THREE.MeshPhysicalMaterial({ name: 'ice-cubes', color: 0xdbe8ff, roughness: 0.02, metalness: 0, clearcoat: 1, clearcoatRoughness: 0.01, transparent: true, opacity: 0.6, envMapIntensity: 2.8, specularIntensity: 1, flatShading: true }), // faceted, clear-looking chunks that sparkle
+    iceBed: new THREE.MeshPhysicalMaterial({ name: 'ice-bed', color: 0xc9d9ee, roughness: 0.18, clearcoat: 1, clearcoatRoughness: 0.06 }), uhmw: M.uhmw };
+  if (over && rough) { const drops = T.dropletMap(); steel.bumpMap = drops; steel.bumpScale = 0.55; } // condensation on the cold body
   return (M._cooler = C);
 }
 
@@ -102,8 +134,13 @@ function ribbonGeo(w, h, notch) {
 }
 
 // ---------- parts ----------
-function buildBase(P, C) { // UHMW ice runners: slides on the rink, nothing metal touches the ice
+function buildBase(P, C, over) { // UHMW ice runners: slides on the rink, nothing metal touches the ice
   const g = named(new THREE.Group(), 'base-ice-runners'), { cL: L, cD: D } = P;
+  if (over) { // a few cubes spilled on the floor around it, like the reference
+    const r = rng(5), cube = geo(K('cchunk'), () => new THREE.IcosahedronGeometry(1.25, 0).scale(1, 0.85, 1.1)), m = [], o = new THREE.Object3D();
+    for (let i = 0; i < 46; i++) { const a = r() * Math.PI * 2, k = 1.05 + r() * r() * 0.5, x = Math.cos(a) * (L / 2 + 2) * k, z = Math.sin(a) * (D / 2 + 2) * k; if (z < -D * 0.3) continue; o.position.set(x, 0.8, z); o.rotation.set(r() * 3, r() * 3, r() * 3); o.scale.setScalar(0.6 + r() * 0.6); o.updateMatrix(); m.push(o.matrix.clone()); }
+    const im = new THREE.InstancedMesh(cube, C.ice, m.length); m.forEach((x, i) => im.setMatrixAt(i, x)); im.castShadow = true; g.add(named(im, 'spilled-ice'));
+  }
   g.add(rbox(L - 2, 0.9, D - 2, 0.4, C.uhmw, 0, SLED - 0.45, 0));
   for (const z of [-(D / 2 - 3.5), 0, D / 2 - 3.5]) g.add(rbox(L - 1, SLED - 0.8, 2.4, 0.38, C.uhmw, 0, (SLED - 0.8) / 2, z));
   return g;
@@ -114,11 +151,22 @@ function buildBody(P, C, I) {
   for (const [x, z] of [[1, 1], [1, -1], [-1, -1], [-1, 1]]) g.add(mesh(geo(K('corner', R, H), () => brushedUV(new THREE.CylinderGeometry(R, R, H, 32))), s, x * (L / 2 - R), y0 + H / 2, z * (D / 2 - R)));
   g.add(box(L - 2 * R, H, WALL, s, 0, y0 + H / 2, -zw));
   for (const x of [-1, 1]) g.add(box(WALL, H, D - 2 * R, s, x * (L / 2 - WALL / 2), y0 + H / 2, 0));
+  if (I.over) { // no freezer: solid front with the printed logo + faceted ribbon
+    g.add(box(L - 2 * R, H, WALL, s, 0, y0 + H / 2, zw));
+    g.add(box(iL + 1, TRAY, iD + 1, C.steelIn, 0, wellBottom - TRAY / 2, 0)); // raised false floor under the ice
+    if (C.print) {
+      const lw = L * 0.5, lh = lw * (1231 / 1600), ly = y0 + H * 0.47;
+      const lg = mesh(geo(K('logoplane', lw, lh), () => new THREE.PlaneGeometry(lw, lh)), C.print, 0, ly, D / 2 + 0.02); lg.castShadow = false; g.add(lg);
+      if (C.printIsDefault !== false) g.add(named(mesh(ribbonGeo(lw * 0.107, lh * 0.37, lh * 0.046), C.gemRed, (0.473 - 0.5) * lw, ly + lh / 2 - lh * 0.805, D / 2 + 0.05), 'ribbon-gem'));
+    }
+  }
   // front wall around the door opening (the thin gaps read as the door seam)
   const wl = L / 2 - R - dw / 2 - gap;
-  for (const x of [-1, 1]) g.add(box(wl, H, WALL, s, x * (dw / 2 + gap + wl / 2), y0 + H / 2, zw));
-  g.add(box(dw + 2 * gap, rim - (yd1 + gap), WALL, s, 0, (rim + yd1 + gap) / 2, zw));
-  g.add(box(dw + 2 * gap, yd0 - gap - y0, WALL, s, 0, (yd0 - gap + y0) / 2, zw));
+  if (!I.over) {
+    for (const x of [-1, 1]) g.add(box(wl, H, WALL, s, x * (dw / 2 + gap + wl / 2), y0 + H / 2, zw));
+    g.add(box(dw + 2 * gap, rim - (yd1 + gap), WALL, s, 0, (rim + yd1 + gap) / 2, zw));
+    g.add(box(dw + 2 * gap, yd0 - gap - y0, WALL, s, 0, (yd0 - gap + y0) / 2, zw));
+  }
     // bottom bead and the rolled lip
   for (const z of [-1, 1]) g.add(rbox(L - 2 * R, 0.5, 0.4, 0.2, s, 0, y0 + 2.6, z * (D / 2 + 0.05)));
   for (const x of [-1, 1]) g.add(rbox(0.4, 0.5, D - 2 * R, 0.2, s, x * (L / 2 + 0.05), y0 + 2.6, 0));
@@ -126,7 +174,7 @@ function buildBody(P, C, I) {
   // blue faceted trim just under the rim
   g.add(named(mesh(facetBand(L / 2, D / 2, R, rim - 2.3, rim - 0.5, 0.17, 2.4), C.gemBlue), 'trim-blue'));
   // ice well liner: tray floor + walls
-  g.add(box(iL + 1, TRAY, iD + 1, C.steelIn, 0, wellBottom - TRAY / 2, 0));
+  if (!I.over) g.add(box(iL + 1, TRAY, iD + 1, C.steelIn, 0, wellBottom - TRAY / 2, 0));
   for (const z of [-1, 1]) g.add(box(iL + 1, rim - wellBottom, 0.3, C.steelIn, 0, (rim + wellBottom) / 2, z * (iD / 2 + 0.35)));
   for (const x of [-1, 1]) g.add(box(0.3, rim - wellBottom, iD + 1, C.steelIn, x * (iL / 2 + 0.35), (rim + wellBottom) / 2, 0));
   // side handles: brackets, arms, bar with a blue faceted grip
@@ -149,6 +197,7 @@ function buildBody(P, C, I) {
   g.add(along(mesh(geo(K('cap'), () => new THREE.CylinderGeometry(0.9, 0.95, 1.1, 18)), s, dx, dy, D / 2 + 0.95), 'z'));
   const link = geo(K('link'), () => new THREE.TorusGeometry(0.32, 0.08, 6, 12));
   for (let i = 0; i < 6; i++) { const m = mesh(link, s, dx - 0.4 - i * 0.18, dy - 0.9 - i * 0.5, D / 2 + 0.6); m.rotation.set(0, i % 2 ? Math.PI / 2 : 0, 0.3); g.add(m); }
+  if (I.over) { g.userData.setPanel = () => {}; return g; }
   // front door (freezer access), hinged on the left
   const door = named(new THREE.Group(), 'front-door'), dh = yd1 - yd0, dyc = (yd0 + yd1) / 2;
   door.position.set(-dw / 2, 0, D / 2);
@@ -188,7 +237,12 @@ function buildContents(P, M, C, I, { instanced = true, seed = 11, lod = 'high' }
   g.add(named(mesh(bed, C.iceBed), 'ice-bed'));
   // bottles in staggered rows, labels to the front, each sunk and tilted a little differently
   const slots = [], mats = [], o = new THREE.Object3D();
-  for (let row = 0; row < rows; row++) for (let c = 0; c < cols; c++) {
+  if (I.over) for (const [bx, bz] of I.ring) { // around the edge, leaning out toward the walls, labels to the front
+    const x = bx + jit(0.5), z = bz + jit(0.4), ln = Math.hypot(x, z) || 1, lean = 0.16 + r() * (P.lean + 0.18), bury = 3.0 + r() * 0.9;
+    o.position.set(x, surf(x, z) - bury, z); o.rotation.set(0, jit(0.35) + (x / (iL / 2)) * 0.35, 0); o.rotateX(lean * (z / ln)); o.rotateZ(-lean * (x / ln)); o.updateMatrix();
+    mats.push(o.matrix.clone()); slots.push([x, z]);
+  }
+  if (!I.over) for (let row = 0; row < rows; row++) for (let c = 0; c < cols; c++) {
     const x = -iL / 2 + ((c + 0.5 + (row % 2 ? 0.25 : -0.1)) * iL) / cols + jit(0.5), z = -iD / 2 + ((row + 0.5) * iD) / rows + jit(0.4);
     const xx = Math.max(-iL / 2 + 1.4, Math.min(iL / 2 - 1.4, x)), bury = 2.4 + r() * 1.2 - (rows - 1 - row) * 0.25;
     o.position.set(xx, surf(xx, z) - bury, z); o.rotation.set(0, jit(0.45), 0); o.rotateX(0.04 + r() * (P.lean * 1.5 + 0.18)); o.rotateZ(jit(0.28)); o.updateMatrix();
@@ -199,33 +253,46 @@ function buildContents(P, M, C, I, { instanced = true, seed = 11, lod = 'high' }
   const cubes = [];
   for (let x = -iL / 2 + 1.1; x < iL / 2 - 0.9; x += 2.05) for (let z = -iD / 2 + 1.1; z < iD / 2 - 0.9; z += 2.05) {
     const px = x + jit(0.45), pz = z + jit(0.45);
-    if (slots.some(([bx, bz]) => Math.hypot(px - bx, pz - bz) < 1.75)) continue;
+    if (slots.some(([bx, bz]) => Math.hypot(px - bx, pz - bz) < 1.75) || (I.over && Math.hypot(px, pz) < 4.1)) continue;
     o.position.set(px, surf(px, pz) - 0.35 + r() * 0.55, pz); o.rotation.set(r() * 3, r() * 3, r() * 3); o.scale.setScalar(0.8 + r() * 0.35); o.updateMatrix(); cubes.push(o.matrix.clone());
   }
   o.scale.setScalar(1);
-  const cube = geo(K('ccube', instanced), () => (instanced ? new RoundedBoxGeometry(2.1, 2.1, 2.1, 2, 0.35) : new THREE.BoxGeometry(2, 2, 2)));
+  const cube = geo(K('cchunk'), () => new THREE.IcosahedronGeometry(1.25, 0).scale(1, 0.85, 1.1));
   if (instanced) { const im = new THREE.InstancedMesh(cube, C.ice, cubes.length); cubes.forEach((m, i) => im.setMatrixAt(i, m)); im.castShadow = true; im.receiveShadow = true; g.add(im); }
   else g.add(mesh(geo(K('ccubes', iL, iD, rim, heap, P.lean, seed), () => mergeGeometries(cubes.map((m) => cube.clone().applyMatrix4(m)))), C.ice));
+  if (I.over) { // the puck in the centre, on a steel collar, with a blue light underneath
+    const yb = surf(0, 0) - 0.2, pk = named(new THREE.Group(), 'puck-light');
+    pk.add(mesh(geo(K('collar'), () => new THREE.LatheGeometry([[2.0, 0], [3.25, 0], [3.4, 0.45], [3.1, 0.95], [2.15, 0.95], [2.0, 0.5]].map(([a, b]) => new THREE.Vector2(a, b)), 64)), C.steel || M.metal, 0, yb, 0));
+    for (let i = 0; i < 6; i++) { const a = (i / 6) * Math.PI * 2, m = mesh(geo(K('clip'), () => new RoundedBoxGeometry(0.9, 0.7, 0.6, 2, 0.15)), C.steel, Math.sin(a) * 3.35, yb + 0.45, Math.cos(a) * 3.35); m.rotation.y = a; pk.add(m); }
+    pk.add(along2(mesh(geo(K('glowring'), () => new THREE.RingGeometry(1.2, 2.25, 64)), C.glow, 0, yb + 0.92, 0)));
+    pk.add(mesh(geo(K('glowband'), () => new THREE.CylinderGeometry(1.42, 1.75, 0.5, 48, 1, true)), C.glow, 0, yb + 1.2, 0)); // the light seen under the puck from the side
+    pk.add(along2(mesh(geo(K('halo2'), () => new THREE.PlaneGeometry(22, 22)), C.halo, 0, yb + 1.0, 0)));
+    pk.add(mesh(geo(K('puck'), () => new THREE.CylinderGeometry(1.5, 1.5, 1.0, 48)), C.rubber, 0, yb + 1.95, 0)); // regulation puck: 3" × 1", lifted on the light
+    const light = new THREE.PointLight(new THREE.Color(P.oGlow || '#36c8ff'), 220, 30, 2); light.position.set(0, yb + 1.1, 0); pk.add(light);
+    g.add(pk);
+  }
   g.userData.top = rim + heap + 9;
   return g;
 }
+const along2 = (m) => { m.rotation.x = -Math.PI / 2; return m; }; // lay a plane / ring flat, facing up
 
-export function buildModel(P, M, { lod = 'both', merged = false } = {}) {
-  const I = info(P), C = materials(P, M); C.printIsDefault = M.coolerLogoIsDefault;
+export function buildModel(P0, M, { lod = 'both', merged = false } = {}) {
+  const P = eff(P0), I = info(P0), C = materials(P, M); C.printIsDefault = M.coolerLogoIsDefault;
   const root = new THREE.Group(), parts = {};
-  parts.base = buildBase(P, C); parts.enc = buildBody(P, C, I); parts.fridge = T.fridgeAt(I.fridgeY, I.zf);
+  parts.base = buildBase(P, C, I.over); parts.enc = buildBody(P, C, I); parts.fridge = I.over ? new THREE.Group() : T.fridgeAt(I.fridgeY, I.zf);
   parts.cupGroup = new THREE.Group(); parts.cup = buildLid(P, C, I);
   parts.contents = buildContents(P, M, C, I, { instanced: !merged, lod: lod === 'low' ? 'low' : 'high' });
   parts.cupGroup.add(parts.cup, parts.contents); root.add(parts.base, parts.enc, parts.fridge, parts.cupGroup);
   parts.info = I;
   return { root, parts };
 }
-export function arrange(parts, P, V) {
+export function arrange(parts, P0, V) {
+  const P = eff(P0);
   const only = V.isolate ? V.sel : null, vis = V.vis;
   parts.cup.visible = only ? only === 'cup' : vis.cup;
   parts.cvis = only ? only === 'contents' : vis.contents; parts.contents.visible = parts.cvis;
   parts.enc.visible = only ? only === 'enc' : vis.enc;
-  parts.fridge.visible = only ? only === 'enc' || only === 'fridge' : vis.fridge;
+  parts.fridge.visible = !parts.info.over && (only ? only === 'enc' || only === 'fridge' : vis.fridge);
   parts.base.visible = only ? only === 'base' : vis.base;
   parts.enc.userData.setPanel(V.panel);
   const ex = only ? 0 : V.explode;
@@ -233,8 +300,8 @@ export function arrange(parts, P, V) {
   parts.base.position.y = -ex * 6; parts.cupGroup.position.y = 0; parts.cup.position.y = parts.info.rim + ex * 22; parts.contents.position.y = ex * 12;
   return { top: parts.info.rim, grounded: parts.base.visible || parts.enc.visible, contact: [P.cL * 1.25, P.cD * 1.9] };
 }
-export function weights(P) {
-  const I = info(P), skin = (2 * (I.L * I.H + I.D * I.H) + 2 * I.L * I.D) / 144; // ft² of stainless + foam panels
+export function weights(P0) {
+  const P = eff(P0), I = info(P0), skin = (2 * (I.L * I.H + I.D * I.H) + 2 * I.L * I.D) / 144; // ft² of stainless + foam panels
   return { body: Math.round(skin * 1.45), lid: Math.round((I.L * I.D) / 144 * 2.2), base: Math.round((I.L * I.D) / 144 * 1.6),
-    bottles: Math.round(I.n * 1.2), ice: Math.round(I.iL * I.iD * Math.max(2, P.heap + 4) * 0.55 * 0.033), fridge: T.FRIDGE.weight };
+    bottles: Math.round(I.n * 1.2), ice: Math.round(I.iL * I.iD * (I.over ? I.well : Math.max(2, P.heap + 4)) * 0.55 * 0.033), fridge: I.over ? 0 : T.FRIDGE.weight };
 }
