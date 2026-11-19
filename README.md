@@ -34,7 +34,7 @@ Switch with **Design → Cooler** at the top of the panel. A brushed-stainless c
 
 ## Reference window
 
-The top-left of the viewport shows the image each design was modelled from; click it to see it full size (Esc or *Close* to go back), or minimize it with *–*. Reference images are **not stored in this repository or on Vercel**: a build includes them only if they are present locally in the git-ignored `src/refs/` folder (`trophy.jpg`, `cooler.jpg`). Without them, the window offers *Add the reference image*; an image added there stays in that browser only (IndexedDB `trophy-cooler-refs`), and *Replace image* / *Use original* manage it.
+The top-left of the viewport shows the image each design was modelled from; click it to see it full size (Esc or *Close* to go back), or minimize it with *–*. The images live in `src/refs/` (`trophy.jpg`, `cooler.jpg`) and are embedded in every build, so anyone with the link sees them. To change one, replace the file and push. A visitor can also swap in their own image with *Replace image*; that copy stays in their browser only (IndexedDB `trophy-cooler-refs`) and *Use original* goes back.
 
 ## Rendering pipeline
 

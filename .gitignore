@@ -2,4 +2,3 @@ node_modules/
 dist/
 models/
 .DS_Store
-src/refs/
