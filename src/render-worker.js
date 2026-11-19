@@ -11,7 +11,7 @@ import * as T from './trophy.js';
 import * as S from './stage.js';
 
 const canvas = new OffscreenCanvas(4, 4);
-let renderer = null, scene, lights, ground, mirror, env = {}, model = null, modelKey = '', texKey = '', tex = {}, job = 0;
+let texDefault = true, renderer = null, scene, lights, ground, mirror, env = {}, model = null, modelKey = '', texKey = '', tex = {}, job = 0;
 const tick = () => new Promise((r) => setTimeout(r, 0)); // yield so 'cancel' and new jobs get through
 
 function setup() {
@@ -30,15 +30,15 @@ function texture(d) {
 }
 // (re)build the scene only when the object or view state changed; geometry comes from this worker's cache
 function sync(st, texMsg, { merged, fast }) {
-  if (texMsg) { Object.values(tex).forEach((t) => t && t.dispose()); tex = { logo: texture(texMsg.logo), bottleLabel: texture(texMsg.bottleLabel), neckLabel: texture(texMsg.neckLabel) }; texKey = texMsg.key; }
+  if (texMsg) { Object.values(tex).forEach((t) => t && t.dispose()); tex = { logo: texture(texMsg.logo), bottleLabel: texture(texMsg.bottleLabel), neckLabel: texture(texMsg.neckLabel), coolerLogo: texture(texMsg.coolerLogo) }; texDefault = texMsg.coolerLogoIsDefault; texKey = texMsg.key; }
   const k = JSON.stringify([st.P, st.V, merged, fast, texKey]);
   if (k !== modelKey) {
     if (model) { scene.remove(model.root); model.root.traverse((o) => { if (o.geometry && !o.geometry.userData.cached) o.geometry.dispose(); }); }
-    const M = T.makeMaterials(st.P, tex, { fast, detail: true });
+    const M = T.makeMaterials(st.P, { ...tex, coolerLogoIsDefault: texDefault }, { fast, detail: true });
     model = S.buildModel(st.P, M, { lod: 'high', merged }); scene.add(model.root); modelKey = k;
   }
   const a = S.arrange(model.parts, st.P, st.V);
-  ground.contact.scale.set(st.P.W * 1.5, st.P.D * 2.6, 1); ground.contact.visible = a.grounded;
+  ground.contact.scale.set(a.contact[0], a.contact[1], 1); ground.contact.visible = a.grounded;
   ground.rink.visible = st.V.env === 'rink';
   if (!env[st.V.env]) env[st.V.env] = S.pmremEnv(renderer, st.V.env);
   scene.environment = env[st.V.env]; scene.background = new THREE.Color(S.BG[st.V.env]); scene.environmentIntensity = 1;
@@ -65,7 +65,7 @@ async function turntable(m) {
 // one high-quality frame from the real-time engine: full materials, mirror floor, key-light shadow, supersampled
 async function detail(m) {
   const id = ++job; setup();
-  sync(m.state, m.tex, { merged: false, fast: false });
+  sync(m.state, m.tex, { merged: false, fast: !!m.fast });
   const W = m.size.w, H = m.size.h, ss = m.ss || 2, iw = Math.round(W * ss), ih = Math.round(H * ss);
   renderer.setPixelRatio(1); renderer.setSize(iw, ih, false);
   mirror.visible = m.state.V.env === 'studio';

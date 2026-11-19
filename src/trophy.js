@@ -71,6 +71,16 @@ function latheGeo(pts, seg, aoStrength = 0) {
 }
 const lathe = (pts, seg, mat, aoStrength = 0) => mesh(latheGeo(pts, seg, aoStrength), mat);
 // static micro-detail maps (built once): faint roughness variation keeps paint and chrome from looking like plastic
+let DROPS = null;
+function dropletMap() { // condensation beads on cold glass (bump map, built once)
+  if (DROPS) return DROPS;
+  const N = 256, r = rng(21), h = new Float32Array(N * N);
+  for (let k = 0; k < 320; k++) { const cx = r() * N, cy = r() * N, rad = 2.5 + r() * r() * 8;
+    for (let y = Math.floor(cy - rad); y <= cy + rad; y++) for (let x = Math.floor(cx - rad); x <= cx + rad; x++) { const d = Math.hypot(x - cx, (y - cy) * 0.8) / rad; if (d < 1) { const i = ((y + N) % N) * N + ((x + N) % N); h[i] = Math.max(h[i], Math.sqrt(1 - d * d)); } } }
+  const b = new Uint8Array(N * N * 4); for (let i = 0; i < h.length; i++) { const v = Math.round(255 * h[i]); b[i * 4] = b[i * 4 + 1] = b[i * 4 + 2] = v; b[i * 4 + 3] = 255; }
+  const t = new THREE.DataTexture(b, N, N, THREE.RGBAFormat); t.wrapS = t.wrapT = THREE.RepeatWrapping; t.repeat.set(2, 1.5); t.needsUpdate = true;
+  return (DROPS = t);
+}
 let DETAIL = null;
 function detailMaps() {
   if (DETAIL) return DETAIL;
@@ -109,6 +119,8 @@ export function makeMaterials(P, o = {}, { fast = false, detail = false } = {}) 
     cap: new THREE.MeshPhysicalMaterial({ name: 'bottle-cap', color: 0xdfe3ea, metalness: 1, roughness: 0.2 }),
     logo: o.logo ? new THREE.MeshStandardMaterial({ name: 'front-logo', map: o.logo, transparent: true, roughness: 0.35 }) : null,
   };
+  M._fast = fast; M.coolerLogoMap = o.coolerLogo || null; M.coolerLogoIsDefault = o.coolerLogoIsDefault !== false;
+  if (D) { M.glass.bumpMap = dropletMap(); M.glass.bumpScale = 0.7; }
   // same chrome, with the baked AO vertex colours (bowl grooves, pedestal coves)
   M.metalAO = M.metal.clone(); M.metalAO.name = 'polished-metal-ao'; M.metalAO.vertexColors = true;
   if (fast) { // no transmission: avoids a full extra scene render per frame; reflections come from the precomputed environment map
@@ -118,6 +130,7 @@ export function makeMaterials(P, o = {}, { fast = false, detail = false } = {}) 
       ? new THREE.MeshPhysicalMaterial({ name: 'bottle-glass-clear', color: 0xcfe3d8, roughness: 0.03, clearcoat: 1, transparent: true, opacity: 0.4, envMapIntensity: 1.5 })
       : new THREE.MeshPhysicalMaterial({ name: 'bottle-glass-amber', color: 0x5e2a07, roughness: 0.05, metalness: 0, clearcoat: 1, clearcoatRoughness: 0.03, envMapIntensity: 1.6 });
     M.uhmw = new THREE.MeshStandardMaterial({ name: 'UHMW-PE', color: 0xe9e9e3, roughness: 0.6 });
+    if (D) { M.glass.bumpMap = dropletMap(); M.glass.bumpScale = 0.7; }
   }
   return M;
 }
@@ -234,6 +247,35 @@ export function buildCup(P, M, { lod = 'high' } = {}) {
 // 12 oz longneck: straight body, long gentle shoulder, tapered neck, crown lip
 const BOTTLE = [[0, 0], [1.14, 0], [1.2, 0.15], [1.2, 4.9], [1.16, 5.5], [1.0, 6.2], [0.74, 6.9], [0.61, 7.4], [0.55, 8.5], [0.6, 8.62], [0.6, 8.92], [0, 8.97]];
 const rBottle = (y) => { for (let i = 1; i < BOTTLE.length; i++) if (y <= BOTTLE[i][1]) { const [r0, y0] = BOTTLE[i - 1], [r1, y1] = BOTTLE[i]; return r0 + (r1 - r0) * (y - y0) / Math.max(1e-6, y1 - y0); } return 0.5; };
+// ---------- shared pieces (used by the cooler design too) ----------
+export const U = { rng, ss, mesh, box, rbox, cyl, named, K };
+export function bottleGeometries(hi = true) {
+  const bs = hi ? 40 : 16;
+  return [
+    [cachedGeometry(K('bottle', bs), () => new THREE.LatheGeometry(BOTTLE.map(([q, y]) => new THREE.Vector2(q, y)), bs)), 'glass'],
+    [cachedGeometry(K('beer', bs), () => new THREE.LatheGeometry(BOTTLE.filter(([, y]) => y < 7.2).map(([q, y]) => new THREE.Vector2(Math.max(0, q - 0.12), y + 0.05)), Math.max(12, bs - 16))), 'beer'],
+    [cachedGeometry(K('label', bs), () => new THREE.CylinderGeometry(1.222, 1.222, 3.9, hi ? 64 : 24, 1, true).translate(0, 2.65, 0)), 'label'],
+    [cachedGeometry(K('neck', bs), () => new THREE.CylinderGeometry(rBottle(8.5) + 0.02, rBottle(7.0) + 0.02, 1.5, bs, 1, true).translate(0, 7.75, 0)), 'neck'],
+    [cachedGeometry(K('cap', bs), () => new THREE.CylinderGeometry(0.6, 0.64, 0.36, hi ? 24 : 12).translate(0, 8.86, 0)), 'cap'],
+  ];
+}
+// add bottles at the given matrices (instanced for the live view, plain meshes for export)
+export function addBottles(g, M, matrices, { instanced = true, hi = true } = {}) {
+  for (const [geo, key] of bottleGeometries(hi)) {
+    if (instanced) { const im = new THREE.InstancedMesh(geo, M[key], matrices.length); matrices.forEach((m, i) => im.setMatrixAt(i, m)); im.castShadow = true; g.add(im); }
+    else matrices.forEach((m) => { const me = mesh(geo, M[key]); me.applyMatrix4(m); g.add(me); });
+  }
+}
+// the freezer stand-in, front face at z = zf, standing on y0
+export function fridgeAt(y0, zf, x = 0) {
+  const g = named(new THREE.Group(), 'meling-DW-XL90'), { w, d, h } = FRIDGE;
+  const body = new THREE.MeshStandardMaterial({ name: 'fridge-body', color: 0xf5f5f3, roughness: 0.5 }), dark = new THREE.MeshStandardMaterial({ color: 0x1a1d22, roughness: 0.6 });
+  g.add(box(w, h, d, body, x, y0 + h / 2, zf - d / 2));
+  g.add(box(w - 5, h - 10, 0.15, new THREE.MeshPhysicalMaterial({ color: 0x9fb6c8, roughness: 0.1, transparent: true, opacity: 0.6 }), x, y0 + h / 2 + 1, zf + 0.05));
+  g.add(box(w - 2, 2.2, 0.2, dark, x, y0 + 1.6, zf + 0.06));
+  return g;
+}
+
 export function buildContents(P, M, bowl, { instanced = true, seed = 7, lod = 'high' } = {}) {
   const g = named(new THREE.Group(), 'bottles-and-ice'), r = rng(seed), Ri = bowl.rAt(bowl.rim) - 0.4, heap = P.heap;
   const surf = (x, z) => { const q = Math.min(1, Math.hypot(x, z) / Ri); return bowl.rim - 0.9 + heap * (1 - q * q) + 0.35 * Math.sin(x * 0.7) * Math.cos(z * 0.6); };

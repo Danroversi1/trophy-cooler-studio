@@ -2,6 +2,7 @@
 // (turntable cache + final render). Everything here works with either an HTMLCanvasElement or an OffscreenCanvas.
 import * as THREE from 'three';
 import * as T from './trophy.js';
+import * as C from './cooler.js';
 
 export const mkCanvas = (w, h) => {
   if (typeof document !== 'undefined') { const c = document.createElement('canvas'); c.width = w; c.height = h; return c; }
@@ -74,6 +75,7 @@ export function makeGround(scene) {
 // The model, from cached geometry. lod: 'both' (interactive: high + low, toggled by screen size), 'high', or 'low'.
 // merged: non-instanced bottles/ice (used by the GLB export path).
 export function buildModel(P, M, { lod = 'both', merged = false } = {}) {
+  if (P.design === 'cooler') return C.buildModel(P, M, { lod, merged });
   const root = new THREE.Group(), parts = {};
   parts.base = T.buildBase(P, M); parts.enc = T.buildEnclosure(P, M); parts.fridge = T.buildFridge(P);
   parts.cupGroup = new THREE.Group(); parts.cup = T.buildCup(P, M, { lod });
@@ -83,6 +85,7 @@ export function buildModel(P, M, { lod = 'both', merged = false } = {}) {
 }
 // visibility / exploded view / lifted panel (transforms only; geometry is never rebuilt for these)
 export function arrange(parts, P, V) {
+  if (P.design === 'cooler') return C.arrange(parts, P, V);
   const top = T.casterH(P) + P.H, only = V.isolate ? V.sel : null, vis = V.vis;
   parts.cup.visible = only ? only === 'cup' : vis.cup;
   parts.cvis = only ? only === 'cup' || only === 'contents' : vis.contents; parts.contents.visible = parts.cvis;
@@ -92,5 +95,5 @@ export function arrange(parts, P, V) {
   parts.enc.userData.setPanel(V.panel);
   const ex = only ? 0 : V.explode;
   parts.base.position.y = -ex * 6; parts.enc.position.y = 0; parts.cupGroup.position.y = top + ex * 40;
-  return { top, grounded: parts.base.visible || parts.enc.visible };
+  return { top, grounded: parts.base.visible || parts.enc.visible, contact: [P.W * 1.5, P.D * 2.6] };
 }

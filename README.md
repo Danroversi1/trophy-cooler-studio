@@ -22,6 +22,16 @@ See **Rendering pipeline** below for preview modes, the CPU fallback and the fin
 
 All dimensions are parametric. **Keep the render's proportions** scales the cup with the enclosure width. The freezer fit is checked live, and the box can't be made smaller than the freezer.
 
+## Second design: the cooler
+
+Switch with **Design → Cooler** at the top of the panel. A brushed-stainless chest cooler after the client's reference: blue faceted trim around the rim and the lid, clear crystal lid corners, a front latch, side handles with blue faceted grips, a drain plug, and the Michelob ULTRA logo on the front with a faceted red ribbon.
+
+- **Freezer:** the Meling DW-XL90 stands upright inside, behind a **front door** (hinged on the left, flush pull, vent slots at the bottom for the freezer's front vent). Default 64 × 32 × 43 in body: 18.7 in each side, 0.8 in under the ice well, 3.4 in behind. The fit is checked live.
+- **Ice well:** the top 8 in of the body; bottles stand in staggered rows in big clear cubes, labels to the front. The count follows the well size (36 at the default size, 28 at 48 in long, 48 at 80 in long).
+- **Proportions:** length about 1.5 × the body height, like a classic steel-belted cooler. The body has to be about 43 in tall to fit the freezer under the well, which sets the overall size.
+- **Base:** UHMW-PE ice runners, no wheels.
+- Controls: length, depth, height, ice-well depth, lid angle, front door, X-ray, trim colour. Part keys match the trophy, so layers, export and the render worker work the same way.
+
 ## Rendering pipeline
 
 Everything is real-time WebGL (three.js): no path tracing, no cloud. The viewer detects whether WebGL runs on a hardware GPU (integrated graphics count) or in **software** (SwiftShader, llvmpipe, Microsoft Basic Render — i.e. on the CPU) and adapts. The readout in the bottom-right corner shows the preview mode, frame rate, render resolution and scale, and hardware vs software rendering.
@@ -70,6 +80,7 @@ Limitations of CPU-only rendering: everything still runs on the processor, so tu
 ## Files
 | Path | What |
 |---|---|
+| `src/cooler.js` | Cooler design: body, front door, lid, trim, handles, ice well, bottle grid, fit check, weights |
 | `src/trophy.js` | Parametric geometry (inches, +Y up, +Z front), geometry cache, LOD, baked AO, materials (fast + full) |
 | `src/stage.js` | Scene pieces shared by the viewer and the worker: environment, lights, ground, model assembly |
 | `src/render-worker.js` | Background worker: cached turntable and Detail render on an OffscreenCanvas |
