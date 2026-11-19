@@ -176,6 +176,24 @@ details b{color:#d6dbe4;font-weight:600}
 #still-pane .still{max-width:100%;max-height:100%;object-fit:contain;cursor:zoom-in}
 #still-pane .still.zoom{max-width:none;max-height:none;cursor:zoom-out}
 body[data-design="cooler"] [data-design="trophy"],body[data-design="trophy"] [data-design="cooler"]{display:none!important}
+/* reference window (top-left of the viewport) + full-size view */
+.refwin{position:absolute;left:20px;top:78px;z-index:2;width:clamp(120px,19%,210px);background:#0a0b0ee6;border:1px solid #ffffff1a;border-radius:10px;overflow:hidden;cursor:zoom-in;backdrop-filter:blur(12px);box-shadow:0 8px 24px #0007}
+.refwin .refhead{display:flex;align-items:center;justify-content:space-between;gap:8px;padding:5px 6px 5px 10px;font-size:9.5px;letter-spacing:1.1px;text-transform:uppercase;color:#a9b0bf}
+.refwin img{display:block;width:100%;height:auto;max-height:210px;object-fit:cover;background:#000}
+.refwin .refbtn{min-height:0;height:20px;width:22px;padding:0;font-size:12px;line-height:1;background:transparent;border:1px solid #ffffff1f;color:#cfd6e4;border-radius:5px;cursor:pointer}
+.refwin.min{width:auto;cursor:pointer}.refwin.min img,.refwin.min .refadd{display:none!important}
+.refwin .refadd{display:block;margin:0 8px 8px;padding:14px 8px;border:1px dashed #ffffff33;border-radius:7px;text-align:center;font-size:10.5px;line-height:1.4;color:#a9b0bf;cursor:pointer}
+.refwin .refadd input{display:none}
+.refwin:focus-visible{outline:2px solid #4d7dff;outline-offset:2px}
+#stage.split .refwin{left:calc(50% + 20px)}
+.refbox{position:absolute;inset:0;z-index:9;background:#000000f0;display:none;flex-direction:column;cursor:zoom-out}
+.refbox.on{display:flex}
+.refbox img{flex:1;min-height:0;width:100%;object-fit:contain;padding:22px}
+.refbox .refbar{display:flex;gap:8px;align-items:center;padding:10px 14px;border-top:1px solid #ffffff14;background:#0a0b0e;font-size:11px;color:#a1a8b7;cursor:default}
+.refbox .refbar span{margin-right:auto}.refbox .refbar button{min-height:30px;font-size:10.5px;padding:0 12px}
+.stage-design{position:absolute;top:20px;left:50%;transform:translateX(-50%);z-index:2;width:190px;padding:4px;background:#0a0b0edc;border:1px solid #ffffff0c;border-radius:10px;backdrop-filter:blur(16px)}
+#stage.split .stage-design{left:75%}
+@media(max-width:1180px){.stage-design{display:none}}
 #tt-view{position:absolute;left:0;top:0;pointer-events:none;opacity:0;transition:opacity .18s;z-index:1}
 #tt-view.on{opacity:1;transition:none}
 #stage.split #tt-view{left:50%}
@@ -326,7 +344,15 @@ body[data-design="cooler"] [data-design="trophy"],body[data-design="trophy"] [da
 
 <main id="stage" aria-label="Interactive trophy cooler 3D viewer">
   <div class="viewbar" id="viewbar"><button data-view="front" class="active">Front</button><button data-view="hero">3/4</button><button data-view="side">Side</button><button data-view="back">Back</button><button data-view="top">Top</button><button data-view="bottles">Bottles</button></div>
+  <div class="seg stage-design" id="design2" role="group" aria-label="Design"><button data-v="trophy">Trophy</button><button data-v="cooler">Cooler</button></div>
   <button class="focusbtn" id="fit-btn">Fit view</button>
+  <div class="refwin" id="ref-win" role="button" tabindex="0" aria-label="Reference image: click to expand">
+    <div class="refhead"><span id="ref-title">Reference</span><button class="refbtn" id="ref-min" aria-label="Minimize the reference window" title="Minimize">–</button></div>
+    <img id="ref-img" alt="Reference image this design was modelled from">
+    <label class="refadd" id="ref-add"><input type="file" id="f-ref" accept="image/*">Add the reference image<br><small>stays in this browser only</small></label>
+  </div>
+  <div class="refbox" id="ref-box" aria-hidden="true"><img id="ref-big" alt="Reference image, full size">
+    <div class="refbar"><span id="ref-cap"></span><input type="file" id="f-ref2" accept="image/*" hidden><button id="ref-replace">Replace image</button><button id="ref-reset">Use original</button><button id="ref-close">Close</button></div></div>
   <div class="scene-label" id="scene-label">Freezer enclosed · 12 Michelob ULTRA on ice</div>
   <div class="hint">Drag to orbit<span>·</span>Scroll to zoom<span>·</span>Right-drag to pan</div>
   <div id="toast" role="status" aria-live="polite"></div>
@@ -579,7 +605,8 @@ $('xray').onchange = (e) => { V.xray = e.target.checked; applyView(); };
 $('xray2').onchange = (e) => { V.xray = e.target.checked; applyView(); };
 $('door-open').oninput = (e) => { V.panel = +e.target.value; $('door-open-v').textContent = V.panel < 0.02 ? 'Closed' : `${Math.round(V.panel * 100)}° open`; applyView(); };
 $('trim').oninput = (e) => { P.cTrim = e.target.value; $('trim-v').textContent = P.cTrim; clearTimeout(bt); bt = setTimeout(build, 120); };
-$('design').onclick = (e) => { const b = e.target.closest('button'); if (!b || b.dataset.v === P.design) return; P.design = b.dataset.v; V.sel = P.design === 'cooler' ? 'enc' : 'cup'; Object.assign(V, { isolate: false, panel: 0, explode: 0, xray: false }); $('explode').value = 0; $('explode-v').textContent = '0%'; $('panel-open').value = 0; $('door-open').value = 0; build(); goCam('hero'); toast(P.design === 'cooler' ? 'Cooler design' : 'Trophy design'); };
+function setDesign(v) { if (v === P.design) return; P.design = v; V.sel = P.design === 'cooler' ? 'enc' : 'cup'; Object.assign(V, { isolate: false, panel: 0, explode: 0, xray: false }); $('explode').value = 0; $('explode-v').textContent = '0%'; $('panel-open').value = 0; $('door-open').value = 0; build(); goCam('hero'); toast(P.design === 'cooler' ? 'Cooler design' : 'Trophy design'); }
+for (const id of ['design', 'design2']) $(id).onclick = (e) => { const b = e.target.closest('button'); if (b) setDesign(b.dataset.v); };
 $('panel-open').oninput = (e) => { V.panel = +e.target.value; $('panel-open-v').textContent = V.panel < 0.02 ? 'On' : V.panel > 0.98 ? 'Lifted off' : 'Lifting…'; applyView(); };
 $('explode').oninput = (e) => { V.explode = +e.target.value; $('explode-v').textContent = Math.round(V.explode * 100) + '%'; applyView(); };
 $('spin').onchange = (e) => { controls.autoRotate = e.target.checked; };
@@ -596,7 +623,7 @@ function syncUI() {
   $('mode-note').textContent = MODE === 'fast' ? 'Precomputed reflections and a static shadow; redraws only when something changes, at lower resolution while you drag.' : 'Adds the mirror floor, see-through ice and glass, and ambient occlusion when still. Heavy without a graphics card.';
   const hi = MODE === 'high'; $('hq').disabled = !hi; $('hq-row').style.opacity = hi ? 1 : 0.45;
   $('tt-toggle').checked = TT.enabled; $('tt-toggle').disabled = !RW; $('lock').checked = lock; $('color').value = P.color; $('color-v').textContent = P.color; $('xray').checked = V.xray; $('hq').checked = HQ;
-  document.body.dataset.design = P.design; document.querySelectorAll('#design button').forEach((b) => b.classList.toggle('active', b.dataset.v === P.design));
+  document.body.dataset.design = P.design; document.querySelectorAll('#design button, #design2 button').forEach((b) => b.classList.toggle('active', b.dataset.v === P.design)); refShow(); $('study-sub').textContent = P.design === 'cooler' ? '· Michelob ULTRA cooler — brushed-stainless chest with the freezer behind a front door' : '· Trophy cooler — chrome fluted cup on a Michelob blue freezer enclosure';
   $('design-note').textContent = P.design === 'cooler' ? 'Stainless chest cooler: freezer upright behind the front door, bottles on ice in the top.' : 'Trophy: chrome fluted cup on a blue freezer enclosure.';
   $('xray2').checked = V.xray; $('trim').value = P.cTrim; $('trim-v').textContent = P.cTrim;
   const go = $('glb-what').options; go[0].text = P.design === 'cooler' ? 'Whole cooler' : 'Whole trophy'; go[1].text = P.design === 'cooler' ? 'Lid' : 'Cup + pedestal'; go[3].text = P.design === 'cooler' ? 'Cooler body + door' : 'Enclosure';
@@ -788,6 +815,57 @@ $('still-again').onclick = () => finalRender();
 $('still-close').onclick = () => { if (FIN.running) { RW && RW.postMessage({ type: 'cancel' }); FIN.id = -1; finalStop(); } view.classList.remove('split'); resize(); };
 $('still-dl').onclick = () => FIN.blob && saveFile('michelob-ultra-trophy-cooler-detail.png', FIN.blob, false);
 $('still-cv').onclick = (e) => { e.target.classList.toggle('zoom'); e.target.parentElement.classList.toggle('zoom'); };
+
+// ---------- reference window ----------
+// Built-in references come from src/refs/ at build time (never committed or deployed). Images people add here are kept
+// in this browser only (IndexedDB 'trophy-cooler-refs'), one per design.
+const REF_BUILT = (() => { try { return JSON.parse(document.getElementById('ref-images')?.textContent || '{}'); } catch { return {}; } })();
+const REF = { local: {}, min: false };
+try { REF.min = localStorage.getItem('trophy-cooler-ref-min') === '1'; } catch {}
+const refDB = (() => {
+  let p = null; const open = () => p || (p = new Promise((res, rej) => { const r = indexedDB.open('trophy-cooler-refs', 1); r.onupgradeneeded = () => r.result.createObjectStore('refs', { keyPath: 'design' }); r.onsuccess = () => res(r.result); r.onerror = () => rej(r.error); }));
+  const run = async (mode, fn) => { const db = await open(); return new Promise((res, rej) => { const t = db.transaction('refs', mode), q = fn(t.objectStore('refs')); t.oncomplete = () => res(q && q.result); t.onerror = () => rej(t.error); }); };
+  return { all: () => run('readonly', (st) => st.getAll()).catch(() => []), put: (rec) => run('readwrite', (st) => st.put(rec)).catch(() => null), del: (d) => run('readwrite', (st) => st.delete(d)).catch(() => null) };
+})();
+const refURL = () => REF.local[P.design] || REF_BUILT[P.design] || null;
+const refName = () => (P.design === 'cooler' ? 'Cooler' : 'Trophy');
+function refShow() {
+  const u = refURL();
+  $('ref-title').textContent = `${refName()} reference`;
+  $('ref-img').style.display = u ? '' : 'none'; $('ref-add').style.display = u ? 'none' : '';
+  if (u && $('ref-img').getAttribute('src') !== u) $('ref-img').src = u;
+  $('ref-win').classList.toggle('min', REF.min); $('ref-min').textContent = REF.min ? '+' : '–'; $('ref-min').title = REF.min ? 'Show' : 'Minimize';
+  $('ref-win').setAttribute('aria-label', u ? `${refName()} reference image: click to expand` : `Add a ${refName().toLowerCase()} reference image`);
+  if ($('ref-box').classList.contains('on')) refOpen();
+}
+function refOpen() {
+  const u = refURL(); if (!u) return;
+  $('ref-big').src = u; $('ref-cap').textContent = `${refName()} · the reference image this model was built from${REF.local[P.design] ? ' (added in this browser)' : ''}`;
+  $('ref-reset').style.display = REF.local[P.design] && REF_BUILT[P.design] ? '' : 'none';
+  $('ref-box').classList.add('on'); $('ref-box').setAttribute('aria-hidden', 'false'); $('ref-close').focus();
+}
+function refClose() { $('ref-box').classList.remove('on'); $('ref-box').setAttribute('aria-hidden', 'true'); }
+async function refSet(file) {
+  if (!file || !file.type.startsWith('image/')) return;
+  await refDB.put({ design: P.design, blob: file, name: file.name, added: Date.now() });
+  if (REF.local[P.design]) URL.revokeObjectURL(REF.local[P.design]);
+  REF.local[P.design] = URL.createObjectURL(file); refShow(); toast('Reference saved in this browser');
+}
+$('ref-win').onclick = (e) => {
+  if (e.target.closest('#ref-min')) { REF.min = !REF.min; try { localStorage.setItem('trophy-cooler-ref-min', REF.min ? '1' : '0'); } catch {} refShow(); return; }
+  if (e.target.closest('#ref-add')) return;
+  if (REF.min) { REF.min = false; try { localStorage.setItem('trophy-cooler-ref-min', '0'); } catch {} refShow(); return; }
+  refOpen();
+};
+$('ref-win').onkeydown = (e) => { if ((e.key === 'Enter' || e.key === ' ') && e.target === $('ref-win')) { e.preventDefault(); REF.min ? $('ref-win').click() : refOpen(); } };
+$('ref-box').onclick = (e) => { if (!e.target.closest('.refbar')) refClose(); };
+$('ref-close').onclick = refClose;
+addEventListener('keydown', (e) => { if (e.key === 'Escape' && $('ref-box').classList.contains('on')) refClose(); });
+$('f-ref').onchange = (e) => { refSet(e.target.files[0]); e.target.value = ''; };
+$('ref-replace').onclick = () => $('f-ref2').click();
+$('f-ref2').onchange = (e) => { refSet(e.target.files[0]); e.target.value = ''; };
+$('ref-reset').onclick = async () => { await refDB.del(P.design); if (REF.local[P.design]) URL.revokeObjectURL(REF.local[P.design]); delete REF.local[P.design]; refShow(); };
+refDB.all().then((recs) => { for (const r of recs || []) if (r && r.blob) REF.local[r.design] = URL.createObjectURL(r.blob); refShow(); });
 
 // ---------- cameras ----------
 let tween = null;

@@ -13,7 +13,12 @@ fs.rmSync('src/.entry.js');
 const worker = await build({ entryPoints: ['src/render-worker.js'], bundle: true, format: 'iife', minify, target: 'es2022', write: false, loader });
 const esc = (s) => s.replace(/<\/script/gi, '<\\/script');
 const js = esc(out.outputFiles[0].text), wjs = esc(worker.outputFiles[0].text);
+// Reference images: only from src/refs/ (git-ignored, never committed or deployed). Builds without that folder simply
+// have no built-in references; the viewer then lets people add one, stored only in their own browser.
+const refs = {};
+for (const d of ['trophy', 'cooler']) for (const ext of ['jpg', 'png', 'webp']) { const f = `src/refs/${d}.${ext}`; if (!refs[d] && fs.existsSync(f)) refs[d] = `data:image/${ext === 'jpg' ? 'jpeg' : ext};base64,` + fs.readFileSync(f).toString('base64'); }
+const refTag = `<script type="application/json" id="ref-images">${JSON.stringify(refs)}</script>\n`;
 const page = html.replace(/<script type="importmap">[\s\S]*?<\/script>\n/, '')
-  .replace(/<script type="module">[\s\S]*?<\/script>/, () => `<script type="text/plain" id="render-worker-src">${wjs}</script>\n<script type="module">${js}</script>`);
+  .replace(/<script type="module">[\s\S]*?<\/script>/, () => `${refTag}<script type="text/plain" id="render-worker-src">${wjs}</script>\n<script type="module">${js}</script>`);
 fs.writeFileSync('dist/index.html', page);
-console.log('dist/index.html', (page.length / 1024).toFixed(0) + ' KB', '(worker', (wjs.length / 1024).toFixed(0) + ' KB)');
+console.log('dist/index.html', (page.length / 1024).toFixed(0) + ' KB', '(worker', (wjs.length / 1024).toFixed(0) + ' KB) · built-in references:', Object.keys(refs).join(', ') || 'none');

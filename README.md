@@ -32,6 +32,10 @@ Switch with **Design → Cooler** at the top of the panel. A brushed-stainless c
 - **Base:** UHMW-PE ice runners, no wheels.
 - Controls: length, depth, height, ice-well depth, lid angle, front door, X-ray, trim colour. Part keys match the trophy, so layers, export and the render worker work the same way.
 
+## Reference window
+
+The top-left of the viewport shows the image each design was modelled from; click it to see it full size (Esc or *Close* to go back), or minimize it with *–*. Reference images are **not stored in this repository or on Vercel**: a build includes them only if they are present locally in the git-ignored `src/refs/` folder (`trophy.jpg`, `cooler.jpg`). Without them, the window offers *Add the reference image*; an image added there stays in that browser only (IndexedDB `trophy-cooler-refs`), and *Replace image* / *Use original* manage it.
+
 ## Rendering pipeline
 
 Everything is real-time WebGL (three.js): no path tracing, no cloud. The viewer detects whether WebGL runs on a hardware GPU (integrated graphics count) or in **software** (SwiftShader, llvmpipe, Microsoft Basic Render — i.e. on the CPU) and adapts. The readout in the bottom-right corner shows the preview mode, frame rate, render resolution and scale, and hardware vs software rendering.
