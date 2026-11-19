@@ -617,7 +617,7 @@ $('xray').onchange = (e) => { V.xray = e.target.checked; applyView(); };
 $('xray2').onchange = (e) => { V.xray = e.target.checked; applyView(); };
 $('door-open').oninput = (e) => { V.panel = +e.target.value; $('door-open-v').textContent = V.panel < 0.02 ? 'Closed' : `${Math.round(V.panel * 100)}° open`; applyView(); };
 $('trim').oninput = (e) => { P.cTrim = e.target.value; $('trim-v').textContent = P.cTrim; clearTimeout(bt); bt = setTimeout(build, 120); };
-function setDesign(v) { if (v === P.design) return; P.design = v; V.sel = P.design === 'cooler' ? 'enc' : 'cup'; Object.assign(V, { isolate: false, panel: 0, explode: 0, xray: false }); $('explode').value = 0; $('explode-v').textContent = '0%'; $('panel-open').value = 0; $('door-open').value = 0; build(); goCam('hero'); toast(P.design === 'cooler' ? 'Cooler design' : 'Trophy design'); }
+function setDesign(v) { if (v === P.design) return; P.design = v; V.sel = P.design === 'cooler' ? 'enc' : 'cup'; Object.assign(V, { isolate: false, panel: 0, explode: 0, xray: false }); $('explode').value = 0; $('explode-v').textContent = '0%'; $('panel-open').value = 0; $('door-open').value = 0; build(); USER_MOVED = false; frameView(heroDir(), false); toast(P.design === 'cooler' ? 'Cooler design' : 'Trophy design'); }
 for (const id of ['design', 'design2', 'design3']) $(id).onclick = (e) => { const b = e.target.closest('button'); if (b) setDesign(b.dataset.v); };
 $('panel-open').oninput = (e) => { V.panel = +e.target.value; $('panel-open-v').textContent = V.panel < 0.02 ? 'On' : V.panel > 0.98 ? 'Lifted off' : 'Lifting…'; applyView(); };
 $('explode').oninput = (e) => { V.explode = +e.target.value; $('explode-v').textContent = Math.round(V.explode * 100) + '%'; applyView(); };
@@ -902,8 +902,36 @@ function camForRaw(k) {
     bottles: [[P.bowlD * 0.75 + 8, top + P.pedH + P.bowlH + 30, P.bowlD * 1.3 + 22], [0, top + P.pedH + P.bowlH, 0]] }[k];
 }
 function goCam(k, instant) { document.querySelectorAll('#viewbar button').forEach((b) => b.classList.toggle('active', b.dataset.view === k)); const [p, t] = camFor(k), toP = new THREE.Vector3(...p), toT = new THREE.Vector3(...t); if (instant) { camera.position.copy(toP); controls.target.copy(toT); return; } tween = { t0: performance.now(), fromP: camera.position.clone(), fromT: controls.target.clone(), toP, toT }; }
-function fit() { const b = new THREE.Box3(); root.traverse((o) => { if (o.isMesh && o.visible && [parts.base, parts.enc, parts.fridge, parts.cupGroup].some((p) => p.visible && p.getObjectById(o.id))) b.expandByObject(o); }); if (b.isEmpty()) return; const c = b.getCenter(new THREE.Vector3()), r = b.getSize(new THREE.Vector3()).length() / 2, dir = camera.position.clone().sub(controls.target).normalize(); tween = { t0: performance.now(), fromP: camera.position.clone(), fromT: controls.target.clone(), toP: c.clone().add(dir.multiplyScalar(r / Math.sin(Math.min(THREE.MathUtils.degToRad(camera.fov / 2), halfH())) * 1.02)), toT: c }; }
-$('viewbar').onclick = (e) => { const b = e.target.closest('button'); if (b) goCam(b.dataset.view); };
+// Fit the visible model to the screen from a given direction: measure its bounding-box corners on screen and
+// adjust the distance until it fills the free area (room kept for the toolbars and, on phones, the reference panel).
+function visibleBox() {
+  const b = new THREE.Box3(), parts4 = [parts.base, parts.enc, parts.fridge, parts.cupGroup];
+  root.updateMatrixWorld(true);
+  root.traverse((o) => { if (!o.isMesh) return; for (let q = o; q && q !== root; q = q.parent) if (!q.visible) return; if (parts4.some((p) => p.getObjectById(o.id))) b.expandByObject(o); });
+  return b;
+}
+function frameView(dir, instant) {
+  const b = visibleBox(); if (b.isEmpty()) return;
+  const c = b.getCenter(new THREE.Vector3()), d0 = dir.clone().normalize(), corners = [];
+  for (const x of [b.min.x, b.max.x]) for (const y of [b.min.y, b.max.y]) for (const z of [b.min.z, b.max.z]) corners.push(new THREE.Vector3(x, y, z));
+  const cam = camera.clone(); cam.aspect = camera.aspect; if (camera.view && camera.view.enabled) cam.view = { ...camera.view };
+  const cx = -2 * VSHIFT, limX = (1 - 2 * VSHIFT) * 0.9, limY = 0.78, tmp = new THREE.Vector3();
+  let dist = b.getSize(tmp).length() * 1.2;
+  for (let it = 0; it < 6; it++) {
+    cam.position.copy(c).addScaledVector(d0, dist); cam.lookAt(c); cam.updateProjectionMatrix(); cam.updateMatrixWorld();
+    let mx = 0, my = 0; for (const k of corners) { tmp.copy(k).project(cam); mx = Math.max(mx, Math.abs(tmp.x - cx)); my = Math.max(my, Math.abs(tmp.y)); }
+    const m = Math.max(mx / limX, my / limY); dist *= 0.35 + 0.65 * m; // converges on the distance where the model just fills the free area
+  }
+  const toP = c.clone().addScaledVector(d0, dist);
+  document.querySelectorAll('#viewbar button').forEach((bt) => bt.classList.toggle('active', bt.dataset.view === 'hero' && d0.distanceTo(heroDir()) < 1e-3));
+  if (instant) { tween = null; camera.position.copy(toP); controls.target.copy(c); controls.update(); redraw(); return; }
+  tween = { t0: performance.now(), fromP: camera.position.clone(), fromT: controls.target.clone(), toP, toT: c };
+}
+const heroDir = () => { const [p, t] = camForRaw('hero'); return new THREE.Vector3(...p).sub(new THREE.Vector3(...t)).normalize(); };
+function fit() { frameView(camera.position.clone().sub(controls.target), false); }
+let USER_MOVED = false; // until someone moves the view, keep the load framing fitted to the screen
+
+$('viewbar').onclick = (e) => { const b = e.target.closest('button'); if (!b) return; if (b.dataset.view === 'hero') frameView(heroDir(), false); else goCam(b.dataset.view); };
 $('fit-btn').onclick = fit;
 let VSHIFT = 0;
 const cssW = () => view.clientWidth * (view.classList.contains('split') ? 0.5 : 1);
@@ -923,13 +951,14 @@ function resize() {
   if (backdrop) backdrop.dispose(); backdrop = stageBackdrop(w, h); applyEnv();
   ttCanvas.width = Math.max(2, Math.round(w)); ttCanvas.height = Math.max(2, Math.round(h)); ttCanvas.style.width = w + 'px'; ttCanvas.style.height = h + 'px';
   redraw(); ttSchedule();
+  if (!USER_MOVED && root && !tween) frameView(heroDir(), true);
 }
 addEventListener('resize', resize);
 // the viewer's frame can change size without a window resize (images loading, panels opening): follow it
 let roT = 0; if (typeof ResizeObserver !== 'undefined') new ResizeObserver(() => { cancelAnimationFrame(roT); roT = requestAnimationFrame(() => { if (Math.abs(view.clientHeight - (renderer.domElement.clientHeight || 0)) > 1 || Math.abs(cssW() - (renderer.domElement.clientWidth || 0)) > 1) resize(); }); }).observe(view);
 
 // ---------- interaction-aware render loop ----------
-controls.addEventListener('start', () => { Q.interacting = true; redraw(); });
+controls.addEventListener('start', () => { Q.interacting = true; USER_MOVED = true; redraw(); });
 controls.addEventListener('end', () => { Q.interacting = false; Q.settleUntil = performance.now() + 250; ttSchedule(); });
 controls.addEventListener('change', redraw);
 function busy(now) { return Q.interacting || !!tween || EDIT || controls.autoRotate || now < Q.settleUntil; }
@@ -976,7 +1005,7 @@ function loop(now) {
 try { await Promise.all([LOGO.white.decode(), LOGO.color.decode()]); } catch {}
 try { await Promise.race([Promise.all([document.fonts.load('italic 700 64px "Playfair Display"'), document.fonts.load('600 64px Montserrat'), document.fonts.load('700 64px "Barlow Condensed"')]), new Promise((r) => setTimeout(r, 2500))]); } catch {}
 if (B.logoSrc) { try { const im = await loadImg(B.logoSrc); const c = mk(im.naturalWidth, im.naturalHeight); c.getContext('2d').drawImage(im, 0, 0); B.logo = c; } catch {} }
-resize(); build(); goCam('front', true); $('loading').remove(); requestAnimationFrame(loop);
+resize(); build(); frameView(heroDir(), true); $('loading').remove(); requestAnimationFrame(loop);
 </script>
 </body>
 </html>
