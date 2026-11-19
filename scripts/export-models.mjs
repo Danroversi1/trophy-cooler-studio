@@ -39,7 +39,8 @@ await save(T.buildEnclosure(P, M), '1-enclosure'); await save(T.buildFridge(P), 
 {
   const PO = { ...T.DEFAULTS, ...C.DEFAULTS, design: 'oversized' }, MO = T.makeMaterials(PO);
   const V = { isolate: false, sel: 'enc', vis: { cup: true, contents: true, enc: true, fridge: true, base: true }, panel: 0, explode: 0 };
-  const mk = () => { const m = S.buildModel(PO, MO, { lod: 'high', merged: true }); S.arrange(m.parts, PO, V); m.root.updateMatrixWorld(true); return m; };
+  const strip = (root) => root.traverse((o) => { if (o.material && (o.material.map?.isDataTexture || o.material.bumpMap)) { o.material = o.material.clone(); if (o.material.map?.isDataTexture) o.material.map = null; o.material.bumpMap = null; } }); // procedural glow/droplet textures are display-only
+  const mk = () => { const m = S.buildModel(PO, MO, { lod: 'high', merged: true }); S.arrange(m.parts, PO, V); m.root.updateMatrixWorld(true); strip(m.root); return m; };
   await save(mk().root, 'OVERSIZED-ASSEMBLY');
   for (const [k, name] of [['enc', 'oversized-1-body'], ['cup', 'oversized-2-lid'], ['contents', 'oversized-3-bottles-ice-and-puck'], ['base', 'oversized-0-base-and-spilled-ice']]) await save(mk().parts[k], name);
 }
