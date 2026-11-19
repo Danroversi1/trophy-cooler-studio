@@ -34,7 +34,7 @@ Switch with **Design → Cooler** at the top of the panel. A brushed-stainless c
 
 ## Third design: the oversized cooler
 
-**Design → Oversized.** The same stainless cooler language without the freezer, so it can be a (large) cooler size: 44 × 24 × 22 in body, 2 ft 3 in tall with the lid closed. Bottles stand around the edge of the ice, leaning out toward the walls, with the front middle left open; in the centre a regulation hockey puck (3 × 1 in) sits on a steel collar with a light underneath (colour adjustable). Condensation on the body, ice spilled around the base. The ice rests on a raised false floor (11 in below the rim by default), so it only takes about 160 lb of ice instead of filling the whole body. The bottle count follows the size (10 at 36 in long, 11 at 44 in, 14 at 56 in).
+**Design → Oversized.** The same stainless cooler language without the freezer, so it can be a (large) cooler size: 44 × 24 × 22 in body, 2 ft 3 in tall with the lid closed. Bottles stand around the edge of the ice, leaning out toward the walls, with the front middle left open; in the centre a regulation hockey puck (3 × 1 in) sits on a steel collar with a light underneath (colour adjustable). Condensation on the body. The ice rests on a raised false floor (11 in below the rim by default), so it only takes about 160 lb of ice instead of filling the whole body. The bottle count follows the size (10 at 36 in long, 11 at 44 in, 14 at 56 in).
 
 ## Reference window
 

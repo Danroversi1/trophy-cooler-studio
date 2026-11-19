@@ -136,11 +136,6 @@ function ribbonGeo(w, h, notch) {
 // ---------- parts ----------
 function buildBase(P, C, over) { // UHMW ice runners: slides on the rink, nothing metal touches the ice
   const g = named(new THREE.Group(), 'base-ice-runners'), { cL: L, cD: D } = P;
-  if (over) { // a few cubes spilled on the floor around it, like the reference
-    const r = rng(5), cube = geo(K('cchunk'), () => new THREE.IcosahedronGeometry(1.25, 0).scale(1, 0.85, 1.1)), m = [], o = new THREE.Object3D();
-    for (let i = 0; i < 46; i++) { const a = r() * Math.PI * 2, k = 1.05 + r() * r() * 0.5, x = Math.cos(a) * (L / 2 + 2) * k, z = Math.sin(a) * (D / 2 + 2) * k; if (z < -D * 0.3) continue; o.position.set(x, 0.8, z); o.rotation.set(r() * 3, r() * 3, r() * 3); o.scale.setScalar(0.6 + r() * 0.6); o.updateMatrix(); m.push(o.matrix.clone()); }
-    const im = new THREE.InstancedMesh(cube, C.ice, m.length); m.forEach((x, i) => im.setMatrixAt(i, x)); im.castShadow = true; g.add(named(im, 'spilled-ice'));
-  }
   g.add(rbox(L - 2, 0.9, D - 2, 0.4, C.uhmw, 0, SLED - 0.45, 0));
   for (const z of [-(D / 2 - 3.5), 0, D / 2 - 3.5]) g.add(rbox(L - 1, SLED - 0.8, 2.4, 0.38, C.uhmw, 0, (SLED - 0.8) / 2, z));
   return g;

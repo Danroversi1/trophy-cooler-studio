@@ -603,7 +603,7 @@ function coolerSpecs() {
 
 // ---------- UI ----------
 const LAYERS_T = [['cup', 'Cup', 'Fluted bowl + pedestal'], ['contents', '↳ Bottles + ice', ''], ['enc', 'Enclosure', 'Lift-off front panel'], ['fridge', '↳ Freezer · Meling DW-XL90', ''], ['base', 'Base', 'UHMW ice sled']];
-const LAYERS_O = [['enc', 'Cooler body', 'Handles · latch · drain'], ['cup', 'Lid', 'Blue faceted trim'], ['contents', '↳ Bottles, ice + lit puck', ''], ['base', 'Base', 'UHMW runners + spilled ice']];
+const LAYERS_O = [['enc', 'Cooler body', 'Handles · latch · drain'], ['cup', 'Lid', 'Blue faceted trim'], ['contents', '↳ Bottles, ice + lit puck', ''], ['base', 'Base', 'UHMW ice runners']];
 const LAYERS_C = [['enc', 'Cooler body', 'Front door · handles · latch'], ['fridge', '↳ Freezer · Meling DW-XL90', ''], ['cup', 'Lid', 'Blue faceted trim'], ['contents', '↳ Bottles + ice', ''], ['base', 'Base', 'UHMW ice runners']];
 function renderLayers() {
   $('layers').innerHTML = (P.design === 'cooler' ? LAYERS_C : P.design === 'oversized' ? LAYERS_O : LAYERS_T).map(([k, name, sub]) => `<div class="layer ${name.startsWith('↳') ? 'sub' : ''} ${V.sel === k ? 'selected' : ''}"><button class="select" data-sel="${k}">${name.replace('↳ ', '↳ ')}${sub ? `<small>${sub}</small>` : ''}</button><button class="eye ${V.vis[k] ? '' : 'off'}" data-eye="${k}">◉</button></div>`).join('');
