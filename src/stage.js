@@ -7,7 +7,6 @@ export const mkCanvas = (w, h) => {
   if (typeof document !== 'undefined') { const c = document.createElement('canvas'); c.width = w; c.height = h; return c; }
   return new OffscreenCanvas(w, h);
 };
-for (const k of ['environmentRotation', 'backgroundRotation']) if (!(k in THREE.Scene.prototype)) THREE.Scene.prototype[k] = new THREE.Euler(); // read by the path tracer (three r162+)
 
 export const BG = { studio: 0x020203, rink: 0x15181c };
 
@@ -72,19 +71,8 @@ export function makeGround(scene) {
   contact.rotation.x = -Math.PI / 2; contact.position.y = 0.05; contact.renderOrder = 2; scene.add(contact);
   return { rink, contact };
 }
-// path-tracer-only stand-ins: black floor + studio softbox area lights
-export function makePTExtras(scene) {
-  const floor = new THREE.Mesh(new THREE.CircleGeometry(1, 96), new THREE.MeshPhysicalMaterial({ color: 0x000000, roughness: 1, metalness: 0, specularIntensity: 0 }));
-  floor.rotation.x = -Math.PI / 2; floor.scale.set(600, 600, 1); floor.visible = false; scene.add(floor);
-  const softboxes = new THREE.Group(); softboxes.visible = false; scene.add(softboxes);
-  for (const [w, h, i, pos, look] of [[40, 90, 9, [-70, 70, 40], [0, 40, 0]], [40, 90, 9, [70, 70, 40], [0, 40, 0]], [90, 40, 6, [0, 120, 30], [0, 40, 0]], [60, 30, 3, [0, 40, 110], [0, 40, 0]], [30, 90, 5, [0, 60, -80], [0, 40, 0]]]) {
-    const l = new THREE.RectAreaLight(0xffffff, i, w, h); l.position.set(...pos); l.lookAt(...look); softboxes.add(l);
-  }
-  return { floor, softboxes };
-}
-
 // The model, from cached geometry. lod: 'both' (interactive: high + low, toggled by screen size), 'high', or 'low'.
-// merged: non-instanced bottles/ice (the path tracer cannot trace InstancedMesh).
+// merged: non-instanced bottles/ice (used by the GLB export path).
 export function buildModel(P, M, { lod = 'both', merged = false } = {}) {
   const root = new THREE.Group(), parts = {};
   parts.base = T.buildBase(P, M); parts.enc = T.buildEnclosure(P, M); parts.fridge = T.buildFridge(P);

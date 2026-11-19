@@ -225,7 +225,7 @@ details b{color:#d6dbe4;font-weight:600}
 <header class="topbar">
   <div class="header-left"><span class="pill"><span class="statusdot"></span><span id="pill-txt">3D model · from the reference render</span></span><button class="mobile-toggle" id="mobileToggle" aria-controls="panel" aria-expanded="false">Controls</button></div>
   <div class="brand" id="brand-mark"><span class="txt">MICHELOB ULTRA</span></div>
-  <div class="header-actions"><button id="still">Final render</button><button id="capture">Capture view</button><button id="export">Export GLB</button></div>
+  <div class="header-actions"><button id="still">Detail render</button><button id="capture">Capture view</button><button id="export">Export GLB</button></div>
 </header>
 <div class="study-title"><h1>3D study <span id="study-sub">· Trophy cooler — chrome fluted cup on a Michelob blue freezer enclosure</span></h1></div>
 <div class="layout">
@@ -275,10 +275,9 @@ details b{color:#d6dbe4;font-weight:600}
     <div class="input-row"><label>Environment</label><div class="seg" id="env" style="width:170px"><button data-v="studio">Studio</button><button data-v="rink">Rink</button></div></div>
     <div class="input-row"><label>Preview</label><div class="seg" id="mode" style="width:170px"><button data-v="fast">Fast</button><button data-v="high">High quality</button></div></div>
     <p class="note" id="mode-note"></p>
-    <label class="toggle-row" id="hq-row"><input type="checkbox" id="hq" checked>Ambient occlusion when still</label>
-    <label class="toggle-row" id="photo-row"><input type="checkbox" id="photo">Photoreal when still (path-traced, studio only)</label>
+    <label class="toggle-row" id="hq-row"><input type="checkbox" id="hq" checked>Ambient occlusion when still (High quality)</label>
     <label class="toggle-row"><input type="checkbox" id="tt-toggle">Cached turntable while dragging (for computers without a graphics card)</label>
-    <div class="input-row"><label>Final render</label><select id="final-size" style="width:170px"><option value="1600x64">1600 px · 64 samples</option><option value="2400x128">2400 px · 128 samples</option><option value="2400x256">2400 px · 256 samples</option><option value="3200x256">3200 px · 256 samples</option></select></div>
+    <div class="input-row"><label>Detail render</label><select id="final-size" style="width:170px"><option value="1200">1200 px tall</option><option value="1600">1600 px tall</option><option value="2400">2400 px tall</option><option value="3200">3200 px tall</option></select></div>
     <label class="toggle-row"><input type="checkbox" id="spin">Auto-rotate</label>
     <div class="slider-head"><label for="explode">Explode sections</label><output id="explode-v">0%</output></div><input class="range" id="explode" type="range" min="0" max="1" step="0.01" value="0">
     <button id="reset" class="wide">Reset to the render</button>
@@ -311,11 +310,10 @@ details b{color:#d6dbe4;font-weight:600}
   <div class="scene-label" id="scene-label">Freezer enclosed · 12 Michelob ULTRA on ice</div>
   <div class="hint">Drag to orbit<span>·</span>Scroll to zoom<span>·</span>Right-drag to pan</div>
   <div id="toast" role="status" aria-live="polite"></div>
-  <div id="still-pane"><div class="pane-tag" style="left:20px">Still render · path-traced</div><div class="imgwrap"><canvas id="still-cv" class="still" role="img" aria-label="Full-resolution path-traced still of the trophy cooler"></canvas></div>
+  <div id="still-pane"><div class="pane-tag" style="left:20px">Detail render · real-time engine</div><div class="imgwrap"><canvas id="still-cv" class="still" role="img" aria-label="Full-resolution path-traced still of the trophy cooler"></canvas></div>
     <div class="bar"><span class="tag" id="still-info"></span><button id="still-again">Re-render</button><button id="still-dl" disabled>Download PNG</button><button id="still-close">Close</button></div></div>
-  <div id="still-busy"><div id="still-msg">Rendering still…</div><div class="track"><div class="fill" id="still-fill"></div></div><button id="still-cancel">Cancel</button></div>
-  <div class="vchip" id="pt-chip" style="position:absolute;right:20px;bottom:66px;z-index:3;display:none;pointer-events:none;padding:6px 12px">Photoreal</div>
-  <div class="perfchip" id="perf" aria-live="off"></div>
+  <div id="still-busy"><div id="still-msg">Rendering…</div><div class="track"><div class="fill" id="still-fill"></div></div></div>
+    <div class="perfchip" id="perf" aria-live="off"></div>
   <div class="loader" id="loading"><div class="loadbox"><div class="spin"></div><h3>Building the trophy</h3><p>Fluted bowl, pedestal and freezer enclosure.</p></div></div>
 </main>
 </div>
@@ -329,9 +327,6 @@ import { GTAOPass } from 'three/addons/postprocessing/GTAOPass.js';
 import { OutputPass } from 'three/addons/postprocessing/OutputPass.js';
 import { Reflector } from 'three/addons/objects/Reflector.js';
 import { GLTFExporter } from 'three/addons/exporters/GLTFExporter.js';
-import { EXRLoader } from 'three/addons/loaders/EXRLoader.js';
-import { WebGLPathTracer } from 'three-gpu-pathtracer';
-import studioHDRI from '@pmndrs/assets/hdri/studio.exr.js';
 import logoWhiteURL from './assets/logo-white.png';
 import logoColorURL from './assets/logo-color.png';
 import * as T from './trophy.js';
@@ -381,12 +376,6 @@ controls.enableDamping = true; controls.minDistance = 40; controls.maxDistance =
 
 // reflection environments: rendered once into PMREM cubes, reused every frame (no per-frame reflection work)
 const ENV = { studio: S.pmremEnv(renderer, 'studio'), rink: S.pmremEnv(renderer, 'rink') };
-let studioEq = null;
-new EXRLoader().setDataType(THREE.FloatType).load(studioHDRI, (t) => {
-  t.mapping = THREE.EquirectangularReflectionMapping;
-  studioEq = t; ptDirty(); if (typeof RW !== 'undefined' && RW) RW.postMessage({ type: 'hdri', data: t.image.data, width: t.image.width, height: t.image.height }); // the HDRI lights the path tracer; the real-time view keeps its tuned softbox environment
-});
-const hemi = new THREE.HemisphereLight(0xdfe9ff, 0x20242c, 0.25); scene.add(hemi);
 const LIGHTS = S.addLights(scene);
 // floors: black studio floor (+ mirror reflection in High quality only), or a rink disc; cached contact shadow under the object
 const floor = new THREE.Group(); scene.add(floor);
@@ -415,30 +404,7 @@ gtao.updatePdMaterial({ lumaPhi: 10, depthPhi: 2, normalPhi: 3, radius: 6, rings
 composer.addPass(new OutputPass());
 const renderFrame = (withAO) => (withAO ? composer.render() : renderer.render(scene, camera));
 function redraw() { DIRTY = true; }
-let PHOTO = false; try { PHOTO = localStorage.getItem('trophy-cooler-photo2') === '1'; } catch {} // progressive path tracing in the live view: opt-in, High quality only
-for (const k of ['environmentRotation', 'backgroundRotation']) if (!(k in THREE.Scene.prototype) && !(k in scene)) THREE.Scene.prototype[k] = new THREE.Euler(); // fields the path tracer reads (three r162+)
-const pt = new WebGLPathTracer(renderer);
-Object.assign(pt, { minSamples: 2, renderDelay: 250, fadeDuration: 350, bounces: 8, transmissiveBounces: 10, filterGlossyFactor: 0.5, renderScale: Math.min(1, 1.25 / renderer.getPixelRatio()) });
-pt.tiles.set(2, 2);
-const { floor: ptFloor, softboxes } = S.makePTExtras(scene);
-let ptReady = false, ptT = 0;
-function photoActive() { return typeof PHOTO !== 'undefined' && PHOTO && MODE === 'high' && V.env === 'studio' && studioEq; }
-function ptDirty() { if (typeof pt === 'undefined') return; ptReady = false; clearTimeout(ptT); if (photoActive()) ptT = setTimeout(syncPT, 220); }
-async function syncPT() { // swap raster-only helpers for path-traceable stand-ins, then rebuild the BVH
-  if (!photoActive() || !root) return;
-  ptMode(true);
-  try { pt.setScene(scene, camera); ptReady = true; } catch (e) { console.warn('path tracer unavailable', e); PHOTO = false; ptMode(false); syncUI(); }
-}
-function ptMode(on) {
-  mirror.visible = !on && MODE === 'high'; studioFloor.visible = !on; ptFloor.visible = on && V.env === 'studio'; softboxes.visible = on;
-  if (on) { scene.environmentIntensity = 0.4; scene.background = new THREE.Color(0x000000); scene.environment = studioEq; } else applyEnv();
-  contact.visible = !on && !!parts.base && (parts.base.visible || parts.enc.visible);
-  if (on && parts.contents && !parts.contentsMerged) { parts.contentsMerged = T.buildContents(P, MATS, parts.cup.userData.bowl, { instanced: false }); parts.cupGroup.add(parts.contentsMerged); } // built only when the path tracer needs it
-  if (parts.contents && parts.contentsMerged) { parts.contents.visible = !on && parts.cvis; parts.contentsMerged.visible = on && parts.cvis; }
-  if (on) setLOD('high');
-  redraw();
-}
-controls.addEventListener('change', () => { if (ptReady) { pt.pausePathTracing = false; pt.updateCamera(); } });
+function photoActive() { return false; } // (path tracing removed: everything is real-time now)
 
 // ---------- brand textures ----------
 const BLUE = '#14217f', RED = '#d0142c';
@@ -516,13 +482,13 @@ function applyView() {
   contact.scale.set(P.W * 1.5, P.D * 2.6, 1); contact.visible = a.grounded;
   root.updateMatrixWorld(true); parts.cupSphere = new THREE.Box3().setFromObject(parts.cup).getBoundingSphere(new THREE.Sphere());
   renderer.shadowMap.needsUpdate = true; // static shadow: recomputed here, never per frame
-  ptMode(false); ptDirty(); ttSchedule();
+  applyEnv(); ttSchedule();
 }
 // Level of detail by screen size: the low cup is shown while a shape slider is dragged or when the cup is small on screen.
 let LODLEVEL = null;
 function setLOD(want) { if (want === LODLEVEL || !parts.cup) return; LODLEVEL = want; parts.cup.traverse((o) => { if (o.userData.lod) o.visible = o.userData.lod === want; }); redraw(); }
 function updateLOD() {
-  if (!parts.cupSphere || (photoActive() && ptReady)) return;
+  if (!parts.cupSphere) return;
   const sp = parts.cupSphere, d = Math.max(1, camera.position.distanceTo(sp.center)), px = (sp.radius * 2) / (2 * d * Math.tan(THREE.MathUtils.degToRad(camera.fov / 2))) * view.clientHeight;
   setLOD(px < (LODLEVEL === 'low' ? 330 : 270) ? 'low' : 'high'); // hysteresis so it never flickers at the threshold
 }
@@ -561,7 +527,7 @@ for (const [k, [lo, hi, fmt]] of Object.entries(SL)) { const el = $(k); el.min =
 let qb = 0; function queueBuild() { if (qb) return; qb = requestAnimationFrame(() => { qb = 0; build(); }); } // at most one rebuild per frame
 const seg = (id, key) => { $(id).onclick = (e) => { const b = e.target.closest('button'); if (!b) return; P[key] = b.dataset.v; build(); }; };
 seg('metal', 'metal'); seg('glass', 'glass');
-$('env').onclick = (e) => { const b = e.target.closest('button'); if (!b) return; V.env = b.dataset.v; applyEnv(); ptMode(false); ptDirty(); ttSchedule(); syncUI(); save(); };
+$('env').onclick = (e) => { const b = e.target.closest('button'); if (!b) return; V.env = b.dataset.v; applyEnv(); ttSchedule(); syncUI(); save(); };
 $('lock').onchange = (e) => { lock = e.target.checked; build(); };
 $('color').oninput = (e) => { P.color = e.target.value; $('color-v').textContent = P.color; clearTimeout(bt); bt = setTimeout(build, 120); };
 $('xray').onchange = (e) => { V.xray = e.target.checked; applyView(); };
@@ -570,8 +536,7 @@ $('explode').oninput = (e) => { V.explode = +e.target.value; $('explode-v').text
 $('spin').onchange = (e) => { controls.autoRotate = e.target.checked; };
 $('mode').onclick = (e) => { const b = e.target.closest('button'); if (!b || b.dataset.v === MODE) return; MODE = b.dataset.v; try { localStorage.setItem('trophy-cooler-mode', MODE); } catch {} build(); applyEnv(); toast(MODE === 'fast' ? 'Fast preview' : 'High-quality preview'); };
 $('tt-toggle').onchange = (e) => { TT.enabled = e.target.checked; TT.userSet = true; try { localStorage.setItem('trophy-cooler-tt', TT.enabled ? '1' : '0'); } catch {} if (TT.enabled) ttSchedule(); else ttCancel(); syncUI(); };
-$('final-size').onchange = (e) => { try { localStorage.setItem('trophy-cooler-final', e.target.value); } catch {} };
-$('photo').onchange = (e) => { PHOTO = e.target.checked; try { localStorage.setItem('trophy-cooler-photo2', PHOTO ? '1' : '0'); } catch {} ptMode(false); ptDirty(); };
+$('final-size').onchange = (e) => { try { localStorage.setItem('trophy-cooler-detail', e.target.value); } catch {} };
 $('hq').onchange = (e) => { HQ = e.target.checked; try { localStorage.setItem('trophy-cooler-hq', HQ ? '1' : '0'); } catch {} redraw(); };
 $('reset').onclick = () => { P = { ...T.DEFAULTS }; lock = true; V.panel = 0; V.explode = 0; V.xray = false; build(); goCam('front'); toast('Reset to the render'); };
 $('mobileToggle').onclick = () => { const o = $('panel').classList.toggle('open'); $('mobileToggle').setAttribute('aria-expanded', o); };
@@ -580,7 +545,7 @@ function syncUI() {
   for (const [id, key] of [['metal', 'metal'], ['glass', 'glass']]) document.querySelectorAll(`#${id} button`).forEach((b) => b.classList.toggle('active', b.dataset.v === P[key]));
   document.querySelectorAll('#mode button').forEach((b) => b.classList.toggle('active', b.dataset.v === MODE));
   $('mode-note').textContent = MODE === 'fast' ? 'Precomputed reflections and a static shadow; redraws only when something changes, at lower resolution while you drag.' : 'Adds the mirror floor, see-through ice and glass, and ambient occlusion when still. Heavy without a graphics card.';
-  const hi = MODE === 'high'; $('photo').checked = PHOTO; $('photo').disabled = !hi || V.env !== 'studio'; $('photo-row').style.opacity = hi && V.env === 'studio' ? 1 : 0.45; $('hq').disabled = !hi; $('hq-row').style.opacity = hi ? 1 : 0.45;
+  const hi = MODE === 'high'; $('hq').disabled = !hi; $('hq-row').style.opacity = hi ? 1 : 0.45;
   $('tt-toggle').checked = TT.enabled; $('tt-toggle').disabled = !RW; $('lock').checked = lock; $('color').value = P.color; $('color-v').textContent = P.color; $('xray').checked = V.xray; $('hq').checked = HQ;
   $('logo-prev').style.display = B.logo ? 'block' : 'none';
   $('brand-mark').innerHTML = B.logo ? `<img alt="Brand" src="${tint(B.logo, '#ffffff').toDataURL('image/png')}">` : '<span class="txt">MICHELOB ULTRA</span>';
@@ -616,22 +581,23 @@ $('glb').onclick = async () => {
   Object.assign(V, keep); applyView();
 };
 $('export').onclick = () => { $('glb-what').value = 'all'; $('glb').click(); };
-$('capture').onclick = async () => { controls.update(); setScale(Q.idle); if (!(photoActive() && ptReady)) renderFrame(MODE === 'high' && HQ); const blob = await new Promise((r) => renderer.domElement.toBlob(r, 'image/png')); await saveFile('michelob-ultra-trophy-cooler.png', blob, false); };
+$('capture').onclick = async () => { controls.update(); setScale(Q.idle); renderFrame(MODE === 'high' && HQ); const blob = await new Promise((r) => renderer.domElement.toBlob(r, 'image/png')); await saveFile('michelob-ultra-trophy-cooler.png', blob, false); };
 $('copy').onclick = async () => { const cfg = { units: 'inches', enclosure: { W: P.W, D: P.D, H: P.H, color: P.color }, iceSled: { height: T.SLED_H, contact: 'UHMW-PE skid plate + 4 runners' }, cup: { bowlDiameter: P.bowlD, bowlHeight: P.bowlH, pedestalHeight: P.pedH, flutes: P.flutes, twist: P.twist, fluteDepth: P.fluteDepth, metal: P.metal }, bottles: P.bottles, freezer: T.FRIDGE, clearances: T.clearances(P) };
   try { await navigator.clipboard.writeText(JSON.stringify(cfg, null, 2)); toast('Dimensions copied'); } catch { $('glb-msg').textContent = JSON.stringify(cfg); } };
 
 // ---------- background render worker: turntable cache + final render (never blocks this thread) ----------
-const RW = (() => {
+let RW = (() => {
   try {
     const src = document.getElementById('render-worker-src');
     if (!src || typeof OffscreenCanvas === 'undefined' || typeof Worker === 'undefined') return null;
     const w = new Worker(URL.createObjectURL(new Blob([src.textContent], { type: 'text/javascript' })));
-    w.onmessage = (e) => onWorker(e.data); w.onerror = (e) => console.warn('render worker:', e.message);
-    if (studioEq) w.postMessage({ type: 'hdri', data: studioEq.image.data, width: studioEq.image.width, height: studioEq.image.height });
+    w.onmessage = (e) => onWorker(e.data); w.onerror = (e) => { console.warn('render worker:', e.message); if (!rwAlive) workerDown(); };
+    w.postMessage({ type: 'ping' }); setTimeout(() => { if (!rwAlive) workerDown(); }, 4000); // e.g. a page policy that blocks blob: workers
     return w;
   } catch (e) { console.warn('render worker unavailable', e); return null; }
 })();
-let rwTexKey = '';
+let rwTexKey = '', rwAlive = false;
+function workerDown() { if (!RW) return; try { RW.terminate(); } catch {} RW = null; TT.enabled = false; ttOverlay(false); syncUI(); }
 async function texMessage() { // brand textures as pre-flipped ImageBitmaps (only sent when they changed)
   if (rwTexKey === txKey) return null;
   const one = async (t) => t && { bitmap: await createImageBitmap(t.image, { imageOrientation: 'flipY' }), wrapS: t.wrapS, repeat: [t.repeat.x, t.repeat.y], offset: [t.offset.x, t.offset.y] };
@@ -708,76 +674,66 @@ function ttDraw() {
 let ttShown = false;
 function ttOverlay(on) { if (on === ttShown) return; ttShown = on; ttCanvas.classList.toggle('on', on); if (!on) redraw(); }
 
-// ---------- final render: path-traced still in the worker, shown beside the live 3D view ----------
+// ---------- detail render: one high-quality frame from the real-time engine (≈2–5 s), shown beside the live view ----------
+// Full materials (see-through ice and glass), mirror floor, the key-light shadow and 2× supersampling. Rendered in the
+// worker when available, so the live view keeps working; otherwise on this thread with a short busy overlay.
 const FIN = { seq: 0, id: 0, running: false, blob: null, t0: 0, w: 0, h: 0 };
-try { const v = localStorage.getItem('trophy-cooler-final'); $('final-size').value = v || (GPU.software ? '1600x64' : '2400x256'); } catch {}
+try { const v = localStorage.getItem('trophy-cooler-detail'); $('final-size').value = v || (GPU.software ? '1200' : '2400'); } catch {}
+if (!$('final-size').value) $('final-size').value = '1600';
 function showStillBitmap(bmp) { const c = $('still-cv'); c.width = bmp.width; c.height = bmp.height; c.getContext('2d').drawImage(bmp, 0, 0); bmp.close && bmp.close(); }
+const supersample = (H) => (GPU.software ? (H > 1600 ? 1.25 : 1.5) : H > 2400 ? 1.5 : 2); // less supersampling when the CPU does the shading
 async function finalRender() {
-  if (FIN.running) return;
-  const [height, samples] = $('final-size').value.split('x').map(Number);
-  if (!RW) return renderStill({ height, samples });
-  if (!studioEq) { toast('Studio lighting is still loading. Try again in a moment.'); return; }
-  if (V.env !== 'studio') { V.env = 'studio'; applyEnv(); syncUI(); save(); }
+  if (FIN.running || STILL) return;
+  const height = +$('final-size').value || 1600;
   const cam = { position: camera.position.toArray(), target: controls.target.toArray(), fov: camera.fov }; // the view you framed
   view.classList.add('split'); resize(); fit();
   const paneW = view.clientWidth * 0.5, paneH = Math.max(100, view.clientHeight - 50), H = Math.round(height), W = Math.round(H * paneW / paneH);
-  ttCancel(); TT.key = ''; // the worker is busy with the still; the turntable resumes afterwards
+  FIN.running = true; FIN.blob = null; FIN.t0 = performance.now(); FIN.w = W; FIN.h = H;
+  $('still-again').textContent = 'Rendering…'; $('still-again').disabled = true; $('still-dl').disabled = true; $('still-info').textContent = `Rendering ${W} × ${H}…`;
+  if (!RW) return detailOnMainThread(W, H, cam);
+  ttCancel(); TT.key = ''; // the worker does the still first; the turntable resumes afterwards
   const tex = await texMessage();
-  FIN.id = ++FIN.seq; FIN.running = true; FIN.blob = null; FIN.t0 = performance.now(); FIN.w = W; FIN.h = H;
-  $('still-again').textContent = 'Cancel'; $('still-dl').disabled = true; $('still-info').textContent = `Preparing ${W} × ${H} render…`;
-  RW.postMessage({ type: 'final', id: FIN.id, state: objectState(), tex, cam, size: { w: W, h: H }, samples }, bitmapsOf(tex));
+  FIN.id = ++FIN.seq;
+  RW.postMessage({ type: 'detail', id: FIN.id, state: objectState(), tex, cam, size: { w: W, h: H }, ss: supersample(H) }, bitmapsOf(tex));
 }
-function finalStop(msg) { FIN.running = false; $('still-again').textContent = 'Re-render'; $('still-dl').disabled = !FIN.blob; if (msg) $('still-info').textContent = msg; ttSchedule(); }
+function finalStop(msg) { FIN.running = false; $('still-again').textContent = 'Re-render'; $('still-again').disabled = false; $('still-dl').disabled = !FIN.blob; if (msg) $('still-info').textContent = msg; ttSchedule(); }
 function onWorker(m) {
+  if (m.type === 'pong') { rwAlive = true; return; }
   if (m.type === 'frame') {
     if (m.key !== TT.key) { m.bitmap.close(); return; }
     TT.frames[m.i] = m.bitmap; TT.blobs[m.i] = m.blob; TT.count++;
     if (TT.count === TT.n) { TT.job = 0; TT.from = 'fresh'; IDB.put({ key: m.key, created: Date.now(), blobs: TT.blobs.slice(), meta: { ...TT.meta, target: TT.meta.target.toArray() } }).then(() => IDB.prune(4)); }
-  } else if (m.type === 'final-progress' && m.id === FIN.id) {
-    if (m.bitmap) showStillBitmap(m.bitmap);
-    const k = m.samples / m.total, el = (performance.now() - FIN.t0) / 1000, eta = k > 0.03 ? el / k - el : null;
-    $('still-info').textContent = `Rendering ${FIN.w} × ${FIN.h} · ${Math.floor(m.samples)} / ${m.total} samples${eta != null ? ` · about ${eta < 90 ? Math.round(eta) + ' s' : Math.round(eta / 60) + ' min'} left` : ''}`;
-  } else if (m.type === 'final-done' && m.id === FIN.id) {
-    FIN.blob = m.blob; createImageBitmap(m.blob).then(showStillBitmap);
-    finalStop(`${m.w} × ${m.h} px · ${m.samples} samples · path-traced`);
+  } else if (m.type === 'detail-done' && m.id === FIN.id) {
+    FIN.blob = m.blob; showStillBitmap(m.bitmap);
+    finalStop(`${m.w} × ${m.h} px · rendered in ${((performance.now() - FIN.t0) / 1000).toFixed(1)} s`);
   } else if (m.type === 'error') {
-    if (m.id === FIN.id && FIN.running) finalStop('Final render failed: ' + m.message); else console.warn('render worker:', m.message);
+    if (m.id === FIN.id && FIN.running) finalStop('Detail render failed: ' + m.message); else console.warn('render worker:', m.message);
   }
 }
-
-// main-thread fallback for browsers without OffscreenCanvas workers (blocks the viewer while it renders)
-let STILL = false, stillCancel = false;
-const frame = () => new Promise((r) => requestAnimationFrame(r));
-async function renderStill({ height = 2400, samples = 256 } = {}) {
-  if (STILL) return;
-  if (!studioEq) { toast('Studio lighting is still loading. Try again in a moment.'); return; }
-  if (V.env !== 'studio') { V.env = 'studio'; applyEnv(); syncUI(); }
-  const paneW = view.clientWidth * 0.5, paneH = view.clientHeight, H = Math.round(height), W = Math.round(H * paneW / paneH);
-  STILL = true; stillCancel = false; $('still-busy').classList.add('on'); $('still-fill').style.width = '0%';
-  const keep = { pr: renderer.getPixelRatio(), delay: pt.renderDelay, fade: pt.fadeDuration, min: pt.minSamples, scale: pt.renderScale, tiles: pt.tiles.clone(), dyn: pt.dynamicLowRes };
+// fallback without a worker: same render on this thread (blocks the viewer for the few seconds it takes)
+let STILL = false;
+async function detailOnMainThread(W, H, cam) {
+  STILL = true; $('still-busy').classList.add('on'); $('still-fill').style.width = '50%'; $('still-msg').textContent = `Rendering ${W} × ${H}…`;
+  await new Promise((r) => setTimeout(r, 50));
+  const keepMode = MODE, ss = supersample(H), iw = Math.round(W * ss), ih = Math.round(H * ss);
   try {
-    renderer.setPixelRatio(1); renderer.setSize(W, H, false); camera.aspect = W / H; camera.updateProjectionMatrix();
-    ptMode(true); pt.setScene(scene, camera); ptReady = true;
-    Object.assign(pt, { renderDelay: 0, fadeDuration: 0, minSamples: 0, renderScale: 1, dynamicLowRes: false, pausePathTracing: false }); pt.tiles.set(3, 3); pt.reset();
-    while (pt.samples < samples && !stillCancel) {
-      pt.renderSample(); await frame();
-      $('still-fill').style.width = ((pt.samples / samples) * 100).toFixed(1) + '%';
-      $('still-msg').textContent = `Rendering ${W} × ${H} still · ${Math.floor(pt.samples)} / ${samples} samples`;
-    }
-    if (!stillCancel) { FIN.blob = await new Promise((r) => renderer.domElement.toBlob(r, 'image/png')); showStillBitmap(await createImageBitmap(FIN.blob)); $('still-info').textContent = `${W} × ${H} px · ${Math.floor(pt.samples)} samples`; $('still-dl').disabled = false; }
+    if (MODE !== 'high') { MODE = 'high'; build(); }
+    mirror.visible = V.env === 'studio';
+    const c2 = camera.clone(); c2.position.fromArray(cam.position); c2.aspect = W / H; c2.updateProjectionMatrix(); c2.lookAt(new THREE.Vector3(...cam.target));
+    renderer.setPixelRatio(1); renderer.setSize(iw, ih, false); renderer.shadowMap.needsUpdate = true; renderer.render(scene, c2);
+    const out = document.createElement('canvas'); out.width = W; out.height = H; const x = out.getContext('2d'); x.imageSmoothingQuality = 'high'; x.drawImage(renderer.domElement, 0, 0, W, H);
+    FIN.blob = await new Promise((r) => out.toBlob(r, 'image/png')); showStillBitmap(await createImageBitmap(out));
   } finally {
-    Object.assign(pt, { renderDelay: keep.delay, fadeDuration: keep.fade, minSamples: keep.min, renderScale: keep.scale, dynamicLowRes: keep.dyn }); pt.tiles.copy(keep.tiles);
-    STILL = false; $('still-busy').classList.remove('on');
-    if (!stillCancel) view.classList.add('split');
-    resize(); ptMode(false); ptReady = false; ptDirty(); if (!stillCancel) fit();
+    if (MODE !== keepMode) { MODE = keepMode; build(); }
+    STILL = false; $('still-busy').classList.remove('on'); resize(); fit();
+    finalStop(FIN.blob ? `${W} × ${H} px · rendered in ${((performance.now() - FIN.t0) / 1000).toFixed(1)} s` : 'Detail render failed');
   }
 }
-window.renderStill = renderStill; window.finalRender = finalRender; window.__quality = Q; // diagnostics
+window.finalRender = finalRender; window.__quality = Q; // diagnostics
 $('still').onclick = () => finalRender();
-$('still-again').onclick = () => { if (FIN.running) { RW.postMessage({ type: 'cancel' }); FIN.id = -1; finalStop('Final render cancelled'); } else finalRender(); };
-$('still-cancel').onclick = () => { stillCancel = true; };
-$('still-close').onclick = () => { if (FIN.running) { RW.postMessage({ type: 'cancel' }); FIN.id = -1; finalStop(); } view.classList.remove('split'); resize(); ptDirty(); };
-$('still-dl').onclick = () => FIN.blob && saveFile('michelob-ultra-trophy-cooler-still.png', FIN.blob, false);
+$('still-again').onclick = () => finalRender();
+$('still-close').onclick = () => { if (FIN.running) { RW && RW.postMessage({ type: 'cancel' }); FIN.id = -1; finalStop(); } view.classList.remove('split'); resize(); };
+$('still-dl').onclick = () => FIN.blob && saveFile('michelob-ultra-trophy-cooler-detail.png', FIN.blob, false);
 $('still-cv').onclick = (e) => { e.target.classList.toggle('zoom'); e.target.parentElement.classList.toggle('zoom'); };
 
 // ---------- cameras ----------
@@ -796,7 +752,6 @@ function sizeBuffers() {
   const w = cssW(), h = view.clientHeight, k = Q.scale;
   renderer.setPixelRatio(k); renderer.setSize(w, h); composer.setPixelRatio(k); composer.setSize(w, h); gtao.setSize(w * k, h * k);
   if (mirror.getRenderTarget) mirror.getRenderTarget().setSize(Math.max(64, Math.min(1024, Math.round(w * k))), Math.max(64, Math.min(1024, Math.round(h * k))));
-  if (ptReady) pt.updateCamera();
 }
 function setScale(k) { k = Math.round(k * 100) / 100; if (Math.abs(k - Q.scale) < 0.01) return; Q.scale = k; sizeBuffers(); redraw(); }
 function resize() {
@@ -845,11 +800,6 @@ function loop(now) {
   const useTT = TT.enabled && moving && !EDIT && !tween && ttDraw();
   ttOverlay(useTT);
   if (useTT) { measure(now); perfChip(now, 'turntable'); return; }
-  if (photoActive() && ptReady) { // opt-in progressive path tracing (High quality)
-    pt.renderSample(); const n = Math.floor(pt.samples); $('pt-chip').textContent = n < 2 ? 'Photoreal: starting…' : `Photoreal · ${n} sample${n === 1 ? '' : 's'}${n >= 300 ? ' · done' : ''}`; $('pt-chip').style.display = ''; if (n >= 300) pt.pausePathTracing = true;
-    measure(now); perfChip(now, 'live'); return;
-  }
-  $('pt-chip').style.display = 'none';
   const ao = MODE === 'high' && HQ && !moving;
   if (!ao) aoFade = 0; else if (aoFade < 1) { aoFade = Math.min(1, aoFade + 0.25); gtao.blendIntensity = 0.8 * aoFade; DIRTY = true; } // AO fades in, no pop
   if (!DIRTY) { perfChip(now, 'idle'); return; }

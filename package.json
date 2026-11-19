@@ -9,10 +9,7 @@
     "export-models": "node scripts/export-models.mjs models"
   },
   "dependencies": {
-    "three": "0.160.0",
-    "three-gpu-pathtracer": "0.0.23",
-    "three-mesh-bvh": "0.7.8",
-    "@pmndrs/assets": "1.7.0"
+    "three": "0.160.0"
   },
   "devDependencies": {
     "esbuild": "^0.24.0"

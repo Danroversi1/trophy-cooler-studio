@@ -1,18 +1,17 @@
 // Background render worker: builds its own copy of the model (same trophy.js code, its own geometry cache) and renders
 // on an OffscreenCanvas, so neither the turntable cache nor the final still ever blocks the interactive viewer.
-// Messages in:  {type:'hdri', data, width, height}
-//               {type:'turntable', id, key, state, tex, cam:{radius, phi, target:[x,y,z], fov}, size:{w,h}, n}
-//               {type:'final', id, state, tex, cam:{position:[...], target:[...], fov}, size:{w,h}, samples}
-//               {type:'cancel'}
-// Messages out: {type:'frame', id, key, i, n, bitmap, blob} · {type:'final-progress', id, samples, total, bitmap?}
-//               {type:'final-done', id, blob, samples} · {type:'error', id, message}
+// Messages in:  {type:'turntable', id, key, state, tex, cam:{radius, phi, target:[x,y,z], fov}, size:{w,h}, n}
+//               {type:'detail', id, state, tex, cam:{position:[...], target:[...], fov}, size:{w,h}, ss}
+//               {type:'cancel'} · {type:'ping'}
+// Messages out: {type:'frame', id, key, i, n, bitmap, blob} · {type:'detail-done', id, blob, bitmap, w, h}
+//               {type:'pong'} · {type:'error', id, message}
 import * as THREE from 'three';
-import { WebGLPathTracer } from 'three-gpu-pathtracer';
+import { Reflector } from 'three/addons/objects/Reflector.js';
 import * as T from './trophy.js';
 import * as S from './stage.js';
 
 const canvas = new OffscreenCanvas(4, 4);
-let renderer = null, scene, lights, ground, pte, env = {}, hdri = null, model = null, modelKey = '', texKey = '', tex = {}, job = 0;
+let renderer = null, scene, lights, ground, mirror, env = {}, model = null, modelKey = '', texKey = '', tex = {}, job = 0;
 const tick = () => new Promise((r) => setTimeout(r, 0)); // yield so 'cancel' and new jobs get through
 
 function setup() {
@@ -20,7 +19,9 @@ function setup() {
   renderer = new THREE.WebGLRenderer({ canvas, antialias: true, preserveDrawingBuffer: true });
   renderer.toneMapping = THREE.ACESFilmicToneMapping; renderer.toneMappingExposure = 1.0;
   renderer.shadowMap.enabled = true; renderer.shadowMap.type = THREE.VSMShadowMap; renderer.shadowMap.autoUpdate = false;
-  scene = new THREE.Scene(); lights = S.addLights(scene); ground = S.makeGround(scene); pte = S.makePTExtras(scene);
+  scene = new THREE.Scene(); lights = S.addLights(scene); ground = S.makeGround(scene);
+  mirror = new Reflector(new THREE.CircleGeometry(260, 96), { textureWidth: 1024, textureHeight: 1024, color: 0x1c1e23 }); // detail renders only
+  mirror.rotation.x = -Math.PI / 2; mirror.position.y = -0.02; mirror.visible = false; scene.add(mirror);
 }
 function texture(d) {
   if (!d) return null;
@@ -41,7 +42,7 @@ function sync(st, texMsg, { merged, fast }) {
   ground.rink.visible = st.V.env === 'rink';
   if (!env[st.V.env]) env[st.V.env] = S.pmremEnv(renderer, st.V.env);
   scene.environment = env[st.V.env]; scene.background = new THREE.Color(S.BG[st.V.env]); scene.environmentIntensity = 1;
-  pte.floor.visible = false; pte.softboxes.visible = false;
+  mirror.visible = false;
   renderer.shadowMap.needsUpdate = true;
 }
 
@@ -61,46 +62,31 @@ async function turntable(m) {
   }
 }
 
-async function final(m) {
+// one high-quality frame from the real-time engine: full materials, mirror floor, key-light shadow, supersampled
+async function detail(m) {
   const id = ++job; setup();
-  if (!hdri) { postMessage({ type: 'error', id: m.id, message: 'Studio lighting is still loading' }); return; }
-  sync(m.state, m.tex, { merged: true, fast: false });
-  // path-traced studio: black floor, softbox area lights + the studio HDRI (dimmed), black background
-  ground.contact.visible = false; ground.rink.visible = false; pte.floor.visible = true; pte.softboxes.visible = true;
-  scene.environment = hdri; scene.environmentIntensity = 0.4; scene.background = new THREE.Color(0x000000);
-  renderer.setPixelRatio(1); renderer.setSize(m.size.w, m.size.h, false);
-  const cam = new THREE.PerspectiveCamera(m.cam.fov, m.size.w / m.size.h, 1, 20000);
+  sync(m.state, m.tex, { merged: false, fast: false });
+  const W = m.size.w, H = m.size.h, ss = m.ss || 2, iw = Math.round(W * ss), ih = Math.round(H * ss);
+  renderer.setPixelRatio(1); renderer.setSize(iw, ih, false);
+  mirror.visible = m.state.V.env === 'studio';
+  const cam = new THREE.PerspectiveCamera(m.cam.fov, W / H, 1, 20000);
   cam.position.set(...m.cam.position); cam.lookAt(new THREE.Vector3(...m.cam.target)); cam.updateMatrixWorld();
-  { // instant raster preview of the exact framing while the path tracer warms up
-    ground.contact.visible = true; pte.floor.visible = false; pte.softboxes.visible = false; scene.environment = env.studio || (env.studio = S.pmremEnv(renderer, 'studio')); scene.environmentIntensity = 1;
-    renderer.render(scene, cam); const bitmap = await createImageBitmap(canvas); postMessage({ type: 'final-progress', id: m.id, samples: 0, total: m.samples, bitmap }, [bitmap]);
-    ground.contact.visible = false; pte.floor.visible = true; pte.softboxes.visible = true; scene.environment = hdri; scene.environmentIntensity = 0.4;
-    if (id !== job) return;
-  }
-  const pt = new WebGLPathTracer(renderer);
-  Object.assign(pt, { bounces: 8, transmissiveBounces: 10, filterGlossyFactor: 0.5, renderDelay: 0, fadeDuration: 0, minSamples: 0, dynamicLowRes: false, renderScale: 1 });
-  pt.tiles.set(3, 3); // smaller chunks of GPU/CPU work per call
-  pt.setScene(scene, cam);
-  let last = 0;
-  try {
-    while (pt.samples < m.samples) {
-      await tick(); if (id !== job) return;
-      pt.renderSample();
-      const now = performance.now();
-      if (now - last > 2000) { last = now; const bitmap = await createImageBitmap(canvas); postMessage({ type: 'final-progress', id: m.id, samples: pt.samples, total: m.samples, bitmap }, [bitmap]); }
-      else postMessage({ type: 'final-progress', id: m.id, samples: pt.samples, total: m.samples });
-    }
-    const blob = await canvas.convertToBlob({ type: 'image/png' });
-    postMessage({ type: 'final-done', id: m.id, blob, samples: Math.floor(pt.samples), w: m.size.w, h: m.size.h });
-  } finally { try { pt.dispose(); } catch {} }
+  await tick(); if (id !== job) return;
+  renderer.render(scene, cam);
+  mirror.visible = false;
+  const out = new OffscreenCanvas(W, H), x = out.getContext('2d'); // downsample = antialiasing
+  x.imageSmoothingEnabled = true; x.imageSmoothingQuality = 'high'; x.drawImage(canvas, 0, 0, W, H);
+  const blob = await out.convertToBlob({ type: 'image/png' }), bitmap = await createImageBitmap(out);
+  if (id !== job) { bitmap.close(); return; }
+  postMessage({ type: 'detail-done', id: m.id, blob, bitmap, w: W, h: H }, [bitmap]);
 }
 
 onmessage = (e) => {
   const m = e.data;
   try {
-    if (m.type === 'cancel') job++;
-    else if (m.type === 'hdri') { hdri = new THREE.DataTexture(m.data, m.width, m.height, THREE.RGBAFormat, THREE.FloatType); hdri.mapping = THREE.EquirectangularReflectionMapping; hdri.needsUpdate = true; }
+    if (m.type === 'ping') postMessage({ type: 'pong' });
+    else if (m.type === 'cancel') job++;
     else if (m.type === 'turntable') turntable(m).catch((err) => postMessage({ type: 'error', id: m.id, message: String(err && err.message || err) }));
-    else if (m.type === 'final') final(m).catch((err) => postMessage({ type: 'error', id: m.id, message: String(err && err.message || err) }));
+    else if (m.type === 'detail') detail(m).catch((err) => postMessage({ type: 'error', id: m.id, message: String(err && err.message || err) }));
   } catch (err) { postMessage({ type: 'error', id: m.id, message: String(err && err.message || err) }); }
 };
