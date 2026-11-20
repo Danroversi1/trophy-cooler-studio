@@ -16,7 +16,7 @@ const js = esc(out.outputFiles[0].text), wjs = esc(worker.outputFiles[0].text);
 // Reference images: src/refs/{trophy,cooler}.jpg are embedded in the page, so everyone with the link sees them.
 // If one is missing, the viewer lets people add their own (kept in their browser only).
 const refs = {};
-for (const d of ['trophy', 'cooler', 'oversized']) for (const ext of ['jpg', 'png', 'webp']) { const f = `src/refs/${d}.${ext}`; if (!refs[d] && fs.existsSync(f)) refs[d] = `data:image/${ext === 'jpg' ? 'jpeg' : ext};base64,` + fs.readFileSync(f).toString('base64'); }
+for (const d of ['cooler', 'oversized']) for (const ext of ['jpg', 'png', 'webp']) { const f = `src/refs/${d}.${ext}`; if (!refs[d] && fs.existsSync(f)) refs[d] = `data:image/${ext === 'jpg' ? 'jpeg' : ext};base64,` + fs.readFileSync(f).toString('base64'); }
 const refTag = `<script type="application/json" id="ref-images">${JSON.stringify(refs)}</script>\n`;
 const page = html.replace(/<script type="importmap">[\s\S]*?<\/script>\n/, '')
   .replace(/<script type="module">[\s\S]*?<\/script>/, () => `${refTag}<script type="text/plain" id="render-worker-src">${wjs}</script>\n<script type="module">${js}</script>`);

@@ -191,12 +191,12 @@ body[data-design="trophy"] [data-design]:not([data-design~="trophy"]),body[data-
 .refbox img{flex:1;min-height:0;width:100%;object-fit:contain;padding:22px}
 .refbox .refbar{display:flex;gap:8px;align-items:center;padding:10px 14px;border-top:1px solid #ffffff14;background:#0a0b0e;font-size:11px;color:#a1a8b7;cursor:default}
 .refbox .refbar span{margin-right:auto}.refbox .refbar button{min-height:30px;font-size:10.5px;padding:0 12px}
-.dcards{grid-template-columns:repeat(3,1fr)!important}
+.dcards{grid-template-columns:repeat(2,1fr)!important}
 .dcards button{display:flex;flex-direction:column;align-items:center;gap:5px;padding:5px 5px 7px;line-height:1.1}
 .dcards .dthumb{display:block;width:100%;height:58px;object-fit:cover;border-radius:5px;background:#000;opacity:.7;transition:opacity .15s}
 .dcards button.active .dthumb,.dcards button:hover .dthumb{opacity:1}
 .dcards .dthumb[hidden]{display:none}
-.stage-design{position:absolute;top:20px;right:118px;z-index:2;width:330px;padding:5px;background:#0a0b0edc;border:1px solid #ffffff14;border-radius:11px;backdrop-filter:blur(16px)}
+.stage-design{position:absolute;top:20px;right:118px;z-index:2;width:236px;padding:5px;background:#0a0b0edc;border:1px solid #ffffff14;border-radius:11px;backdrop-filter:blur(16px)}
 .stage-design .dthumb{height:46px}
 .mdesign{display:none}
 @media(max-width:1180px){.stage-design{display:none}.mdesign{display:grid;margin-top:12px;max-width:420px}.mdesign .dthumb{height:64px}}
@@ -259,12 +259,12 @@ body[data-design="trophy"] [data-design]:not([data-design~="trophy"]),body[data-
   <div class="brand" id="brand-mark"><span class="txt">MICHELOB ULTRA</span></div>
   <div class="header-actions"><button id="still">Detail render</button><button id="capture">Capture view</button><button id="export">Export GLB</button></div>
 </header>
-<div class="study-title"><h1>3D study <span id="study-sub">· Trophy cooler — chrome fluted cup on a Michelob blue freezer enclosure</span></h1><div class="seg dcards mdesign" id="design3" role="group" aria-label="Choose a design"><button data-v="trophy"><img class="dthumb" data-d="trophy" alt=""><span>Trophy</span></button><button data-v="cooler"><img class="dthumb" data-d="cooler" alt=""><span>Cooler</span></button><button data-v="oversized"><img class="dthumb" data-d="oversized" alt=""><span>Oversized</span></button></div></div>
+<div class="study-title"><h1>3D study <span id="study-sub">· Trophy cooler — chrome fluted cup on a Michelob blue freezer enclosure</span></h1><div class="seg dcards mdesign" id="design3" role="group" aria-label="Choose a design"><button data-v="cooler"><img class="dthumb" data-d="cooler" alt=""><span>Cooler</span></button><button data-v="oversized"><img class="dthumb" data-d="oversized" alt=""><span>Oversized</span></button></div></div>
 <div class="layout">
 <aside id="panel" aria-label="Studio controls">
 
   <section class="section"><h2>Design</h2>
-    <div class="seg dcards" id="design"><button data-v="trophy"><img class="dthumb" data-d="trophy" alt=""><span>Trophy</span></button><button data-v="cooler"><img class="dthumb" data-d="cooler" alt=""><span>Cooler</span></button><button data-v="oversized"><img class="dthumb" data-d="oversized" alt=""><span>Oversized</span></button></div>
+    <div class="seg dcards" id="design"><button data-v="cooler"><img class="dthumb" data-d="cooler" alt=""><span>Cooler</span></button><button data-v="oversized"><img class="dthumb" data-d="oversized" alt=""><span>Oversized</span></button></div>
     <p class="note" id="design-note"></p>
   </section>
 
@@ -357,18 +357,18 @@ body[data-design="trophy"] [data-design]:not([data-design~="trophy"]),body[data-
   </section>
 
   <section class="section"><h2>Export</h2>
-    <div class="input-row"><label>GLB scope</label><select id="glb-what"><option value="all">Whole trophy</option><option value="cup">Cup + pedestal</option><option value="contents">Bottles + ice</option><option value="enc">Enclosure</option><option value="base">Base</option></select></div>
+    <div class="input-row"><label>GLB scope</label><select id="glb-what"><option value="all">Whole cooler</option><option value="cup">Lid</option><option value="contents">Bottles + ice</option><option value="enc">Enclosure</option><option value="base">Base</option></select></div>
     <button class="wide" id="glb">Download .glb</button>
     <button class="wide ghost" id="copy">Copy dimensions JSON</button>
-    <p class="muted" id="glb-msg">GLB in meters, +Y up, +Z front. Includes the freezer reference volume when exporting the whole trophy.</p>
+    <p class="muted" id="glb-msg">GLB in meters, +Y up, +Z front. Includes the freezer reference volume when exporting the whole freezer cooler.</p>
   </section>
 
   <div class="disclaimer">Visual concept built from the reference render, not a fabrication model. Weights and clearances are estimates that need technical validation. The front-panel lockup is a placeholder until the approved logo artwork is uploaded.</div>
 </aside>
 
-<main id="stage" aria-label="Interactive trophy cooler 3D viewer">
+<main id="stage" aria-label="Interactive Michelob ULTRA cooler 3D viewer">
   <div class="viewbar" id="viewbar"><button data-view="front" class="active">Front</button><button data-view="hero">3/4</button><button data-view="side">Side</button><button data-view="back">Back</button><button data-view="top">Top</button><button data-view="bottles">Bottles</button></div>
-  <div class="seg dcards stage-design" id="design2" role="group" aria-label="Choose a design"><button data-v="trophy"><img class="dthumb" data-d="trophy" alt=""><span>Trophy</span></button><button data-v="cooler"><img class="dthumb" data-d="cooler" alt=""><span>Cooler</span></button><button data-v="oversized"><img class="dthumb" data-d="oversized" alt=""><span>Oversized</span></button></div>
+  <div class="seg dcards stage-design" id="design2" role="group" aria-label="Choose a design"><button data-v="cooler"><img class="dthumb" data-d="cooler" alt=""><span>Cooler</span></button><button data-v="oversized"><img class="dthumb" data-d="oversized" alt=""><span>Oversized</span></button></div>
   <button class="focusbtn" id="fit-btn">Fit view</button>
   <div class="refwin" id="ref-win" role="button" tabindex="0" aria-label="Reference image: click to expand">
     <div class="refhead"><span id="ref-title">Reference</span><button class="refbtn" id="ref-min" aria-label="Minimize the reference window" title="Minimize">–</button></div>
@@ -384,10 +384,10 @@ body[data-design="trophy"] [data-design]:not([data-design~="trophy"]),body[data-
     <div class="bar"><span class="tag" id="still-info"></span><button id="still-again">Re-render</button><button id="still-dl" disabled>Download PNG</button><button id="still-close">Close</button></div></div>
   <div id="still-busy"><div id="still-msg">Rendering…</div><div class="track"><div class="fill" id="still-fill"></div></div></div>
     <div class="perfchip" id="perf" aria-live="off"></div>
-  <div class="loader" id="loading"><div class="loadbox"><div class="spin"></div><h3>Building the trophy</h3><p>Fluted bowl, pedestal and freezer enclosure.</p></div></div>
+  <div class="loader" id="loading"><div class="loadbox"><div class="spin"></div><h3>Building the cooler</h3><p>Stainless body, lid, bottles and ice.</p></div></div>
 </main>
 </div>
-<footer class="wordmark-footer"><span>Trophy Cooler</span></footer>
+<footer class="wordmark-footer"><span>ULTRA Cooler</span></footer>
 <script type="module">
 import * as THREE from 'three';
 import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
@@ -406,10 +406,11 @@ import * as C from './cooler.js';
 const $ = (id) => document.getElementById(id);
 const mk = (w, h) => { const c = document.createElement('canvas'); c.width = w; c.height = h; return c; };
 const KEY = 'trophy-cooler-model-v7';
-let P = { ...T.DEFAULTS, ...C.DEFAULTS, design: 'trophy' }, lock = true;
+let P = { ...T.DEFAULTS, ...C.DEFAULTS, design: 'cooler' }, lock = true;
 const V = { sel: 'cup', isolate: false, xray: false, panel: 0, explode: 0, env: 'studio', spin: false, vis: { cup: true, contents: true, enc: true, fridge: true, base: true } };
 const B = { logo: null, logoSrc: null };
 try { const d = JSON.parse(localStorage.getItem(KEY) || 'null'); if (d) { P = { ...P, ...d.P }; lock = d.lock !== false; V.env = d.env || 'studio'; if (d.logo) B.logoSrc = d.logo; } } catch {}
+if (P.design !== 'cooler' && P.design !== 'oversized') P.design = 'cooler'; // the trophy design has been retired from the site
 let HQ = true; try { HQ = localStorage.getItem('trophy-cooler-hq') !== '0'; } catch {}
 let DIRTY = true, EDIT = false; // render on demand: DIRTY = something changed; EDIT = a shape slider is being dragged
 let saveT; const save = () => { clearTimeout(saveT); saveT = setTimeout(() => { try { localStorage.setItem(KEY, JSON.stringify({ P, lock, env: V.env, logo: B.logoSrc })); } catch {} }, 400); };

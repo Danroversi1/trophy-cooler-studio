@@ -22,6 +22,8 @@ See **Rendering pipeline** below for preview modes, the CPU fallback and the fin
 
 All dimensions are parametric. **Keep the render's proportions** scales the cup with the enclosure width. The freezer fit is checked live, and the box can't be made smaller than the freezer.
 
+> **Site:** the trophy design (chrome cup on the blue freezer base) has been retired from the website; the studio now offers the **Cooler** (with the freezer) and the **Oversized** cooler. Its code stays in `src/trophy.js` because the coolers share its bottles, materials and freezer model.
+
 ## Second design: the cooler
 
 Switch with **Design → Cooler** at the top of the panel. A brushed-stainless chest cooler after the client's reference: blue faceted trim around the rim and the lid, clear crystal lid corners, a front latch, side handles with blue faceted grips, a drain plug, and the Michelob ULTRA logo on the front with a faceted red ribbon.
